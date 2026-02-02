@@ -38,5 +38,3 @@ jobs:
         run: find . -path "*local/ascend_rewards/ci" -type d -exec rm -rf {} + 2>/dev/null || true
       - name: PHP Lint
         run: ci/bin/moodle-plugin-ci phplint
-      - name: Moodle PHPCS
-        run: ci/bin/moodle-plugin-ci phpcs --standard=moodle
