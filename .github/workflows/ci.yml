@@ -34,8 +34,8 @@ jobs:
         run: composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci
       - name: Moodle Plugin CI Install
         run: ci/bin/moodle-plugin-ci install --plugin . --branch main --db-type pgsql --db-host 127.0.0.1 --db-user postgres --no-init --moodle=${{ matrix.moodle-branch }}
-      - name: Remove CI infrastructure before linting
-        run: rm -rf ci
+      - name: Remove CI from installed plugin before linting
+        run: find . -path "*local/ascend_rewards/ci" -type d -exec rm -rf {} + 2>/dev/null || true
       - name: PHP Lint
         run: ci/bin/moodle-plugin-ci phplint
       - name: Moodle PHPCS
