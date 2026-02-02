@@ -147,4 +147,3 @@ echo "- Long line breaks\n";
 echo "- PHPDoc blocks\n";
 echo "- Security validations\n";
 echo "\nRun check_standards.php again to see remaining issues.\n";
->
