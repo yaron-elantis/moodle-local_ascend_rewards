@@ -33,7 +33,7 @@ jobs:
       - name: Install moodle-plugin-ci
         run: composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci
       - name: Moodle Plugin CI Install
-        run: ci/bin/moodle-plugin-ci install --plugin . --branch main --db-type pgsql --db-host 127.0.0.1 --db-user postgres --moodle=${{ matrix.moodle-branch }}
+        run: ci/bin/moodle-plugin-ci install --plugin . --branch main --db-type pgsql --db-host 127.0.0.1 --db-user postgres --no-init --moodle=${{ matrix.moodle-branch }}
       - name: PHP Lint
         run: ci/bin/moodle-plugin-ci phplint
       - name: Moodle PHPCS
