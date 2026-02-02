@@ -39,7 +39,8 @@ function xmldb_local_ascend_rewards_install() {
 
     // Backfill level tokens from stored user level preference on fresh install.
     $now = time();
-    $levelprefs = $DB->get_records_select('user_preferences', "name = :name AND CAST(value AS SIGNED) > 0", ['name' => 'ascend_current_level']);
+    $sql = "SELECT * FROM {user_preferences} WHERE name = :name AND " . $DB->sql_cast_to_int('value') . " > 0";
+    $levelprefs = $DB->get_records_sql($sql, ['name' => 'ascend_current_level']);
 
     foreach ($levelprefs as $pref) {
         $tokens = (int)$pref->value;
