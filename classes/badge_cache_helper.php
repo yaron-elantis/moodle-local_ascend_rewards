@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
  * Helper class for badge activity caching.
  *
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class badge_cache_helper {
@@ -52,7 +52,7 @@ class badge_cache_helper {
         }
 
         $now = time();
-        $cache_record = $DB->get_record('local_ascend_badge_cache', [
+        $cache_record = $DB->get_record('local_ascend_rewards_badge_cache', [
             'userid' => $userid,
             'courseid' => $courseid,
             'badgeid' => $badgeid,
@@ -63,10 +63,10 @@ class badge_cache_helper {
             $cache_record->activities = json_encode($activities);
             $cache_record->metadata = json_encode($metadata);
             $cache_record->timemodified = $now;
-            $DB->update_record('local_ascend_badge_cache', $cache_record);
+            $DB->update_record('local_ascend_rewards_badge_cache', $cache_record);
         } else {
             // Insert new cache
-            $DB->insert_record('local_ascend_badge_cache', (object)[
+            $DB->insert_record('local_ascend_rewards_badge_cache', (object)[
                 'userid' => $userid,
                 'courseid' => $courseid,
                 'badgeid' => $badgeid,
@@ -186,14 +186,14 @@ class badge_cache_helper {
         global $DB;
 
         if ($badgeid) {
-            $DB->delete_records('local_ascend_badge_cache', [
+            $DB->delete_records('local_ascend_rewards_badge_cache', [
                 'userid' => $userid,
                 'courseid' => $courseid,
                 'badgeid' => $badgeid,
             ]);
         } else {
             // Clear all badges for this user/course
-            $DB->delete_records('local_ascend_badge_cache', [
+            $DB->delete_records('local_ascend_rewards_badge_cache', [
                 'userid' => $userid,
                 'courseid' => $courseid,
             ]);
@@ -215,7 +215,7 @@ class badge_cache_helper {
         // Use badgeid as first column in SELECT DISTINCT for uniqueness
         $sql = "SELECT DISTINCT bc.id, c.userid, c.courseid, c.badgeid
                   FROM {local_ascend_rewards_coins} c
-                  LEFT JOIN {local_ascend_badge_cache} bc 
+                  LEFT JOIN {local_ascend_rewards_badge_cache} bc
                     ON bc.userid = c.userid
                    AND bc.courseid = c.courseid
                    AND bc.badgeid = c.badgeid

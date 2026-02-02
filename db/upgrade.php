@@ -20,7 +20,7 @@
  * Handles database schema changes and data migrations.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -191,7 +191,7 @@ function xmldb_local_ascend_rewards_upgrade($oldversion) {
 
     if ($oldversion < 2025120100) {
         // Create badge activity cache table for fast modal loading
-        $table = new xmldb_table('local_ascend_badge_cache');
+        $table = new xmldb_table('local_ascend_rewards_badge_cache');
 
         if (!$dbman->table_exists($table)) {
             // Fields
@@ -222,7 +222,7 @@ function xmldb_local_ascend_rewards_upgrade($oldversion) {
 
     if ($oldversion < 2025120300) {
         // Add villain_id column to avatar_unlocks table and update index
-        $table = new xmldb_table('local_ascend_avatar_unlocks');
+        $table = new xmldb_table('local_ascend_rewards_avatar_unlocks');
 
         if ($dbman->table_exists($table)) {
             // Add villain_id field if missing
@@ -278,10 +278,10 @@ function xmldb_local_ascend_rewards_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025120800) {
-        // Create new local_ascend_xp table for SEPARATE XP tracking
+        // Create new local_ascend_rewards_xp table for SEPARATE XP tracking
         // XP is PERMANENT and never decreases. Used for all rankings.
         // Coins can be spent. Rankings NEVER use coins.
-        $table = new xmldb_table('local_ascend_xp');
+        $table = new xmldb_table('local_ascend_rewards_xp');
 
         if (!$dbman->table_exists($table)) {
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
@@ -309,8 +309,8 @@ function xmldb_local_ascend_rewards_upgrade($oldversion) {
         );
 
         foreach ($course_xp as $record) {
-            if (!$DB->record_exists('local_ascend_xp', ['userid' => $record->userid, 'courseid' => $record->courseid])) {
-                $DB->insert_record('local_ascend_xp', (object)[
+            if (!$DB->record_exists('local_ascend_rewards_xp', ['userid' => $record->userid, 'courseid' => $record->courseid])) {
+                $DB->insert_record('local_ascend_rewards_xp', (object)[
                     'userid' => $record->userid,
                     'courseid' => $record->courseid,
                     'xp' => $record->xp,
@@ -328,8 +328,8 @@ function xmldb_local_ascend_rewards_upgrade($oldversion) {
         );
 
         foreach ($site_xp as $record) {
-            if (!$DB->record_exists('local_ascend_xp', ['userid' => $record->userid, 'courseid' => 0])) {
-                $DB->insert_record('local_ascend_xp', (object)[
+            if (!$DB->record_exists('local_ascend_rewards_xp', ['userid' => $record->userid, 'courseid' => 0])) {
+                $DB->insert_record('local_ascend_rewards_xp', (object)[
                     'userid' => $record->userid,
                     'courseid' => 0,
                     'xp' => $record->xp,
@@ -359,16 +359,16 @@ function xmldb_local_ascend_rewards_upgrade($oldversion) {
 
         foreach ($levelprefs as $pref) {
             $tokens = (int)$pref->value;
-            $existing = $DB->get_record('local_ascend_level_tokens', ['userid' => $pref->userid]);
+            $existing = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $pref->userid]);
 
             if ($existing) {
                 if ((int)$existing->tokens_available < $tokens) {
                     $existing->tokens_available = $tokens;
                     $existing->timemodified = $now;
-                    $DB->update_record('local_ascend_level_tokens', $existing);
+                    $DB->update_record('local_ascend_rewards_level_tokens', $existing);
                 }
             } else {
-                $DB->insert_record('local_ascend_level_tokens', (object) [
+                $DB->insert_record('local_ascend_rewards_level_tokens', (object) [
                     'userid' => $pref->userid,
                     'tokens_available' => $tokens,
                     'tokens_used' => 0,

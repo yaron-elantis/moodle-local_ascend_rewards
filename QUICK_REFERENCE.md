@@ -42,7 +42,7 @@ C:\laragon\bin\composer\composer.bat install
 
 ### File Header (REQUIRED)
 ```php
-<?php
+<php
 // This file is part of Moodle - https://moodle.org/
 // ... GPL license block ...
 defined('MOODLE_INTERNAL') || die();
@@ -90,7 +90,7 @@ $record = $DB->get_record('table', array('id' => $id));
 $records = $DB->get_records('table', array('active' => 1));
 
 // Execute query
-$sql = 'SELECT * FROM {table} WHERE id = ?';
+$sql = 'SELECT * FROM {table} WHERE id = ';
 $record = $DB->get_record_sql($sql, array($id));
 
 // Insert

@@ -18,7 +18,7 @@
  * Admin audit trail page for Ascend Rewards.
  *
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -110,9 +110,9 @@ echo '</div>';
 
 // Course filter
 $courses = $DB->get_records_sql("
-    SELECT DISTINCT c.id, c.fullname 
-    FROM {course} c 
-    JOIN {local_ascend_rewards_coins} arc ON arc.courseid = c.id 
+    SELECT DISTINCT c.id, c.fullname
+    FROM {course} c
+    JOIN {local_ascend_rewards_coins} arc ON arc.courseid = c.id
     WHERE c.id > 1
     ORDER BY c.fullname ASC
 ");
@@ -260,8 +260,8 @@ echo '</div>';
 echo '<div style="margin-top: 30px; padding: 15px; background: #f9f9f9; border-radius: 5px;">';
 echo '<h3>Statistics</h3>';
 
-$stats_sql = "SELECT status, COUNT(*) as count 
-              FROM {local_ascend_rewards_badgerlog} 
+$stats_sql = "SELECT status, COUNT(*) as count
+              FROM {local_ascend_rewards_badgerlog}
               WHERE 1=1";
 $stats_params = [];
 

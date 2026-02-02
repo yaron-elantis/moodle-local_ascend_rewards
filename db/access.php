@@ -18,7 +18,7 @@
  * Capability definitions for Ascend Rewards plugin.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

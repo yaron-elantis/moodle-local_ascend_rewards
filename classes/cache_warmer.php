@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * Pre-loads badge cache entries that a user is close to earning.
  *
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cache_warmer {
@@ -63,7 +63,7 @@ class cache_warmer {
             foreach ($close_badges as $badgeid) {
                 // Check if already cached
                 if (
-                    !$DB->record_exists('local_ascend_badge_cache', [
+                    !$DB->record_exists('local_ascend_rewards_badge_cache', [
                     'userid' => $userid,
                     'courseid' => $cid,
                     'badgeid' => $badgeid,

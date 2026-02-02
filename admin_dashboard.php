@@ -18,7 +18,7 @@
  * Admin dashboard page for Ascend Rewards.
  *
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -78,8 +78,8 @@ echo '<style>
 .apx-why-title{color:#FF9500;font-size:16px;font-weight:600;margin:0 0 8px 0;}
 .apx-why-text{color:#A5B4D6;margin:0;font-size:14px;line-height:1.5;}
 /* Celebration banner and level-up pulse (copied from index.php) */
-.aa-congrats{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:18px;}
-.aa-congrats video{width:19.9cm;height:11.01cm;max-width:100%;object-fit:contain;border-radius:10px;}
+.aa-congrats{display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:18px;text-align:center;}
+.aa-congrats video{width:19.9cm;height:11.01cm;max-width:100%;object-fit:contain;border-radius:10px;margin:0 auto;}
 .xp-ring-container{position:relative;width:80px;height:80px;margin:0 auto 12px;}
 .level-up-flash{animation:levelUpPulse 2s infinite;}
 @keyframes levelUpPulse{0%{transform:scale(1);box-shadow:0 0 0 rgba(255,149,0,0.25)}50%{transform:scale(1.04);box-shadow:0 10px 40px rgba(255,149,0,0.1)}100%{transform:scale(1);box-shadow:0 0 0 rgba(255,149,0,0.0)}}
@@ -97,7 +97,7 @@ echo '<h1>Apex Rewards Admin Dashboard</h1>';
 // Add site-like celebration banner just below the heading (hidden by default)
 echo '<div id="adminApexCongrats" class="aa-congrats" style="display:none;">';
 echo '  <video id="adminApexCongratsVideo" autoplay muted loop playsinline><source src="' . (new moodle_url('/local/ascend_rewards/pix/reward_animation.mp4'))->out(false) . '" type="video/mp4"></video>';
-echo '  <div><div style="font-weight:800;font-size:18px;" id="adminApexCongratsText">New badge earned this week!</div><div class="aa-muted">Keep up the momentum — more Ascend Assets are on the way.</div></div>';
+echo '  <div><div style="font-weight:800;font-size:18px;" id="adminApexCongratsText">New badge earned this week!</div><div class="aa-muted">Keep up the momentum  more Ascend Assets are on the way.</div></div>';
 echo '</div>';
 
 // Define available tabs
@@ -141,13 +141,14 @@ foreach ($badge_definitions as $name => $id) {
 // Store POST messages to display after rendering header/tabs
 $post_message = '';
 $post_message_type = '';
+$handled_post = false;
 
 // Handle POST requests for award/revoke/gift from any tab
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$ispost = data_submitted();
+if ($ispost) {
     global $DB;
-    // Use raw POST value instead of optional_param to preserve underscores
-    $action = isset($_POST['action']) ? $_POST['action'] : '';
-    echo '<!-- DEBUG: POST received, action=' . htmlspecialchars($action) . ' -->';
+    require_sesskey();
+    $action = optional_param('action', '', PARAM_ALPHANUMEXT);
 
 
 
@@ -165,9 +166,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    $handled_actions = ['gift_coins', 'gift_tokens', 'award', 'revoke'];
+    if (in_array($action, $handled_actions, true)) {
+        $handled_post = true;
+    }
+
     $giftactions = ['gift_coins', 'gift_tokens'];
     if (in_array($action, $giftactions, true)) {
-        $post_message = 'PRO Version only.';
+        $post_message = get_string('pro_version_only_message', 'local_ascend_rewards');
         $post_message_type = 'error';
     } else if (($action === 'gift_coins' || $action === 'gift_tokens') && (!$userid || $amount <= 0)) {
         $post_message = 'Invalid user or amount.';
@@ -204,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'timecreated' => time(),
                         'awarded_by' => $USER->id,
                     ], false);
-                    $post_message = '✅ <strong>Gift Awarded!</strong><br>Gifted <strong>' . $amount . ' coin' . ($amount > 1 ? 's' : '') . '</strong> to <strong>' . $username . '</strong>';
+                    $post_message = ' <strong>Gift Awarded!</strong><br>Gifted <strong>' . $amount . ' coin' . ($amount > 1 ? 's' : '') . '</strong> to <strong>' . $username . '</strong>';
                     $post_message_type = 'success';
                 }
             } catch (Exception $e) {
@@ -215,13 +221,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Gift tokens
             try {
                 // Check if user has a token record
-                $token_record = $DB->get_record('local_ascend_level_tokens', ['userid' => $userid]);
+                $token_record = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $userid]);
 
                 if ($token_record) {
                     // Update existing record - add to tokens_available
                     $token_record->tokens_available += $amount;
                     $token_record->timemodified = time();
-                    $DB->update_record('local_ascend_level_tokens', $token_record);
+                    $DB->update_record('local_ascend_rewards_level_tokens', $token_record);
                     $new_available = $token_record->tokens_available;
                 } else {
                     // Create new record
@@ -231,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'tokens_used' => 0,
                         'timemodified' => time(),
                     ];
-                    $DB->insert_record('local_ascend_level_tokens', $token_record);
+                    $DB->insert_record('local_ascend_rewards_level_tokens', $token_record);
                     $new_available = $amount;
                 }
 
@@ -244,7 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'timecreated' => time(),
                     'awarded_by' => $USER->id,
                 ], false);
-                $post_message = '✅ <strong>Gift Awarded!</strong><br>Gifted <strong>' . $amount . ' token' . ($amount > 1 ? 's' : '') . '</strong> to <strong>' . $username . '</strong>';
+                $post_message = ' <strong>Gift Awarded!</strong><br>Gifted <strong>' . $amount . ' token' . ($amount > 1 ? 's' : '') . '</strong> to <strong>' . $username . '</strong>';
                 $post_message_type = 'success';
             } catch (Exception $e) {
                 $post_message = 'Error gifting tokens: ' . $e->getMessage();
@@ -256,7 +262,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $userid_str = optional_param('userid', '', PARAM_TEXT);
         $courseid_str = optional_param('courseid', '', PARAM_TEXT);
         $badgeid_str = optional_param('badgeid', '', PARAM_TEXT);
-        echo '<!-- DEBUG: award/revoke - userid_str=' . htmlspecialchars($userid_str) . ', courseid_str=' . htmlspecialchars($courseid_str) . ', badgeid_str=' . htmlspecialchars($badgeid_str) . ' -->';
 
         // Parse IDs - handle both "Name (ID: X)" format and plain "X" format
         $userid = 0;
@@ -286,12 +291,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        echo '<!-- DEBUG: parsed ids -> userid=' . $userid . ', courseid=' . $courseid . ', badgeid=' . $badgeid . ' -->';
-
         if (!$userid || !$courseid || !$badgeid) {
-            echo '<!-- DEBUG: Validation failed - userid=' . $userid . ', courseid=' . $courseid . ', badgeid=' . $badgeid . ' -->';
-            $post_message = 'Invalid selection. Please select from the dropdown.<br>';
-            $post_message .= 'DEBUG: userid=' . $userid . ' (input: "' . htmlspecialchars($userid_str) . '"), courseid=' . $courseid . ' (input: "' . htmlspecialchars($courseid_str) . '"), badgeid=' . $badgeid . ' (input: "' . htmlspecialchars($badgeid_str) . '")';
+            $post_message = 'Invalid selection. Please select from the dropdown.';
             $post_message_type = 'error';
         } else if ($action === 'award') {
             // Validate course and badge before attempting award
@@ -306,7 +307,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Ensure this badge actually awards coins (only active demo badges return > 0)
                 $coins_for_badge = \local_ascend_rewards\badge_awarder::coins_for_badge($badgeid);
-                echo '<!-- DEBUG: coins_for_badge=' . $coins_for_badge . ' -->';
                 if ($coins_for_badge <= 0) {
                     $post_message = 'This badge is inactive and cannot be awarded in the demo set.';
                     $post_message_type = 'error';
@@ -317,7 +317,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'badgeid' => $badgeid,
                         'courseid' => $courseid,
                     ]);
-                    echo '<!-- DEBUG: already_awarded=' . ($already_awarded ? 'yes' : 'no') . ' -->';
 
                     if ($already_awarded) {
                         $post_message = 'Badge already awarded for this user/course.';
@@ -329,7 +328,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             'badgeid' => $badgeid,
                             'courseid' => $courseid,
                         ]);
-                        echo '<!-- DEBUG: award count before=' . $before_awards . ' -->';
 
                         // Award the badge
                         \local_ascend_rewards\badge_awarder::award_coins($userid, $badgeid, $courseid);
@@ -339,7 +337,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             'badgeid' => $badgeid,
                             'courseid' => $courseid,
                         ]);
-                        echo '<!-- DEBUG: award count after=' . $after_awards . ' -->';
 
                         if ($after_awards > $before_awards) {
                             $post_message = '<strong>Badge Awarded!</strong><br>Awarded <strong>' . $badgename . '</strong> to <strong>' . $username . '</strong>';
@@ -348,8 +345,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $post_message = 'Award attempt completed but no database record was created. Please verify the badge is active, the course ID is greater than 1, and check plugin logs.';
                             $post_message_type = 'error';
                         }
-
-                        echo '<!-- DEBUG: award branch reached, post_message_type=' . $post_message_type . ' -->';
                     }
                 }
             }
@@ -373,17 +368,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'message' => "Badge manually revoked by admin",
                 'timecreated' => time(),
             ], false);
-            $post_message = '✅ <strong>Badge Revoked!</strong><br>Revoked <strong>' . $badgename . '</strong> from <strong>' . $username . '</strong>';
+            $post_message = ' <strong>Badge Revoked!</strong><br>Revoked <strong>' . $badgename . '</strong> from <strong>' . $username . '</strong>';
             $post_message_type = 'success';
         }
     }
 }
 
-// Display any POST messages
-echo '<!-- DEBUG: post_message="' . htmlspecialchars($post_message) . '", type="' . htmlspecialchars($post_message_type) . '" -->';
-
 // Fallback: ensure the admin sees something if POST produced no message
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $post_message === '') {
+if ($ispost && $handled_post && $post_message === '') {
     $post_message = 'Award request processed but no status message was returned. Please re-check the input and database records.';
     $post_message_type = 'error';
 }
@@ -420,13 +412,13 @@ switch ($tab) {
         $top_badge_id = $top_badge ? reset($top_badge)->badgeid : null;
         $top_badge_count = $top_badge ? reset($top_badge)->cnt : 0;
         $badge_icons = [
-            4 => '🏅', 6 => '🚀', 5 => '⏩', 8 => '🧭',
-            9 => '⏰', 11 => '🎯', 10 => '🔥', 12 => '⏳',
-            13 => '💡', 15 => '📈', 14 => '🐯', 16 => '🏆',
-            19 => '🦅', 17 => '🎓', 7 => '✅', 20 => '👑',
+            4 => '', 6 => '', 5 => '', 8 => '',
+            9 => '', 11 => '', 10 => '', 12 => '',
+            13 => '', 15 => '', 14 => '', 16 => '',
+            19 => '', 17 => '', 7 => '', 20 => '',
         ];
         $top_badge_name = $top_badge_id && isset($badge_names[$top_badge_id]) ? $badge_names[$top_badge_id] : ($top_badge_id ?: 'N/A');
-        $top_badge_icon = $top_badge_id && isset($badge_icons[$top_badge_id]) ? $badge_icons[$top_badge_id] : '🏅';
+        $top_badge_icon = $top_badge_id && isset($badge_icons[$top_badge_id]) ? $badge_icons[$top_badge_id] : '';
         // Modern card UI
         echo '<style>
         .apex-metrics-row { display: flex; gap: 32px; margin-bottom: 32px; }
@@ -449,12 +441,12 @@ switch ($tab) {
         </style>';
         echo '<div class="apex-metrics-row">';
         echo '<div class="apex-metric-card">'
-            . '<span class="apex-metric-icon">🏅</span>'
+            . '<span class="apex-metric-icon"></span>'
             . '<div class="apex-metric-label">Total Badges Awarded</div>'
             . '<div class="apex-metric-value">' . $total_badges . '</div>'
         . '</div>';
         echo '<div class="apex-metric-card">'
-            . '<span class="apex-metric-icon">👤</span>'
+            . '<span class="apex-metric-icon"></span>'
             . '<div class="apex-metric-label">Users with Badges</div>'
             . '<div class="apex-metric-value">' . $users_with_badges . '</div>'
         . '</div>';
@@ -473,14 +465,14 @@ switch ($tab) {
         foreach ($badge_counts as $row) {
             $bid = $row->badgeid;
             $bname = isset($badge_names[$bid]) ? $badge_names[$bid] : 'Badge #' . $bid;
-            $bicon = isset($badge_icons[$bid]) ? $badge_icons[$bid] : '🏅';
+            $bicon = isset($badge_icons[$bid]) ? $badge_icons[$bid] : '';
             echo '<tr><td style="padding:8px 12px;">' . $bicon . ' ' . htmlspecialchars($bname ?: '') . '</td><td style="padding:8px 12px;">' . $row->cnt . '</td></tr>';
         }
         echo '</table>';
 
         // --- User leaderboard ---
         echo '<h3>User Leaderboard (by XP)</h3>';
-        $leaders = $DB->get_records_sql("SELECT x.userid, x.xp FROM {local_ascend_xp} x JOIN {user} u ON u.id = x.userid WHERE x.courseid = 0 AND x.xp > 0 AND u.suspended = 0 AND u.deleted = 0 ORDER BY x.xp DESC LIMIT 10");
+        $leaders = $DB->get_records_sql("SELECT x.userid, x.xp FROM {local_ascend_rewards_xp} x JOIN {user} u ON u.id = x.userid WHERE x.courseid = 0 AND x.xp > 0 AND u.suspended = 0 AND u.deleted = 0 ORDER BY x.xp DESC LIMIT 10");
         echo '<table style="margin-bottom:32px;width:100%;max-width:700px;border-collapse:collapse;">';
         echo '<tr style="background:#f5f7fa;"><th style="padding:8px 12px;">Rank</th><th style="padding:8px 12px;">User</th><th style="padding:8px 12px;">Total XP</th></tr>';
         $rank = 1;
@@ -531,6 +523,7 @@ switch ($tab) {
         echo '<p>Select a badge to preview its award modal:</p>';
 
         echo '<form method="post" id="testModalForm">';
+        echo '<input type="hidden" name="sesskey" value="' . sesskey() . '">';
         echo '<div style="display:flex; gap:15px; align-items:flex-end; margin-bottom:15px; flex-wrap:wrap;">';
         echo '<div>';
         echo '<label style="display:block; margin-bottom:5px; font-weight:600;">Badge:</label>';
@@ -540,7 +533,7 @@ switch ($tab) {
         }
         echo '</select>';
         echo '</div>';
-        echo '<button type="button" onclick="triggerTestModal()" class="btn btn-primary" style="height:38px;">🎖️ Show Modal</button>';
+        echo '<button type="button" onclick="triggerTestModal()" class="btn btn-primary" style="height:38px;"> Show Modal</button>';
         echo '</div>';
         echo '</form>';
         echo '</div>';
@@ -559,7 +552,7 @@ switch ($tab) {
         echo '            <video id="apxRewardVideo" class="apx-badge-video" playsinline loop>';
         echo '                <source id="apxRewardVideoSource" src="" type="video/mp4">';
         echo '            </video>';
-        echo '            <button id="apxVideoFullscreen" class="apx-video-fullscreen-btn" title="Fullscreen">⛶</button>';
+        echo '            <button id="apxVideoFullscreen" class="apx-video-fullscreen-btn" title="Fullscreen"></button>';
         echo '        </div>';
         echo '        <div class="apx-badge-title-block">';
         echo '            <h2 id="apxBName" class="apx-badge-name">Badge Name Placeholder</h2>';
@@ -608,7 +601,7 @@ switch ($tab) {
 <script>
 (function(){
   function q(sel){return document.querySelector(sel);}
-  
+
     const modal = q("#apxModal");
     const backdrop = q("#apxModalBackdrop");
     const closeBtn = q("#apxModalClose");
@@ -618,9 +611,9 @@ switch ($tab) {
   const video = q("#apxRewardVideo");
   const videoSource = q("#apxRewardVideoSource");
   const fullscreenBtn = q("#apxVideoFullscreen");
-  
+
   console.log("Modal elements found:", {modal, backdrop, closeBtn, video, videoSource, fullscreenBtn});
-  
+
   // Map badge IDs to their video files
   const badgeVideos = {
     6: "Getting Started/getting_started_2.mp4",
@@ -640,7 +633,7 @@ switch ($tab) {
     7: "Mission Complete/mission_complete_1.mp4",
     20: "Learning Legend/learning_legend_5.mp4"
   };
-  
+
   // Badge categories
   const badgeCategories = {
     6: "Progress", 4: "Progress", 5: "Progress", 8: "Progress",
@@ -648,7 +641,7 @@ switch ($tab) {
     13: "Quality & Growth", 15: "Quality & Growth", 14: "Quality & Growth", 16: "Quality & Growth",
     19: "Quality & Growth", 17: "Mastery", 7: "Mastery", 20: "Mastery"
   };
-  
+
   // Badge descriptions
   const badgeDescriptions = {
     6: "First activity completed",
@@ -668,7 +661,7 @@ switch ($tab) {
     7: "All course activities completed",
     20: "Earn 2+ badges in Mastery category"
   };
-  
+
   function openModal(badgeData){
     console.log("openModal called with:", badgeData);
     const d = badgeData;
@@ -677,17 +670,17 @@ switch ($tab) {
     q("#apxBCourse").textContent = d.course || "";
     q("#apxBWhen").textContent = d.when || "";
     q("#apxBWhy").textContent = d.why || "";
-    
+
     // Extract coins value from the text (e.g., "+10 Ascend Assets" -> 10)
     const coinsText = d.coins || "+0 Ascend Assets";
     const coins = parseInt(coinsText.match(/\d+/)) || 0;
-    
+
     // Calculate badge XP (coins / 2)
     const badgeXp = Math.floor(coins / 2);
-    
+
     q("#apxBXP").textContent = "+" + badgeXp + " XP";
     q("#apxBCoins").textContent = coinsText;
-    
+
         // Hide activities/badges for preview; we'll fetch if applicable
         q("#apxBActivities").style.display = "none";
         q("#apxBBadges").style.display = "none";
@@ -696,12 +689,12 @@ switch ($tab) {
         const badgeId = parseInt(d.badgeid) || 0;
         const metaBadges = [8, 12, 16, 20];
         const isMeta = metaBadges.includes(badgeId);
-        
+
         // For meta badges, always hide qualifying activities section
         if (isMeta) {
             q('#apxBActivities').style.display = 'none';
         }
-        
+
         if (courseid > 0 && !isMeta) {
             fetch(M.cfg.wwwroot + '/local/ascend_rewards/get_activities.php?courseid=' + courseid + '&badgeid=' + badgeId)
                 .then(response => response.json())
@@ -721,7 +714,7 @@ switch ($tab) {
                             badgesList.innerHTML = '';
                             data.activities.forEach(function(badge) {
                                 const li = document.createElement('li');
-                                li.textContent = '🏅 ' + badge;
+                                li.textContent = ' ' + badge;
                                 li.style.color = '#FFD700';
                                 badgesList.appendChild(li);
                             });
@@ -734,7 +727,7 @@ switch ($tab) {
                             data.activities.forEach(function(activity, index) {
                                 if (index < 15) {
                                     const li = document.createElement('li');
-                                    li.textContent = '✓ ' + activity;
+                                    li.textContent = ' ' + activity;
                                     li.style.color = '#A5B4D6';
                                     activitiesList.appendChild(li);
                                 }
@@ -763,11 +756,11 @@ switch ($tab) {
                 q('#apxBBadges').style.display = 'none';
             }
         }
-    
+
     // Load the correct video for this badge
     const videoFile = badgeVideos[d.badgeid] || "reward_animation_2.mp4";
     const videoUrl = M.cfg.wwwroot + "/local/ascend_rewards/pix/" + videoFile;
-    
+
     if(video && videoSource){
       videoSource.src = videoUrl;
       video.load();
@@ -789,7 +782,7 @@ switch ($tab) {
         backdrop.style.display="block";
     document.body.style.overflow="hidden";
   }
-  
+
   function closeModal(){
     modal.style.display="none";
     backdrop.style.display="none";
@@ -806,7 +799,7 @@ switch ($tab) {
             try{congratsVideo.currentTime = 0;}catch(e){}
         }
   }
-  
+
   // Event listeners
   if(closeBtn) closeBtn.addEventListener("click", closeModal);
   if(backdrop) backdrop.addEventListener("click", closeModal);
@@ -815,11 +808,11 @@ switch ($tab) {
       video.requestFullscreen();
     }
   });
-  
+
   // Make openModal available globally for the trigger function
   window.openBadgeModal = openModal;
   console.log("window.openBadgeModal assigned:", typeof window.openBadgeModal);
-  
+
     window.triggerTestModal = function() {
         // Support both the preview select (badgeModalPreviewSelect) and the test select (testBadgeSelect)
         const badgeSelect = document.getElementById("badgeModalPreviewSelect") || document.getElementById("testBadgeSelect");
@@ -1036,7 +1029,7 @@ EOT;
 function validateAwardForm() {
     var courseid = document.getElementById("courseid_input").value;
     var badgeid = document.getElementById("badgeid_input").value;
-    
+
     if (!courseid || !courseid.includes("(ID:")) {
         alert("Please select a valid course from the dropdown");
         return false;
@@ -1060,8 +1053,9 @@ function validateAwardForm() {
         $all_users = $DB->get_records_sql("SELECT id, firstname, lastname, firstnamephonetic, lastnamephonetic, middlename, alternatename, username FROM {user} WHERE suspended = 0 AND deleted = 0 ORDER BY lastname, firstname");
 
         echo '<div class="card" style="margin-bottom:30px;">';
-        echo '<h3>🎁 Gift Coins</h3>';
+        echo '<h3> Gift Coins</h3>';
         echo '<form method="post" style="padding: 20px; background: #f9f9f9; border-radius: 8px;">';
+        echo '<input type="hidden" name="sesskey" value="' . sesskey() . '">';
         echo '<input type="hidden" name="action" value="gift_coins">';
         echo '<div class="form-group">';
         echo '<label class="form-label">Select User:</label>';
@@ -1077,13 +1071,14 @@ function validateAwardForm() {
         echo '<label class="form-label">Coin Amount:</label>';
         echo '<input type="number" name="amount" class="form-input" min="1" max="10000" required placeholder="Enter amount..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">';
         echo '</div>';
-        echo '<button type="submit" class="btn btn-primary" style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🎁 Gift Coins</button>';
+        echo '<button type="submit" class="btn btn-primary" style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;"> Gift Coins</button>';
         echo '</form>';
         echo '</div>';
 
         echo '<div class="card">';
-        echo '<h3>⭐ Gift Tokens</h3>';
+        echo '<h3> Gift Tokens</h3>';
         echo '<form method="post" style="padding: 20px; background: #f9f9f9; border-radius: 8px;">';
+        echo '<input type="hidden" name="sesskey" value="' . sesskey() . '">';
         echo '<input type="hidden" name="action" value="gift_tokens">';
         echo '<div class="form-group">';
         echo '<label class="form-label">Select User:</label>';
@@ -1099,13 +1094,13 @@ function validateAwardForm() {
         echo '<label class="form-label">Token Amount:</label>';
         echo '<input type="number" name="amount" class="form-input" min="1" max="100" required placeholder="Enter amount..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">';
         echo '</div>';
-        echo '<button type="submit" class="btn btn-primary" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">⭐ Gift Tokens</button>';
+        echo '<button type="submit" class="btn btn-primary" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;"> Gift Tokens</button>';
         echo '</form>';
         echo '</div>';
 
         // Award Audit Log - Show recent gifts with who gave them
         echo '<div class="card" style="margin-top: 40px;">';
-        echo '<h3>📋 Award Audit Log</h3>';
+        echo '<h3> Award Audit Log</h3>';
         echo '<p style="color: #666; font-size: 14px;">Recent gifts and awards with tracking of who gave them.</p>';
 
         $audit_logs = $DB->get_records_sql("
@@ -1155,8 +1150,9 @@ function validateAwardForm() {
     case 'cleanup':
         echo '<h2>Cleanup Tools</h2>';
         echo '<div class="card">';
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-            $action = required_param('action', PARAM_ALPHA);
+        if ($ispost && $action !== '') {
+            $handled_post = true;
+            $action = required_param('action', PARAM_ALPHANUMEXT);
             if ($action === 'cleanup_orphaned') {
                 // Run cleanup orphaned badges
                 global $DB;
@@ -1196,6 +1192,7 @@ function validateAwardForm() {
             }
         }
         echo '<form method="post">';
+        echo '<input type="hidden" name="sesskey" value="' . sesskey() . '">';
         echo '<p><strong>Cleanup Orphaned Badges:</strong> This tool removes badge award records that are linked to courses which no longer exist in the system. Orphaned badges can occur when courses are deleted after badges have been awarded. Running this cleanup ensures the database remains clean and prevents issues with reports or statistics.</p>';
         echo '<p><strong>Cleanup Deleted Users:</strong> This tool removes all badge award records for users who have been deleted from the system. Deleted users should not have any plugin data remaining.</p>';
         echo '<p><strong>Note:</strong> Suspended users are automatically excluded from all plugin functionality (leaderboards, debug info, XP rewards, etc.) and do not appear in any results.</p>';
@@ -1324,7 +1321,7 @@ function validateAwardForm() {
 
                 if ($award_count > 0) {
                     echo '<div class="alert alert-success">';
-                    echo '<h4>✅ Badge Awarded ' . $award_count . ' Time(s)</h4>';
+                    echo '<h4> Badge Awarded ' . $award_count . ' Time(s)</h4>';
 
                     // Show all awards
                     foreach ($all_awards as $idx => $award) {
@@ -1334,7 +1331,7 @@ function validateAwardForm() {
                     echo '</div>';
                 } else {
                     echo '<div class="alert alert-error">';
-                    echo '<h4>⚠️ Badge NOT Awarded</h4>';
+                    echo '<h4> Badge NOT Awarded</h4>';
                     echo '<p>This badge has not been awarded yet.</p>';
                     echo '</div>';
                 }
@@ -1388,7 +1385,7 @@ function validateAwardForm() {
                 $max_consecutive_passes = 0;
                 $first_attempt_passes = 0;
 
-                echo '<h4>📋 STEP 1: Retrieve Course Activity Data</h4>';
+                echo '<h4> STEP 1: Retrieve Course Activity Data</h4>';
                 if ($courseid == 0) {
                     echo '<p>Found <strong>' . $total_count . ' activities</strong> with completion tracking across all courses.</p>';
                 } else {
@@ -1477,20 +1474,20 @@ function validateAwardForm() {
                         }
                         echo '<td>' . htmlspecialchars($comp->modname) . '</td>';
                         echo '<td>' . strtoupper($comp->modname) . '</td>';
-                        echo '<td>' . ($is_completed ? '✓ ' . $completed_date : '✗') . '</td>';
+                        echo '<td>' . ($is_completed ? ' ' . $completed_date : '') . '</td>';
                         echo '<td>' . $grade . ' / ' . $grademax . '</td>';
                         echo '<td>' . $pass_grade . '</td>';
-                        echo '<td>' . ($is_passed ? '✓ Pass' : '✗') . '</td>';
+                        echo '<td>' . ($is_passed ? ' Pass' : '') . '</td>';
                         echo '<td>' . $due_date . '</td>';
-                        echo '<td>' . ($before_deadline ? '✓ Yes' : ($actual_deadline > 0 ? '✗ No' : '-')) . '</td>';
-                        echo '<td>' . ($is_early ? '✓ Yes' : '-') . '</td>';
+                        echo '<td>' . ($before_deadline ? ' Yes' : ($actual_deadline > 0 ? ' No' : '-')) . '</td>';
+                        echo '<td>' . ($is_early ? ' Yes' : '-') . '</td>';
                         echo '</tr>';
                     }
                     echo '</table>';
                 }
 
                 // STEP 2
-                echo '<h4>🎯 STEP 2: Apply Badge Logic for \'' . htmlspecialchars($info['name']) . '\'</h4>';
+                echo '<h4> STEP 2: Apply Badge Logic for \'' . htmlspecialchars($info['name']) . '\'</h4>';
                 echo '<p><strong>Requirement:</strong> ' . htmlspecialchars($info['desc']) . '</p>';
                 echo '<p><strong>Detection Method:</strong> ' . htmlspecialchars($info['method']) . '()</p>';
 
@@ -1612,19 +1609,20 @@ function validateAwardForm() {
 
                 if ($qualifies) {
                     echo '<div class="alert alert-success">';
-                    echo '<h4>✅ QUALIFICATION CHECK: PASS</h4>';
+                    echo '<h4> QUALIFICATION CHECK: PASS</h4>';
                     echo '<p>User meets all requirements for \'' . htmlspecialchars($info['name']) . '\'</p>';
                     echo '<form method="post" style="display:inline;">';
+                    echo '<input type="hidden" name="sesskey" value="' . sesskey() . '">';
                     echo '<input type="hidden" name="userid" value="' . htmlspecialchars($userid_str) . '">';
                     echo '<input type="hidden" name="courseid" value="' . htmlspecialchars($courseid_str) . '">';
                     echo '<input type="hidden" name="badgeid" value="' . htmlspecialchars($badgeid_str) . '">';
                     echo '<input type="hidden" name="action" value="award">';
-                    echo '<button type="submit" class="btn btn-primary">🎖️ Award This Badge</button>';
+                    echo '<button type="submit" class="btn btn-primary"> Award This Badge</button>';
                     echo '</form>';
                     echo '</div>';
                 } else {
                     echo '<div class="alert alert-error">';
-                    echo '<h4>❌ QUALIFICATION CHECK: FAIL</h4>';
+                    echo '<h4> QUALIFICATION CHECK: FAIL</h4>';
                     echo '<p>User does NOT meet requirements for \'' . htmlspecialchars($info['name']) . '\'</p>';
                     echo '</div>';
                 }

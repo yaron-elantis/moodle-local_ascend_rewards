@@ -20,7 +20,7 @@
  * Receives position from JavaScript and processes the pick.
  *
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -1,4 +1,4 @@
-# Ascend Rewards - Moodle Repository Submission Guide
+﻿# Ascend Rewards - Moodle Repository Submission Guide
 
 ## What Has Been Set Up
 
@@ -78,9 +78,9 @@ Review MOODLE_STANDARDS.md for guidance on remaining issues, particularly:
 ### 1. Missing MOODLE_INTERNAL Checks
 Files: `store_section.php`, `villain_unlock.php`
 
-Add to the top of each file after the opening `<?php` tag:
+Add to the top of each file after the opening `<php` tag:
 ```php
-<?php
+<php
 // ... license header ...
 
 defined('MOODLE_INTERNAL') || die();
@@ -116,7 +116,7 @@ $plugin->license = 'https://www.gnu.org/copyleft/gpl.html';
 Use this for ALL new PHP files:
 
 ```php
-<?php
+<php
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -139,7 +139,7 @@ Use this for ALL new PHP files:
  * are defined here and what they do.
  *
  * @package    local_ascend_rewards
- * @copyright  2025 Your Organization
+ * @copyright 2026 Elantis (Pty) LTD
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -331,16 +331,16 @@ If you need help understanding specific issues:
 
 Make sure your plugin root has:
 
-- ✓ version.php
-- ✓ lib.php  
-- ✓ lang/en/local_ascend_rewards.php
-- ✓ classes/ directory with proper classes
-- ✓ db/access.php (capabilities)
-- ✓ db/events.php (if using events)
-- ✓ db/install.xml (database schema)
-- ✓ README.md or similar documentation
-- ✓ .phpcs.xml (code standards config)
-- ✓ LICENSE (GPL-3.0 or similar)
+- âœ“ version.php
+- âœ“ lib.php  
+- âœ“ lang/en/local_ascend_rewards.php
+- âœ“ classes/ directory with proper classes
+- âœ“ db/access.php (capabilities)
+- âœ“ db/events.php (if using events)
+- âœ“ db/install.xml (database schema)
+- âœ“ README.md or similar documentation
+- âœ“ .phpcs.xml (code standards config)
+- âœ“ LICENSE (GPL-3.0 or similar)
 
 ## Next Steps
 
@@ -361,4 +361,4 @@ Make sure your plugin root has:
    - Professional tool checks
    - Compliance verification
 
-Good luck with your submission! 🚀
+Good luck with your submission! ðŸš€

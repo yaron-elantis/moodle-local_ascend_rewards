@@ -5,6 +5,42 @@ All notable changes to the Ascend Rewards plugin will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - 2026-02-02
+
+### Fixed
+- **CRITICAL**: Container width issue - plugin now uses standard Moodle `.container` class for responsive layout
+- Removed custom width overrides that caused layout conflicts with theme
+- Fixed position of congratulations banner video in card layout
+- Verified CSRF protection on all POST requests
+
+### Added
+- Comprehensive Moodle submission checklist (`MOODLE_SUBMISSION_CHECKLIST.md`)
+- Compliance fixes documentation (`COMPLIANCE_FIXES.md`)
+- Submission readiness guide (`SUBMISSION_READY.md`)
+- Copyright and license metadata to version.php
+
+### Changed
+- Updated version format to YYYYMMDDNN standard
+- Documented unused legacy language strings (backwards compatible)
+- Enhanced security validation documentation
+
+### Security
+- Verified all input validation with `optional_param()` / `required_param()`
+- Confirmed `require_sesskey()` on all POST handlers
+- Validated XSS prevention on all user-facing output
+- Confirmed SQL injection prevention with prepared statements
+
+## [1.2.2] - 2026-01-30
+
+### Fixed
+- Code standards compliance issues
+- Missing docblock documentation
+- Trailing whitespace removal
+
+### Changed
+- Improved badge notification modal animations
+- Enhanced mystery box visual presentation
+
 ## [1.2.1] - 2025-12-10
 
 ### Changed
@@ -27,19 +63,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PHPDoc blocks on all classes and methods
 - Proper namespace declarations
 - Database schema documentation
-
-## [1.2.2] - 2026-01-28
-
-### Added
-- Primary navigation hook to surface Ascend Rewards in the top navbar
-- Instructions HTML bundle for demo walkthroughs
-
-### Changed
-- Updated demo badge coin defaults
-- Demo gift rewards tab now displays PRO-only notice
-
-### Fixed
-- Mystery box locked-avatar reward now plays hero video
 
 ## [1.2.0] - 2025-12-01
 

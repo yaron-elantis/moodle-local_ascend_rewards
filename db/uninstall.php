@@ -19,13 +19,13 @@
  *
  * This script completely removes all plugin data including:
  * - Database tables (local_ascend_rewards_coins, local_ascend_rewards_gameboard,
- *   local_ascend_badge_cache, local_ascend_rewards_badges, local_ascend_rewards_badgerlog)
+ *   local_ascend_rewards_badge_cache, local_ascend_rewards_badges, local_ascend_rewards_badgerlog)
  * - User preferences (all apex_* and ascendassets_* preferences)
  * - Scheduled tasks (award_badges, rebuild_badge_cache)
  * - Any cached data
  *
  * @package    local_ascend_rewards
- * @copyright  2025 Apex Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -80,12 +80,12 @@ function xmldb_local_ascend_rewards_uninstall() {
 
         // Drop all plugin tables in reverse dependency order
         $tables_to_drop = [
-            'local_ascend_xp', // XP tracking (separate from coins)
-            'local_ascend_level_tokens', // Level-up unlock tokens
-            'local_ascend_avatar_unlocks', // Avatar and pet unlock tracking
-            'local_ascend_mysterybox', // Mystery box openings and rewards
+            'local_ascend_rewards_xp', // XP tracking (separate from coins)
+            'local_ascend_rewards_level_tokens', // Level-up unlock tokens
+            'local_ascend_rewards_avatar_unlocks', // Avatar and pet unlock tracking
+            'local_ascend_rewards_mysterybox', // Mystery box openings and rewards
             'local_ascend_rewards_badgerlog', // Badge awarding audit log
-            'local_ascend_badge_cache', // Badge activity cache
+            'local_ascend_rewards_badge_cache', // Badge activity cache
             'local_ascend_rewards_gameboard', // Gameboard picks and coins
             'local_ascend_rewards_coins', // Main coin ledger
             'local_ascend_rewards_badges', // Badge configuration

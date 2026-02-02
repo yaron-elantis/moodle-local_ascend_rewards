@@ -1,0 +1,16 @@
+/* Ascend Rewards base styles (extracted for plugin compliance) */
+.aa-panel,
+.store-card,
+.mystery-box,
+.coaching-box {
+    box-sizing: border-box;
+}
+
+.mystery-box img {
+    display: block;
+}
+
+.apex-reward-modal-backdrop,
+.apex-reward-modal {
+    -webkit-font-smoothing: antialiased;
+}

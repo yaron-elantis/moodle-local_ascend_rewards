@@ -21,7 +21,7 @@
  * Manages coin and XP rewards, badge checking, and badge awarding.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -55,7 +55,7 @@ require_once($CFG->dirroot . '/lib/enrollib.php');
  * Handles automatic badge awarding based on activity completion and student achievements.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class badge_awarder {
@@ -111,16 +111,17 @@ class badge_awarder {
      */
     public static function coins_for_badge(int $badgeid): int {
         // DEMO: Only these 7 badges award coins
-        $coin_map = [
-            6  => 250, // Getting Started
-            5  => 550, // Halfway Hero
-            8  => 700, // Master Navigator (meta)
-            13 => 200, // Feedback Follower
-            15 => 300, // Steady Improver
-            14 => 350, // Tenacious Tiger
-            16 => 600, // Glory Guide (meta)
-        ];
-        return $coin_map[$badgeid] ?? 0;
+        $demo_badges = [6, 5, 8, 13, 15, 14, 16];
+        if (!in_array($badgeid, $demo_badges, true)) {
+            return 0;
+        }
+
+        $override = get_config('local_ascend_rewards', "coins_badge_{$badgeid}");
+        if ($override !== false) {
+            return (int)$override;
+        }
+
+        return coin_map::coins_for_badge($badgeid);
     }
 
     /**
@@ -160,7 +161,7 @@ class badge_awarder {
 
         try {
             // Update COURSE-specific XP
-            $course_record = $DB->get_record('local_ascend_xp', [
+            $course_record = $DB->get_record('local_ascend_rewards_xp', [
                 'userid' => $userid,
                 'courseid' => $courseid,
             ]);
@@ -168,9 +169,9 @@ class badge_awarder {
             if ($course_record) {
                 $course_record->xp += $xp_earned;
                 $course_record->timemodified = time();
-                $DB->update_record('local_ascend_xp', $course_record);
+                $DB->update_record('local_ascend_rewards_xp', $course_record);
             } else {
-                $DB->insert_record('local_ascend_xp', (object)[
+                $DB->insert_record('local_ascend_rewards_xp', (object)[
                     'userid' => $userid,
                     'courseid' => $courseid,
                     'xp' => $xp_earned,
@@ -179,7 +180,7 @@ class badge_awarder {
             }
 
             // Update SITE-WIDE XP (courseid = 0)
-            $site_record = $DB->get_record('local_ascend_xp', [
+            $site_record = $DB->get_record('local_ascend_rewards_xp', [
                 'userid' => $userid,
                 'courseid' => 0,
             ]);
@@ -187,9 +188,9 @@ class badge_awarder {
             if ($site_record) {
                 $site_record->xp += $xp_earned;
                 $site_record->timemodified = time();
-                $DB->update_record('local_ascend_xp', $site_record);
+                $DB->update_record('local_ascend_rewards_xp', $site_record);
             } else {
-                $DB->insert_record('local_ascend_xp', (object)[
+                $DB->insert_record('local_ascend_rewards_xp', (object)[
                     'userid' => $userid,
                     'courseid' => 0,
                     'xp' => $xp_earned,
@@ -772,7 +773,7 @@ class badge_awarder {
         }
 
         // Check for level up (handle multiple level-ups in one badge award)
-        $current_site_xp = (int)$DB->get_field('local_ascend_xp', 'xp', [
+        $current_site_xp = (int)$DB->get_field('local_ascend_rewards_xp', 'xp', [
             'userid' => $userid,
             'courseid' => 0,
         ]);
@@ -799,14 +800,14 @@ class badge_awarder {
 
                 // Award 3 tokens per level-up
                 // Get or create token record
-                $token_record = $DB->get_record('local_ascend_level_tokens', ['userid' => $userid]);
+                $token_record = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $userid]);
                 if ($token_record) {
                     // Update existing record - increment tokens_available
                     $token_record->tokens_available += 3;
-                    $DB->update_record('local_ascend_level_tokens', $token_record);
+                    $DB->update_record('local_ascend_rewards_level_tokens', $token_record);
                 } else {
                     // Create new token record with 3 tokens
-                    $DB->insert_record('local_ascend_level_tokens', (object)[
+                    $DB->insert_record('local_ascend_rewards_level_tokens', (object)[
                         'userid' => $userid,
                         'tokens_available' => 3,
                         'tokens_used' => 0,
@@ -969,7 +970,7 @@ class badge_awarder {
             }
         }
 
-        $debug = "Getting Started: completed={$n} (need ≥1).";
+        $debug = "Getting Started: completed={$n} (need >=1).";
         return ['result' => ($n >= 1), 'debug' => $debug, 'activities' => $activity_names];
     }
 
@@ -991,7 +992,7 @@ class badge_awarder {
              WHERE cm.course = :c AND cmc.userid = :u AND cmc.completionstate >= 1
         ", ['c' => $courseid, 'u' => $userid]));
         $pct = round(100.0 * $completed / max(1, $tot), 2);
-        return ['result' => ($pct >= 50.0), 'debug' => "Halfway Hero: completed={$completed}/{$tot} = {$pct}% (need ≥50%)."];
+        return ['result' => ($pct >= 50.0), 'debug' => "Halfway Hero: completed={$completed}/{$tot} = {$pct}% (need >=50%)."];
     }
 
     private static function check_feedback_follower(int $userid, int $courseid, array $course_activities = [], array $course_completions = [], array $course_grades = [], bool $skip_awarded_filter = false) {
@@ -1032,8 +1033,8 @@ class badge_awarder {
                 $attempts = $DB->get_records_sql("
                     SELECT qa.id, qa.sumgrades, qa.timefinish
                       FROM {quiz_attempts} qa
-                     WHERE qa.quiz = :quizid 
-                       AND qa.userid = :userid 
+                     WHERE qa.quiz = :quizid
+                       AND qa.userid = :userid
                        AND qa.state = 'finished'
                        AND qa.sumgrades IS NOT NULL
                   ORDER BY qa.timefinish ASC
@@ -1153,7 +1154,7 @@ class badge_awarder {
 
         return [
             'result' => (count($activity_names) >= 1),
-            'debug' => "Feedback Follower: new_improved_activities=" . count($activity_names) . " (need ≥1). Details: " . implode('; ', $debug_details),
+            'debug' => "Feedback Follower: new_improved_activities=" . count($activity_names) . " (need >=1). Details: " . implode('; ', $debug_details),
             'activities' => $activity_names,
         ];
     }
@@ -1255,7 +1256,7 @@ class badge_awarder {
 
         return [
             'result' => ($improved >= 2),
-            'debug' => "Tenacious Tiger: improved_activities={$improved} (need ≥2 activities with improvement).",
+            'debug' => "Tenacious Tiger: improved_activities={$improved} (need >=2 activities with improvement).",
             'activities' => $improved_activities,
         ];
     }
@@ -1332,7 +1333,7 @@ class badge_awarder {
                 $first_attempt = $DB->get_record_sql("
                     SELECT qa.sumgrades
                       FROM {quiz_attempts} qa
-                     WHERE qa.quiz = :quizid AND qa.userid = :userid 
+                     WHERE qa.quiz = :quizid AND qa.userid = :userid
                        AND qa.state = 'finished' AND qa.sumgrades IS NOT NULL
                   ORDER BY qa.timefinish ASC
                      LIMIT 1
@@ -1341,7 +1342,7 @@ class badge_awarder {
                 $last_attempt = $DB->get_record_sql("
                     SELECT qa.sumgrades
                       FROM {quiz_attempts} qa
-                     WHERE qa.quiz = :quizid AND qa.userid = :userid 
+                     WHERE qa.quiz = :quizid AND qa.userid = :userid
                        AND qa.state = 'finished' AND qa.sumgrades IS NOT NULL
                   ORDER BY qa.timefinish DESC
                      LIMIT 1

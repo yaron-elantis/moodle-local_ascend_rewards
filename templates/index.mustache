@@ -1,0 +1,1105 @@
+<style>
+  :root {
+    --aa-font: 'Montserrat', 'Segoe UI', sans-serif;
+    --aa-gap: 16px;
+    --aa-pad: 16px;
+    --aa-card-radius: 12px;
+    --aa-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+.path-local-ascend_rewards{background:#010828!important;font-family:var(--aa-font);}
+  .path-local-ascend_rewards #page-debug,.path-local-ascend_rewards .debug,.path-local-ascend_rewards .notifytiny{display:none!important;}
+  
+  /* Main wrapper inside region-main */
+  .aa-wrap{padding:12px 0;color:#e6e9f0;}
+  
+  /* Base card styles */
+  .aa-filter-bar,.aa-congrats,.section--instructions,.aa-card,.aa-panel,.aa-balance-bar,.aa-rank-bar{
+    background:linear-gradient(to bottom,#01142E 0%,#010828 100%);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:var(--aa-card-radius);
+    box-shadow:var(--aa-shadow);
+    padding:var(--aa-pad);
+    margin-bottom:var(--aa-gap);
+  }
+  
+  /* Balance and Rank bars */
+  .aa-balance-rank-container{display:grid;grid-template-columns:1fr 1fr;gap:var(--aa-gap);margin-bottom:var(--aa-gap);}
+  .aa-balance-bar,.aa-rank-bar{display:flex;flex-direction:column;align-items:center;text-align:center;}
+  .aa-balance-bar img,.aa-rank-bar img{height:60px;width:auto;object-fit:contain;margin-bottom:12px;}
+  .aa-balance-bar .aa-muted,.aa-rank-bar .aa-muted{min-height:20px;}
+  .aa-balance-bar > div,.aa-rank-bar > div{display:flex;flex-direction:column;align-items:center;}
+  .rank-main{font-size:28px;font-weight:800;min-height:38px;display:flex;align-items:center;justify-content:center;}
+  @media (max-width:768px){.aa-balance-rank-container{grid-template-columns:1fr;}}
+  
+  .aa-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--aa-gap);margin:16px 0;}
+  @media (max-width:1200px){.aa-kpis{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:600px){.aa-kpis{grid-template-columns:1fr}}
+  .aa-card,.aa-panel,.aa-xp-card,.aa-rank-card{padding:var(--aa-pad);margin-bottom:var(--aa-gap);background:linear-gradient(to bottom,#01142E 0%,#010828 100%);border:1px solid rgba(255,255,255,.06);border-radius:var(--aa-card-radius);box-shadow:var(--aa-shadow);}
+  /* Ensure 'You' row styling is identical in Top 10 and My Position */
+  .leaderboard { list-style: none; margin: 0; padding: 0; }
+  .leaderboard li { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 8px; }
+  .leaderboard li .pos { width: 46px; font-weight: 800; color: #fff; }
+  .leaderboard li strong { font-weight: 800; color: #e6e9f0; }
+  .leaderboard li.current-user {
+    background: linear-gradient(135deg,rgba(255,0,170,0.12) 0%,rgba(0,212,255,0.12) 100%) !important;
+    border: 2px solid #FF00AA !important;
+    box-shadow: 0 0 24px rgba(255,0,170,0.4), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  }
+  .leaderboard li.current-user strong { color: #e6e9f0; background: none; padding: 0; border-radius: 0; }
+  .user-id-badge, .user-id-pill { background: linear-gradient(90deg,#FFDD57,#FFD100); padding: 3px 8px; border-radius: 8px; color: #111; font-weight: 800; display: inline-block; margin-left: 6px; }
+  .xp-display { display: flex; align-items: center; gap: 8px; }
+  /* Leaderboard styles */
+  .leaderboard{list-style:none;margin:0;padding:0}
+  .leaderboard li{display:flex;align-items:center;padding:8px 10px;border-radius:8px;margin-bottom:8px}
+  .leaderboard li .pos{width:46px;font-weight:800;color:#fff}
+  .leaderboard li strong{font-weight:800;color:#e6e9f0}
+  .leaderboard li.highlight-user{background:linear-gradient(90deg,rgba(255,240,160,0.03),rgba(6,182,212,0.02));box-shadow:0 6px 18px rgba(6,182,212,0.04);border:1px solid rgba(6,182,212,0.06)}
+  /* Keep the 'You' strong styling plain to match the My Position view */
+  .leaderboard li.current-user strong, .leaderboard li.highlight-user strong{color:#e6e9f0;padding:0;border-radius:0}
+  .leaderboard .user-id-badge, .leaderboard .user-id-pill{background:linear-gradient(90deg,#FFDD57,#FFD100);padding:3px 8px;border-radius:8px;color:#111;font-weight:800;margin-left:6px;display:inline-block}
+
+  .leaderboard-banner{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px;border-radius:14px;background:linear-gradient(135deg,rgba(0,212,255,0.08),rgba(255,0,170,0.06));border:2px solid rgba(0,212,255,0.3);box-shadow:0 8px 32px rgba(0,212,255,0.15);font-weight:700;color:#e6e9f0}
+  .leaderboard-banner .banner-icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#00D4FF,#FF00AA);border-radius:10px;flex-shrink:0;box-shadow:0 4px 12px rgba(0,212,255,0.4)}
+  .leaderboard-banner .banner-icon svg{width:28px;height:28px}
+  .leaderboard-banner .banner-text{display:flex;flex-direction:column;gap:8px;flex:1}
+  .leaderboard-banner .banner-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .leaderboard-banner .banner-label{color:#94a3b8;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+  .leaderboard-banner .banner-value{color:#FFD700;font-size:16px;font-weight:800}
+  .leaderboard-banner .banner-context{color:#06b6d4;font-size:13px;font-weight:700;padding:4px 10px;background:rgba(6,182,212,0.15);border-radius:6px}
+  .aa-panel + .aa-panel{margin-top:0;}
+  .aa-kpi-label{color:#fff;font-weight:800;}
+  .aa-kpi-value{color:#fff;font-size:22px;font-weight:800;}
+  .xp-ring-container{position:relative;width:80px;height:80px;margin:0 auto 12px;}
+  .xp-ring{transform:rotate(-90deg);width:100%;height:100%;}
+  .xp-ring circle{fill:none;stroke-width:8;}
+  .xp-ring .bg-ring{stroke:rgba(255,255,255,0.1);}
+  .xp-ring .progress{stroke:url(#xpGradient);stroke-linecap:round;stroke-dasharray:226;stroke-dashoffset:226;animation:xp-fill 2.2s ease-out forwards;}
+  @keyframes xp-fill{0%{stroke-dashoffset:226;}50%{stroke-dashoffset:0;}100%{stroke-dashoffset:var(--final-offset);}}
+  .xp-level{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:800;color:#FFD700;text-shadow:0 0 10px rgba(255,215,0,0.6);}
+  .xp-level.max{color:#FF4500;text-shadow:0 0 15px rgba(255,69,0,0.8);}
+  .xp-text{font-size:0.85rem;color:#A5B4D6;}
+  .level-up-flash{animation:levelUpPulse 2s infinite;}
+  @keyframes levelUpPulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+  .aa-filter-bar form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .aa-filter-bar h3{font-size:1rem;color:#fff;margin:0 0 8px 0;font-weight:600;}
+  .aa-filter-bar label{color:#A5B4D6;font-size:.9rem;}
+  .aa-filter-bar select,.aa-filter-bar button,.aa-filter-bar a{background:#010828;color:#A5B4D6;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:6px 10px;font-size:.9rem;}
+  .aa-filter-bar button,.aa-filter-bar a{cursor:pointer;text-decoration:none;display:inline-block;}
+  .aa-congrats{display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;margin:0 0 24px 0;text-align:left;}
+  .aa-congrats video{display:block;width:100%;max-width:480px;height:auto;object-fit:contain;border-radius:10px;margin:0 auto;}
+  .aa-congrats .aa-muted{font-size:.9rem;}
+  .aa-panel-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06);margin:-8px 0 var(--aa-pad) 0;cursor:pointer;}
+  .aa-panel-head h3{display:flex;align-items:center;gap:8px;margin:0;color:#F8FAFF;font-size:1rem;font-weight:800;}
+  .aa-panel-head .fa-chevron-down{font-size:12px;color:#A5B4D6;transition:transform .3s;}
+  .aa-panel-head.open .fa-chevron-down{transform:rotate(180deg);}
+  .aa-panel-content{display:none;margin-top:12px;}
+  .aa-panel-head.open + .aa-panel-content{display:block;}
+  .aa-muted{color:#A5B4D6;font-size:.9rem}
+  .recent-list{list-style:none;margin:0;padding:0}
+  .recent-list li{display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.06);transition:all 0.2s ease;cursor:pointer;}
+  .recent-list li:hover{background:rgba(255,255,255,.04);padding-left:4px;padding-right:-4px;}
+  .recent-list li:last-child{border-bottom:0}
+  .earned-badge-icon{height:90px;width:90px;border-radius:6px;background:rgba(255,255,255,.05);object-fit:contain;border:1px solid rgba(255,255,255,.1)}
+  
+  /* Badge & Challenge grids */
+  .badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+  .badge-card{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px;transition:all 0.2s ease;cursor:pointer;}
+  .badge-card:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);}
+  .badge-card img{height:100px;width:100px;object-fit:contain;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.2);transition:all 0.2s ease;}
+  .badge-card:hover img{transform:scale(1.05);}
+  .leaderboard{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+  .leaderboard li{display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:12px;background:linear-gradient(135deg, rgba(0,212,255,0.03) 0%, rgba(255,0,170,0.03) 100%);border:1px solid rgba(255,255,255,.08);transition:all 0.3s ease;position:relative;overflow:hidden;}
+  .leaderboard li::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg, #00D4FF 0%, #FF00AA 50%, #FF9500 100%);opacity:0;transition:opacity 0.3s ease;}
+  .leaderboard li:hover{background:linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(255,0,170,0.08) 100%);border-color:rgba(255,255,255,.15);transform:translateX(4px);}
+  .leaderboard li:hover::before{opacity:1;}
+  .leaderboard li.current-user{background:linear-gradient(135deg,rgba(255,0,170,0.12) 0%,rgba(0,212,255,0.12) 100%);border:2px solid #FF00AA;box-shadow:0 0 24px rgba(255,0,170,0.4), inset 0 1px 0 rgba(255,255,255,0.1);}
+  .leaderboard li.current-user::before{opacity:1;width:5px;}
+  .leaderboard li .pos{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:48px;background:linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(255,0,170,0.15) 100%);border-radius:10px;font-size:18px;font-weight:800;color:#00D4FF;border:1px solid rgba(0,212,255,0.3);flex-shrink:0;}
+  .leaderboard li.current-user .pos{background:linear-gradient(135deg, #FF00AA 0%, #FF9500 100%);color:#fff;border-color:#FF00AA;box-shadow:0 4px 12px rgba(255,0,170,0.4);}
+  .leaderboard li strong{font-size:16px;font-weight:700;color:#F8FAFF;flex-grow:1;}
+  .leaderboard li .aa-muted{font-size:14px;color:#A5B4D6;font-weight:600;}
+  .leaderboard .user-id-badge{background:linear-gradient(135deg,#FFD700 0%,#FFA500 100%);color:#0b1530;font-weight:800;font-size:11px;padding:4px 10px;border-radius:8px;margin-left:8px;box-shadow:0 2px 8px rgba(255,215,0,0.4);white-space:nowrap;}
+  #apxBActivities::-webkit-scrollbar,#apxBBadges::-webkit-scrollbar{width:6px;}
+  #apxBActivities::-webkit-scrollbar-track,#apxBBadges::-webkit-scrollbar-track{background:rgba(255,255,255,0.05);border-radius:3px;}
+  #apxBActivities::-webkit-scrollbar-thumb,#apxBBadges::-webkit-scrollbar-thumb{background:rgba(255,0,170,0.5);border-radius:3px;}
+  #apxBActivities::-webkit-scrollbar-thumb:hover,#apxBBadges::-webkit-scrollbar-thumb:hover{background:rgba(255,0,170,0.7);}
+  #apxBActivitiesList li,#apxBBadgesList li{padding:4px 0;list-style:none;}
+  #apxBActivitiesList li{color:#A5B4D6;}
+  #apxBBadgesList li{color:#FFD700;}
+  .apex-rank-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(0,212,255,0.2) 0%,rgba(255,0,170,0.2) 100%);border:1px solid #00D4FF;padding:8px 12px;border-radius:8px;font-size:13px;margin-top:8px;}
+  .apex-rank-up{color:#00FF88;font-weight:800;}
+  .apex-rank-down{color:#FF4444;font-weight:800;}
+  
+
+  
+  /* Modern Badge Notification Modal (matches site-wide modal) */
+  .apx-modal-backdrop{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:9998;display:none;animation:fadeIn 0.3s ease-out;}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes slideUp{from{opacity:0;transform:translate(-50%,-60%);}to{opacity:1;transform:translate(-50%,-50%);}}
+  .apx-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:520px;max-width:95vw;max-height:90vh;background:linear-gradient(145deg,#0a1832 0%,#0d1b35 100%);border:2px solid #ff9500;border-radius:20px;box-shadow:0 25px 50px rgba(0,0,0,0.5),0 0 0 1px rgba(255,149,0,0.1),inset 0 1px 0 rgba(255,255,255,0.05);z-index:9999;display:none;overflow:hidden;animation:slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);}
+  .apx-modal-header{position:relative;padding:24px 24px 20px;background:linear-gradient(90deg,rgba(255,149,0,0.1) 0%,rgba(0,212,255,0.1) 100%);border-bottom:1px solid rgba(255,149,0,0.2);overflow:hidden;}
+  .apx-modal-header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 20%,rgba(255,149,0,0.1) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(0,212,255,0.1) 0%,transparent 50%);pointer-events:none;}
+  .apx-modal-title{font-size:1.75rem;font-weight:800;color:#ffffff;margin:0;text-align:center;text-shadow:0 2px 4px rgba(0,0,0,0.3);background:linear-gradient(135deg,#ffd700 0%,#ff9500 50%,#00d4ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative;z-index:1;}
+  .apx-modal-subtitle{font-size:0.9rem;color:#a5b4d6;text-align:center;margin:4px 0 0;font-weight:500;position:relative;z-index:1;}
+  .apx-modal-progress{position:absolute;bottom:0;left:0;height:3px;background:linear-gradient(90deg,#ff9500 0%,#ffd700 50%,#00d4ff 100%);width:100%;transform-origin:left;animation:progressShrink 25s linear forwards;border-radius:0 0 20px 20px;}
+  @keyframes progressShrink{from{transform:scaleX(1);}to{transform:scaleX(0);}}
+  .apx-modal-close{position:absolute;top:16px;right:16px;background:rgba(255,149,0,0.2);border:2px solid rgba(255,149,0,0.4);color:#FF9500;cursor:pointer;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all 0.3s;z-index:20;padding:0;box-shadow:0 4px 12px rgba(0,0,0,0.3);}
+  .apx-modal-close:hover{background:rgba(255,149,0,0.4);transform:rotate(90deg) scale(1.15);box-shadow:0 0 24px rgba(255,149,0,0.7);border-color:#FF9500;}
+  .apx-modal-close svg{width:24px;height:24px;}
+  .apx-modal-body{padding:24px;overflow-y:auto;max-height:calc(90vh - 120px);}
+  .apx-modal-body::-webkit-scrollbar{width:8px;}
+  .apx-modal-body::-webkit-scrollbar-track{background:rgba(255,255,255,0.05);border-radius:4px;}
+  .apx-modal-body::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,149,0,0.6) 0%,rgba(255,149,0,0.3) 100%);border-radius:4px;}
+  .apx-video-container{position:relative;width:100%;max-width:320px;aspect-ratio:1;border-radius:16px;overflow:hidden;margin:0 auto 24px;box-shadow:0 8px 32px rgba(0,0,0,0.3);background:linear-gradient(135deg,rgba(0,212,255,0.1) 0%,rgba(255,0,170,0.1) 50%,rgba(255,149,0,0.1) 100%);}
+  .apx-badge-video{width:100%;height:100%;object-fit:contain;display:block;background:#000;}
+  .apx-video-fullscreen-btn{position:absolute;bottom:12px;right:12px;width:36px;height:36px;background:rgba(0,0,0,0.8);border:2px solid rgba(255,149,0,0.5);border-radius:8px;color:#ffd700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.3s ease;z-index:10;}
+  .apx-video-fullscreen-btn svg{width:16px;height:16px;display:block;}
+  .apx-video-fullscreen-btn:hover{background:rgba(255,149,0,0.2);border-color:#ff9500;transform:scale(1.05);}
+  .apx-badge-name-section{text-align:center;margin-bottom:24px;}
+  .apx-badge-name{font-size:1.5rem;font-weight:800;color:#00d4ff;margin:0;text-shadow:0 2px 4px rgba(0,212,255,0.3);}
+  .apx-badge-category{font-size:0.9rem;color:#a5b4d6;margin:4px 0 0;font-weight:500;}
+  .apx-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+  .apx-stat-card{background:linear-gradient(135deg,rgba(0,212,255,0.1) 0%,rgba(255,0,170,0.1) 100%);border:2px solid rgba(255,149,0,0.3);border-radius:12px;padding:20px;text-align:center;transition:all 0.3s ease;position:relative;overflow:hidden;}
+  .apx-stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00d4ff 0%,#ff00aa 50%,#ff9500 100%);}
+  .apx-stat-card:hover{transform:translateY(-2px);border-color:rgba(255,149,0,0.6);box-shadow:0 8px 25px rgba(255,149,0,0.2);}
+  .apx-stat-icon{width:48px;height:48px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,rgba(0,212,255,0.2) 0%,rgba(255,0,170,0.2) 100%);border:2px solid rgba(255,149,0,0.4);}
+  .apx-stat-icon svg,.apx-stat-icon img{width:24px;height:24px;}
+  .apx-stat-value{font-size:1.5rem;font-weight:800;color:#ffd700;margin:0;text-shadow:0 1px 2px rgba(0,0,0,0.5);}
+  .apx-stat-label{font-size:0.8rem;color:#a5b4d6;margin:4px 0 0;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+  .apx-info-section{background:rgba(255,255,255,0.02);border:1px solid rgba(255,149,0,0.2);border-radius:12px;padding:20px;margin-bottom:20px;}
+  .apx-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .apx-info-item{display:flex;flex-direction:column;gap:4px;}
+  .apx-info-label{font-size:0.8rem;color:#a5b4d6;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+  .apx-info-value{font-size:0.95rem;color:#ffffff;font-weight:500;}
+  .apx-description-section{margin-bottom:20px;position:relative;}
+  .apx-description-section::before{content:'*';position:absolute;left:-8px;top:2px;font-size:1.2rem;opacity:0.8;}
+  .apx-description-title{font-size:1rem;font-weight:700;color:#00d4ff;margin:0 0 8px 24px;display:flex;align-items:center;gap:8px;}
+  .apx-description-title::before{content:'';width:4px;height:16px;background:linear-gradient(180deg,#00d4ff,#0099cc);border-radius:2px;}
+  .apx-description-text{font-size:0.9rem;color:#e9f0ff;line-height:1.6;margin:0 0 0 24px;padding:12px 16px;background:rgba(255,255,255,0.02);border-left:3px solid rgba(0,212,255,0.4);border-radius:0 8px 8px 0;}
+  .apx-activities-section{margin-bottom:20px;position:relative;display:block!important;visibility:visible!important;opacity:1!important;min-height:100px;}
+  .apx-activities-section::before{content:'*';position:absolute;left:-8px;top:2px;font-size:1.2rem;opacity:0.8;}
+  .apx-activities-title{font-size:1rem;font-weight:700;color:#00d4ff;margin:0 0 12px 24px;display:flex;align-items:center;gap:8px;}
+  .apx-activities-title::before{content:'';width:4px;height:16px;background:linear-gradient(180deg,#00d4ff,#0099cc);border-radius:2px;}
+  .apx-activities-list{list-style:none;margin:0 0 0 24px;padding:16px;background:rgba(255,255,255,0.02);border-left:3px solid rgba(0,212,255,0.4);border-radius:0 8px 8px 0;max-height:150px;overflow-y:auto;}
+  .apx-activities-list::-webkit-scrollbar{width:6px;}
+  .apx-activities-list::-webkit-scrollbar-track{background:rgba(255,255,255,0.05);border-radius:3px;}
+  .apx-activities-list::-webkit-scrollbar-thumb{background:rgba(255,149,0,0.5);border-radius:3px;}
+  .apx-activity-item{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.85rem;color:#e9f0ff;transition:all 0.2s ease;position:relative;}
+  .apx-activity-item:hover{background:rgba(255,255,255,0.02);border-radius:4px;padding-left:8px;margin-left:-8px;margin-right:-8px;}
+  .apx-activity-item:last-child{border-bottom:none;}
+  .apx-activity-item::before{content:'*';color:#00ff88;font-weight:800;font-size:0.9rem;flex-shrink:0;transition:transform 0.2s ease;}
+  .apx-activity-item:hover::before{transform:scale(1.1);}
+  .apx-badges-section{margin-bottom:20px;position:relative;}
+  .apx-badges-section::before{content:'*';position:absolute;left:-8px;top:2px;font-size:1.2rem;opacity:0.8;}
+  .apx-badges-title{font-size:1rem;font-weight:700;color:#ff00aa;margin:0 0 12px 24px;display:flex;align-items:center;gap:8px;}
+  .apx-badges-title::before{content:'';width:4px;height:16px;background:linear-gradient(180deg,#ff00aa,#cc0088);border-radius:2px;}
+  .apx-badges-list{list-style:none;margin:0 0 0 24px;padding:16px;background:rgba(255,255,255,0.02);border-left:3px solid rgba(255,0,170,0.4);border-radius:0 8px 8px 0;max-height:150px;overflow-y:auto;}
+  .apx-badges-list::-webkit-scrollbar{width:6px;}
+  .apx-badges-list::-webkit-scrollbar-track{background:rgba(255,255,255,0.05);border-radius:3px;}
+  .apx-badges-list::-webkit-scrollbar-thumb{background:rgba(255,0,170,0.5);border-radius:3px;}
+  .apx-badge-item{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.85rem;color:#ffd700;font-weight:600;transition:all 0.2s ease;}
+  .apx-badge-item:hover{background:rgba(255,255,255,0.02);border-radius:4px;padding-left:8px;margin-left:-8px;margin-right:-8px;}
+  .apx-badge-item:last-child{border-bottom:none;}
+  .apx-rank-section{background:linear-gradient(135deg,rgba(0,212,255,0.1) 0%,rgba(255,0,170,0.1) 100%);border:2px solid rgba(0,212,255,0.3);border-radius:12px;padding:16px;margin-bottom:24px;text-align:center;position:relative;overflow:hidden;}
+  .apx-rank-section::before{content:'*';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:1.5rem;opacity:0.6;}
+  .apx-rank-text{font-size:1rem;color:#ffffff;font-weight:600;margin:0;position:relative;z-index:1;}
+  .apx-rank-change{font-size:0.9rem;font-weight:800;margin:4px 0 0;position:relative;z-index:1;}
+  .apx-rank-change.up{color:#00ff88;}
+  .apx-rank-change.down{color:#ff4444;}
+  .apx-muted{color:#94a3b8;}
+  .aa-timeline text{fill:#fff!important;font-family:"Montserrat",sans-serif!important;font-size:12px!important;}
+  .aa-timeline .chartjs-tooltip{background:rgba(11,20,58,0.95)!important;color:#fff!important;border-radius:8px!important;}
+  .aa-timeline .chartjs-tooltip-key{color:#fff!important;}
+  /* Force chart axis, legend, and table text to white for legibility */
+  .aa-timeline .chart-legend, .aa-timeline .chart-legend *,
+  .aa-timeline .chart-axis, .aa-timeline .chart-axis *,
+  .aa-timeline .chart-x-axis, .aa-timeline .chart-x-axis *,
+  .aa-timeline .chart-y-axis, .aa-timeline .chart-y-axis *,
+  .aa-timeline .chart-table, .aa-timeline .chart-table *,
+  .aa-timeline .table, .aa-timeline .table *,
+  .aa-timeline .chartjs-table, .aa-timeline .chartjs-table *,
+  .aa-timeline .chartjs, .aa-timeline .chartjs * {
+    color: #fff !important;
+    fill: #fff !important;
+    border-color: #fff !important;
+    background: transparent !important;
+  }
+  .aa-timeline .chart-axis line, .aa-timeline .chart-x-axis line, .aa-timeline .chart-y-axis line {
+    stroke: #fff !important;
+  }
+  .aa-timeline table, .aa-timeline th, .aa-timeline td {
+    color: #fff !important;
+    background: transparent !important;
+    border-color: #fff !important;
+  }
+  .section--instructions{display:flex;justify-content:center;align-items:center;text-align:center;}
+  .section--instructions p{margin:0;}
+  .section--instructions a{color:#FFF;padding:12px 20px;border-radius:8px;display:inline-flex;align-items:center;gap:12px;text-decoration:none;transition:background .2s;}
+  .section--instructions a:hover{background:rgba(255,255,255,0.1);}
+  .instruction-icon{height:60px;object-fit:contain;}
+  .section-title-icon{height:60px;width:auto;vertical-align:middle;}
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .apexrewards-kpis { grid-template-columns: 1fr 1fr; }
+    .apexrewards-kpis > * { height: 160px; }
+  }
+</style>
+
+<div class="aa-wrap container">
+<div class="apexrewards">
+
+  <!-- Instructions -->
+  <div class="section section--instructions aa-card">
+    <p><a href="{{instructions_url}}" target="_blank" onclick="window.open(this.href,'ascend_instructions','width=1600,height=900,scrollbars=yes,resizable=yes');return false;">
+      <img class="instruction-icon" src="{{instructions_icon_url}}" alt="" onerror="this.style.display='none';"/>
+      {{instructions_text}}
+    </a></p>
+  </div>
+
+  <!-- Celebration Banner -->
+  {{#show_congrats}}
+    <div class="aa-congrats">
+      <video autoplay muted loop playsinline><source src="{{reward_video_url}}" type="video/mp4"></video>
+      <div><div style="font-weight:800;font-size:18px;">{{congrats_title}}</div>
+      <div class="aa-muted">{{congrats_subtext}}</div></div>
+    </div>
+  {{/show_congrats}}
+
+  <!-- Balance & Rank Bars -->
+  <div class="aa-balance-rank-container">
+    <div class="aa-balance-bar">
+      <img src="{{coinimgurl}}" alt="" onerror="this.src='{{coinimg_fallback_url}}'">
+      <div><div class="aa-muted">{{current_balance_label}}</div><div class="rank-main">{{coin_balance_display}} {{assets_label}}</div></div>
+    </div>
+    
+    <div class="aa-rank-bar">
+      <img src="{{stackimgurl}}" alt="" onerror="this.src='{{stackimg_fallback_url}}'">
+      <div><div class="aa-muted">{{current_rank_label}}</div><div class="rank-main">{{rank_display}}</div></div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="aa-filter-bar">
+    <h3>{{filter_by_course_label}}</h3>
+    <form method="get">
+      <select name="courseid">
+        <option value="">{{all_courses_label}}</option>
+        {{#courseoptions}}
+          <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+        {{/courseoptions}}
+      </select>
+      <button type="submit">{{apply_label}}</button>
+      {{#has_course_filter}}<a href="{{reset_url}}">{{reset_label}}</a>{{/has_course_filter}}
+    </form>
+  </div>
+
+  <div class="aa-kpis">
+    <div class="aa-card">
+      <img src="{{medal_gold_url}}" alt="" style="width:60px;height:60px;margin-bottom:12px;">
+      <div class="aa-kpi-label" style="font-weight:800;">{{coins_earned_label}}</div>
+      <div class="aa-kpi-value">{{coins_earned_display}}</div>
+      {{#has_course_filter}}<div class="aa-muted">{{in_this_course_label}}</div>{{/has_course_filter}}
+    </div>
+    <div class="aa-card">
+      <img src="{{medal_silver_url}}" alt="" style="width:60px;height:60px;margin-bottom:12px;">
+      <div class="aa-kpi-label" style="font-weight:800;">{{badges_earned_label}}</div>
+      <div class="aa-kpi-value">{{badges_earned_display}}</div>
+      {{#has_course_filter}}<div class="aa-muted">{{in_this_course_label}}</div>{{/has_course_filter}}
+    </div>
+    <div class="aa-rank-card">
+      <img src="{{medal_bronze_url}}" alt="" style="width:60px;height:60px;margin-bottom:12px;">
+      <div class="aa-kpi-label" style="font-weight:800;">{{ranking_label}}</div>
+      <div class="aa-kpi-value">{{rank_display}}</div>
+      {{#has_course_filter}}<div class="aa-muted">{{in_this_course_label}}</div>{{/has_course_filter}}
+    </div>
+    <div class="aa-xp-card">
+      <div class="xp-ring-container {{#show_level_up}}level-up-flash{{/show_level_up}}">
+        <svg class="xp-ring" viewBox="0 0 80 80" style="--final-offset: {{xp_final_offset}};">
+          <defs>
+            <linearGradient id="xpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00D4FF" />
+              <stop offset="50%" stop-color="#FF00AA" />
+              <stop offset="100%" stop-color="#FF9500" />
+            </linearGradient>
+          </defs>
+          <circle cx="40" cy="40" r="36" class="bg-ring" />
+          <circle class="progress" cx="40" cy="40" r="36" />
+        </svg>
+        <div class="xp-level">L{{level}}</div>
+      </div>
+      <div class="aa-kpi-value" style="margin-top:12px;">{{xp_display}} {{xp_label}}</div>
+      <div style="font-size:14px;color:#94a3b8;margin-top:6px;">{{level_label}} <span style="color:#FFD700;font-weight:800;">{{level}}</span></div>
+    </div>
+  </div>
+
+  <!-- Leaderboard -->
+  <section class="aa-panel aa-leaderboard-wrap">
+    <div class="aa-panel-head">
+      <h3><img class="section-title-icon" src="{{icon_leaderboard_url}}" alt=""> {{leaderboard_label}} <span id="leaderboardMode" style="color:#ec4899;font-size:14px;font-weight:600;">({{leaderboard_mode_label}})</span></h3>
+      <i class="fa-solid fa-chevron-down"></i>
+    </div>
+    <div class="aa-panel-content">
+      <!-- User ID Info (spiced-up) -->
+      <div class="leaderboard-banner" role="status" aria-live="polite">
+        <div class="banner-icon">
+          <svg viewBox="0 0 80 80" aria-hidden="true" fill="none" stroke="#01142E" stroke-width="3">
+            <circle cx="40" cy="40" r="30"></circle>
+            <text x="40" y="50" text-anchor="middle" fill="#01142E" font-size="32" font-weight="800">{{banner_icon_text}}</text>
+          </svg>
+        </div>
+        <div class="banner-text">
+          <div class="banner-row">
+            <span class="banner-label">{{your_id_label}}</span>
+            <span class="banner-value" style="background:linear-gradient(90deg,#FFDD57,#FFD100);color:#01142E;padding:4px 12px;border-radius:8px;display:inline-block;">{{user_id}}</span>
+            {{#has_rank}}
+              <span style="color:#64748b;">|</span>
+              <span class="banner-label">{{rank_label}}</span>
+              <span class="banner-value">#{{rank_value}}</span>
+              <span style="color:#94a3b8;">{{of_label}} {{total_learners}} {{learners_label}}</span>
+            {{/has_rank}}
+          </div>
+          <div class="banner-row">
+            <span class="banner-context">{{leaderboard_context_label}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display:flex;gap:12px;margin-bottom:16px;">
+        <button id="btnTopView" class="leaderboard-view-btn active" style="flex:1;background:#ec4899;border:none;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;">
+          <i class="fa-solid fa-trophy"></i> {{top10_label}}
+        </button>
+        <button id="btnContextView" class="leaderboard-view-btn" style="flex:1;background:#01142E;border:2px solid #06b6d4;color:#06b6d4;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;">
+          <i class="fa-solid fa-location-crosshairs"></i> {{my_position_label}}
+        </button>
+      </div>
+      
+      <ul class="leaderboard" id="leaderboardList">
+        {{^top10}}
+          <li class="aa-muted">{{leaderboard_empty_label}}</li>
+        {{/top10}}
+        {{#top10}}
+          <li{{#is_current_user}} class="current-user"{{/is_current_user}}{{#row_style}} style="{{row_style}}"{{/row_style}}>
+            <span class="pos">{{pos_label}}</span>
+            <strong>{{display_name}}</strong>
+            {{#is_current_user}}
+              <span class="user-id-badge">{{#str}}user_id_badge_label, local_ascend_rewards{{/str}} {{user_id}}</span>
+            {{/is_current_user}}
+            <div class="xp-display" style="margin-left:auto;">
+              <svg width="28" height="28" viewBox="0 0 80 80" aria-hidden="true">
+                <defs><linearGradient id="{{grad_id}}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00D4FF" /><stop offset="50%" stop-color="#FF00AA" /><stop offset="100%" stop-color="#FF9500" /></linearGradient></defs>
+                <circle cx="40" cy="40" r="36" fill="url(#{{grad_id}})" />
+                <text x="40" y="52" text-anchor="middle" fill="#01142E" font-size="34" font-weight="800">X</text>
+              </svg>
+              <span class="aa-muted" style="font-weight:700;color:#e6e9f0;min-width:80px;text-align:right;display:inline-block;margin-left:8px">{{xp_display}}</span>
+            </div>
+          </li>
+        {{/top10}}
+        {{#current_user_entry}}
+          <li class="current-user" style="margin-top:16px;border-top:2px solid rgba(255,0,170,0.08);padding-top:16px;padding-bottom:8px;">
+            <span class="pos">{{pos_label}}</span>
+            <strong>{{you_label}}</strong>
+            <span class="user-id-badge">{{#str}}user_id_badge_label, local_ascend_rewards{{/str}} {{user_id}}</span>
+            <div class="xp-display" style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+              <svg width="28" height="28" viewBox="0 0 80 80" style="flex-shrink:0;">
+                <defs><linearGradient id="xpIconGradLBCurrent" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00D4FF" /><stop offset="50%" stop-color="#FF00AA" /><stop offset="100%" stop-color="#FF9500" /></linearGradient></defs>
+                <circle cx="40" cy="40" r="36" fill="url(#xpIconGradLBCurrent)" />
+                <text x="40" y="52" text-anchor="middle" fill="#01142E" font-size="34" font-weight="800">X</text>
+              </svg>
+              <span class="aa-muted" style="font-weight:700;color:#e6e9f0;min-width:80px;text-align:right;">{{xp_display}}</span>
+            </div>
+          </li>
+        {{/current_user_entry}}
+      </ul>
+    </div>
+  </section>
+  <section class="aa-panel" id="a_all_badges">
+    <div class="aa-panel-head">
+      <h3><img class="section-title-icon" src="{{icon_badges_course_url}}" alt="" onerror="this.style.display='none';"> {{badges_earned_label}}</h3>
+      <i class="fa-solid fa-chevron-down"></i>
+    </div>
+    <div class="aa-panel-content">
+      {{^badges_by_course}}
+        <div class="aa-muted">{{no_badges_label}}</div>
+      {{/badges_by_course}}
+      {{#badges_by_course}}
+        <div style="margin-top:24px;">
+          <div style="font-weight:800;margin-bottom:16px;font-size:18px;color:#F8FAFF;">{{course_name}}</div>
+          {{#categories}}
+            <div style="margin-bottom:16px;">
+              <div style="font-weight:700;margin-bottom:8px;color:{{color}};font-size:14px;">{{name}}</div>
+              <div class="badge-grid">
+                {{#badges}}
+                  <div class="badge-card js-badge-detail" data-badge="{{badge_name_raw}}" data-badgeid="{{badge_id}}" data-courseid="{{course_id}}" data-course="{{course_name}}" data-when="{{formatted_date}}" data-coins="{{coins_text}}" data-xp="{{xp}}" data-level="{{level}}" data-xp-percent="{{xp_percent}}" data-why="{{why}}" data-category="{{category}}" style="cursor:pointer; position: relative;">
+                    {{#earn_count_gt1}}
+                      <div style="position: absolute; top: 8px; right: 8px; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #0b1530; font-weight: 800; font-size: 12px; padding: 4px 8px; border-radius: 12px; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);">x{{earn_count}}</div>
+                    {{/earn_count_gt1}}
+                    <img src="{{icon_url}}" alt="{{badge_name_raw}}" onerror="this.src='{{fallback_icon_url}}'">
+                    <div><div style="font-weight:700;">{{badge_name}}</div><div class="aa-muted">{{earned_text}}</div></div>
+                  </div>
+                {{/badges}}
+              </div>
+            </div>
+          {{/categories}}
+        </div>
+      {{/badges_by_course}}
+    </div>
+  </section>
+  <!-- PERSONALIZED CHALLENGES SECTION DISABLED -->
+
+
+
+{{#gameboard.available}}
+        <section class="aa-panel" id="a_weekly_gameboard">
+            <div class="aa-panel-head">
+                <h3><img class="section-title-icon" src="{{gameboard.icon_url}}" alt="" onerror="this.style.display='none';"> {{weekly_gameboard_label}} <span class="aa-muted" style="font-size:14px;font-weight:400;margin-left:8px;">({{gameboard.week_range_label}})</span></h3>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="aa-panel-content">
+            <div style="background:#01142E;border-radius:16px;padding:24px;margin-bottom:20px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+                    <div>
+                        <div style="font-size:14px;color:#94a3b8;margin-bottom:4px;">{{picks_available_label}}</div>
+                        <div style="font-size:28px;font-weight:800;color:#ec4899;">{{gameboard.remaining_picks}}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:14px;color:#94a3b8;margin-bottom:4px;">{{normal_badges_label}}</div>
+                        <div style="font-size:20px;font-weight:700;color:#ec4899;">{{normal_picks_label}} {{gameboard.available_picks_normal}}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:14px;color:#94a3b8;margin-bottom:4px;">{{meta_badges_label}}</div>
+                        <div style="font-size:20px;font-weight:700;color:#ec4899;">{{meta_picks_label}} {{gameboard.available_picks_meta}}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="gameboardGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+                {{#gameboard.cards}}
+                    <div class="gameboard-card {{#picked}}picked{{/picked}}" 
+                         data-position="{{position}}"
+                         style="aspect-ratio:1;background:{{#picked}}#ffffff{{/picked}}{{^picked}}#01142E{{/picked}};border:3px solid #06b6d4;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:{{#picked}}default{{/picked}}{{^picked}}pointer{{/picked}};transition:all 0.3s ease;position:relative;overflow:hidden;">
+                        
+                        {{#picked}}
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+                                <img src="{{coin_icon_url}}" 
+                                     alt="{{coin_label}}" 
+                                     style="width:48px;height:48px;object-fit:contain;">
+                                <div style="font-size:20px;font-weight:800;color:#01142E;">{{coin_value}}</div>
+                            </div>
+                        {{/picked}}
+                        {{^picked}}
+                            <div class="card-content" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;pointer-events:none;">
+                                <img src="{{badge_image_url}}" 
+                                     alt="{{badge_name}}" 
+                                     style="width:80%;height:80%;object-fit:contain;">
+                            </div>
+                            <div class="card-hover" style="position:absolute;inset:0;background:linear-gradient(135deg, rgb(4,120,140) 0%, rgb(190,50,120) 50%, rgb(200,90,30) 100%);display:none;align-items:center;justify-content:center;pointer-events:none;">
+                                <img src="{{hover_coin_url}}" 
+                                     alt="{{pick_label}}" 
+                                     class="hover-coin"
+                                     style="width:60px;height:60px;object-fit:contain;">
+                            </div>
+                        {{/picked}}
+                    </div>
+                {{/gameboard.cards}}
+            </div>
+        </div>
+    
+    <style>
+    .gameboard-card:not(.picked):hover .card-content {
+        display: none;
+    }
+    .gameboard-card:not(.picked):hover .card-hover {
+        display: flex !important;
+    }
+    .gameboard-card:not(.picked) .hover-coin {
+        animation: coinPulse 1s ease-in-out infinite;
+    }
+    .gameboard-card.picked {
+        pointer-events: none;
+    }
+    @keyframes cardFlip {
+        0% { transform: rotateY(0deg); }
+        50% { transform: rotateY(90deg); }
+        100% { transform: rotateY(0deg); }
+    }
+    @keyframes coinPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.15); }
+    }
+    </style>
+        </div>
+    </section>
+    
+    <script>
+    // Gameboard pick handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const gameboardSuccessText = {{{gameboard_success_text}}};
+        const gameboardErrorPrefix = {{{gameboard_error_prefix}}};
+        const gameboardGenericError = {{{gameboard_generic_error}}};
+        const gameboardProcessingErrorPrefix = {{{gameboard_processing_error_prefix}}};
+        var cards = document.querySelectorAll('.gameboard-card:not(.picked)');
+        
+        cards.forEach(function(card) {
+            card.addEventListener('click', function() {
+                var position = parseInt(card.getAttribute('data-position'));
+                
+                // Disable all cards during processing
+                cards.forEach(function(c) { c.style.pointerEvents = 'none'; });
+                
+                // Make AJAX request
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', M.cfg.wwwroot + '/local/ascend_rewards/gameboard_pick.php');
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        try {
+                            var result = JSON.parse(xhr.responseText);
+                            if (result.success) {
+                                // Animate card flip
+                                card.style.animation = 'cardFlip 0.6s ease-in-out';
+                                
+                                setTimeout(function() {
+                                    // Update card to show result
+                                    card.classList.add('picked');
+                                    card.style.background = '#ffffff';
+                                    card.style.cursor = 'default';
+                                    card.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;">' +
+                                        '<img src="' + M.cfg.wwwroot + '/local/ascend_rewards/pix/ascend_coin_main.png" alt="Coin" style="width:48px;height:48px;object-fit:contain;">' +
+                                        '<div style="font-size:20px;font-weight:800;color:#01142E;">' + result.coins + '</div>' +
+                                        '</div>';
+                                    
+                                    var remainingPicks = result.remaining;
+                                    
+                                    // Play sound
+                                    try {
+                                        var audio = document.getElementById('levelUpSound');
+                                        if (audio) {
+                                            audio.volume = 0.4;
+                                            audio.currentTime = 0;
+                                            audio.play().catch(function(){});
+                                        }
+                                    } catch(e) {}
+                                    
+                                    // Show success message
+                                    setTimeout(function() {
+                                        alert(gameboardSuccessText.replace('{coins}', result.coins));
+                                        
+                                        if (remainingPicks === 0) {
+                                            location.reload();
+                                        } else {
+                                            // Re-enable remaining cards
+                                            cards.forEach(function(c) { 
+                                                if (!c.classList.contains('picked')) {
+                                                    c.style.pointerEvents = 'auto'; 
+                                                }
+                                            });
+                                        }
+                                    }, 800);
+                                }, 600);
+                            } else {
+                                alert(gameboardErrorPrefix + (result.error || gameboardGenericError));
+                                cards.forEach(function(c) { c.style.pointerEvents = 'auto'; });
+                            }
+                        } catch(e) {
+                            alert(gameboardProcessingErrorPrefix + e.message);
+                            cards.forEach(function(c) { c.style.pointerEvents = 'auto'; });
+                        }
+                    } else {
+                        alert(gameboardGenericError);
+                        cards.forEach(function(c) { c.style.pointerEvents = 'auto'; });
+                    }
+                };
+                xhr.send('position=' + position);
+            });
+        });
+    });
+    </script>
+    
+{{/gameboard.available}}
+{{^gameboard.available}}
+    <section class="aa-panel" id="a_weekly_gameboard">
+        <div class="aa-panel-head">
+            <h3><img class="section-title-icon" src="{{gameboard.icon_url}}" alt="" onerror="this.style.display='none';"> {{weekly_gameboard_label}}</h3>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="aa-panel-content">
+            <div class="aa-muted">{{gameboard_locked_label}}</div>
+        </div>
+    </section>
+{{/gameboard.available}}
+
+{{#avatar}}
+  {{> local_ascend_rewards/avatar_section_new}}
+{{/avatar}}
+
+{{#store}}
+  {{> local_ascend_rewards/store_section}}
+{{/store}}
+
+</div>
+</div>
+
+<audio id="levelUpSound" preload="auto"><source src="{{level_up_audio_url}}" type="audio/mpeg"></audio>
+<div id="apxModalBackdrop" class="apx-modal-backdrop"></div>
+<div id="apxModal" class="apx-modal" role="dialog" aria-modal="true" aria-labelledby="apxModalTitle">
+  <div class="apx-modal-header">
+    <h1 class="apx-modal-title" id="apxModalTitle">{{#str}}badge_earned_title, local_ascend_rewards{{/str}}</h1>
+    <p class="apx-modal-subtitle">{{#str}}badge_earned_subtitle, local_ascend_rewards{{/str}}</p>
+    <div class="apx-modal-progress"></div>
+    <button class="apx-modal-close" id="apxModalClose" aria-label="{{#str}}close_label, local_ascend_rewards{{/str}}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  </div>
+  
+  <div class="apx-modal-body">
+    <!-- Video Section -->
+    <div class="apx-video-container">
+      <video id="apxRewardVideo" class="apx-badge-video" playsinline loop>
+        <source id="apxRewardVideoSource" src="" type="video/mp4">
+      </video>
+      <button class="apx-video-fullscreen-btn" id="apxVideoFullscreen" title="{{#str}}fullscreen_label, local_ascend_rewards{{/str}}" aria-label="{{#str}}fullscreen_label, local_ascend_rewards{{/str}}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+          <path d="M16 3h3a2 2 0 0 1 2 2v3" />
+          <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
+          <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Badge Name -->
+    <div class="apx-badge-name-section">
+      <h2 id="apxBName" class="apx-badge-name">{{#str}}badge_name_label, local_ascend_rewards{{/str}}</h2>
+      <p class="apx-badge-category"><span id="apxBCategory">{{#str}}badge_category_default, local_ascend_rewards{{/str}}</span> {{#str}}badge_label, local_ascend_rewards{{/str}}</p>
+    </div>
+    
+    <!-- Stats -->
+    <div class="apx-stats-grid">
+      <div class="apx-stat-card">
+        <div class="apx-stat-icon">
+          <svg width="48" height="48" viewBox="0 0 80 80">
+            <defs><linearGradient id="xpIconGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00D4FF" /><stop offset="50%" stop-color="#FF00AA" /><stop offset="100%" stop-color="#FF9500" /></linearGradient></defs>
+            <circle cx="40" cy="40" r="36" fill="url(#xpIconGrad)" />
+            <text x="40" y="52" text-anchor="middle" fill="#01142E" font-size="32" font-weight="800">X</text>
+          </svg>
+        </div>
+        <div id="apxBXP" class="apx-stat-value">{{#str}}xp_default_display, local_ascend_rewards{{/str}}</div>
+        <div class="apx-stat-label">{{#str}}experience_points_label, local_ascend_rewards{{/str}}</div>
+      </div>
+      
+      <div class="apx-stat-card">
+        <div class="apx-stat-icon">
+          <img id="apxCoinIcon" src="{{stack_fallback_url}}" alt="Coins" style="width:32px;height:32px;object-fit:contain;" onerror="this.style.display='none';">
+        </div>
+        <div id="apxBCoins" class="apx-stat-value">{{#str}}coins_default_display, local_ascend_rewards{{/str}}</div>
+        <div class="apx-stat-label">{{assets_label}}</div>
+      </div>
+    </div>
+    
+    <!-- Info Grid -->
+    <div class="apx-info-section">
+      <div class="apx-info-grid">
+        <div class="apx-info-item">
+          <div class="apx-info-label">{{#str}}course_label, local_ascend_rewards{{/str}}</div>
+          <div id="apxBCourse" class="apx-info-value"></div>
+        </div>
+        <div class="apx-info-item">
+          <div class="apx-info-label">{{#str}}earned_on_label, local_ascend_rewards{{/str}}</div>
+          <div id="apxBWhen" class="apx-info-value"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Description -->
+    <div class="apx-description-section">
+      <h3 class="apx-description-title">{{#str}}achievement_details_label, local_ascend_rewards{{/str}}</h3>
+      <p id="apxBWhy" class="apx-description-text"></p>
+    </div>
+    
+    <!-- Activities -->
+    <div id="apxBActivities" class="apx-activities-section" style="display:none;">
+      <h3 class="apx-activities-title">{{#str}}qualifying_activities_label, local_ascend_rewards{{/str}}</h3>
+      <ul id="apxBActivitiesList" class="apx-activities-list"></ul>
+    </div>
+
+    <!-- Contributing Badges -->
+    <div id="apxBBadges" class="apx-badges-section" style="display:none;">
+      <h3 class="apx-badges-title">{{#str}}contributing_badges_label, local_ascend_rewards{{/str}}</h3>
+      <ul id="apxBBadgesList" class="apx-badges-list"></ul>
+    </div>
+    
+    <!-- Rank -->
+    <div id="apxBRank" class="apx-rank-section" style="display:none;"></div>
+  </div>
+</div>
+<script>
+// Chevron toggle for collapsible panels
+document.addEventListener('DOMContentLoaded', function() {
+  var panels = document.querySelectorAll('.aa-panel-head');
+  panels.forEach(function(h) {
+    h.addEventListener('click', function() {
+      this.classList.toggle('open');
+    });
+  });
+});
+
+(function(){
+  function q(sel){return document.querySelector(sel);}
+  
+  const modal = q('#apxModal');
+  const backdrop = q('#apxModalBackdrop');
+  const closeBtn = q('#apxModalClose');
+  const video = q('#apxRewardVideo');
+  const videoSource = q('#apxRewardVideoSource');
+  const fullscreenBtn = q('#apxVideoFullscreen');
+  const awardLabelPrefix = '{{#str}}award_number_label_prefix, local_ascend_rewards{{/str}}';
+  const awardLabelSuffix = '{{#str}}award_number_label_suffix, local_ascend_rewards{{/str}}';
+  
+  // DEMO VERSION: Map badge IDs to their video files (only 7 active badges).
+  const badgeVideos = {
+    6: 'Getting Started/getting_started_2.mp4',
+    5: 'Halfway Hero/halfway_hero_1.mp4',
+    8: 'Master Navigator/master_navigator_3.mp4',
+    13: 'Feedback Follower/feedback_follower_1.mp4',
+    15: 'Steady Improver/steady_improver_1.mp4',
+    14: 'Tenacious Tiger/tenacious_tiger_1.mp4',
+    16: 'Glory Guide/glory_guide_3.mp4'
+  };
+  
+  function openModal(el){
+    const d = el.dataset;
+    q('#apxBName').textContent = d.badge || '';
+    q('#apxBCategory').textContent = d.category || '';
+    q('#apxBCourse').textContent = d.course || '';
+    q('#apxBWhen').textContent = d.when || '';
+    q('#apxBWhy').textContent = d.why || '';
+    
+    // Extract coins value from the text (e.g., "+10 Ascend Assets" -> 10)
+    const coinsText = d.coins || '+0 Ascend Assets';
+    const coins = parseInt(coinsText.match(/\d+/)) || 0;
+    
+    // Calculate badge XP (coins / 2)
+    const badgeXp = Math.floor(coins / 2);
+    
+    q('#apxBXP').textContent = '+' + badgeXp + ' XP';
+    q('#apxBCoins').textContent = '+' + coins + ' Coins';
+    
+    // Fetch and display completed activities or contributing badges
+    const courseid = parseInt(d.courseid) || 0;
+    const badgeId = parseInt(d.badgeid) || 0;
+    const metaBadges = [8, 16]; // DEMO: Master Navigator, Glory Guide
+    const isMeta = metaBadges.includes(badgeId);
+    
+    if(courseid > 0) {
+      const fetchStart = performance.now();
+      fetch(M.cfg.wwwroot + '/local/ascend_rewards/get_activities.php?courseid=' + courseid + '&badgeid=' + badgeId + '&force=1')
+        .then(response => response.json())
+        .then(data => {
+          const fetchEnd = performance.now();
+          const fetchTime = Math.round(fetchEnd - fetchStart);
+          console.log('=== BADGE MODAL DEBUG ===');
+          console.log('BadgeId:', badgeId, 'CourseId:', courseid, 'isMeta:', isMeta);
+          console.log('Activities returned:', data.activities);
+          console.log('Metadata returned:', data.metadata);
+          console.log('Cached:', data.cached);
+          console.log('========================');
+          if(data && data.activities && data.activities.length > 0) {
+            // Check if these are badge names (meta badges) or activity names
+            const knownBadgeNames = ['Getting Started', 'On a Roll', 'Halfway Hero', 'Early Bird', 
+                                     'Sharp Shooter', 'Deadline Burner', 'Feedback Follower', 
+                                     'Steady Improver', 'Tenacious Tiger', 'High Flyer', 
+                                     'Activity Ace', 'Mission Complete'];
+            const areBadges = data.activities.some(item => knownBadgeNames.includes(item));
+
+            // Always show grouped activities for all badges except meta badges
+            if(isMeta) {
+              // Show as contributing badges
+              const badgesDiv = q('#apxBBadges');
+              const badgesList = q('#apxBBadgesList');
+              badgesList.innerHTML = '';
+              data.activities.forEach(function(badge) {
+                const li = document.createElement('li');
+                li.className = 'apx-badge-item';
+                li.textContent = badge;
+                badgesList.appendChild(li);
+              });
+              badgesDiv.style.display = 'block';
+              q('#apxBActivities').style.display = 'none';
+            } else {
+              // Show as qualifying activities with award indicators (x1, x2, x3 like badge count) for ALL badges
+              const activitiesDiv = q('#apxBActivities');
+              const activitiesList = q('#apxBActivitiesList');
+              
+              console.log('Populating activities div...');
+              console.log('activitiesDiv exists:', !!activitiesDiv);
+              console.log('activitiesList exists:', !!activitiesList);
+              
+              activitiesList.innerHTML = '';
+
+              const metadata = data.metadata || [];
+              const hasMetadata = metadata.length > 0;
+              
+              console.log('hasMetadata:', hasMetadata, 'metadata length:', metadata.length);
+
+              let currentAward = 0;
+
+              data.activities.forEach(function(activity, index) {
+                const meta = hasMetadata ? metadata[index] : null;
+
+                // Check if we're starting a new award group
+                if(meta && meta.award_number && meta.award_number !== currentAward) {
+                  // Add spacing between groups (except before first group)
+                  if(currentAward > 0) {
+                    const spacer = document.createElement('li');
+                    spacer.style.height = '12px';
+                    spacer.style.listStyle = 'none';
+                    activitiesList.appendChild(spacer);
+                  }
+
+                  const header = document.createElement('li');
+                  header.className = 'apx-award-header';
+                  header.style.fontWeight = '700';
+                  header.style.fontSize = '0.95em';
+                  header.style.color = '#FFD700';
+                  header.style.marginTop = '8px';
+                  header.style.marginBottom = '6px';
+                  header.style.listStyle = 'none';
+
+                  // Create badge count indicator like rewards page (gold gradient)
+                  const badgeCount = document.createElement('span');
+                  badgeCount.className = 'aa-badge-count';
+                  badgeCount.style.background = 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)';
+                  badgeCount.style.color = '#0b1530';
+                  badgeCount.style.padding = '4px 8px';
+                  badgeCount.style.borderRadius = '12px';
+                  badgeCount.style.fontSize = '0.85em';
+                  badgeCount.style.fontWeight = '800';
+                  badgeCount.style.marginRight = '8px';
+                  badgeCount.style.display = 'inline-block';
+                  badgeCount.style.boxShadow = '0 2px 8px rgba(255, 215, 0, 0.4)';
+                  badgeCount.textContent = 'x' + meta.award_number;
+
+                  header.appendChild(badgeCount);
+                  header.appendChild(document.createTextNode(awardLabelPrefix + meta.award_number + awardLabelSuffix));
+
+                  activitiesList.appendChild(header);
+                  currentAward = meta.award_number;
+                }
+
+                // Add the activity
+                const li = document.createElement('li');
+                li.className = 'apx-activity-item';
+                li.style.marginLeft = '20px';
+                li.style.fontSize = '0.9em';
+                li.style.color = '#A5B4D6';
+                li.style.marginBottom = '4px';
+
+                let activityHTML = '';
+
+                // Steady Improver: Show fail/pass with indicators
+                if(meta && meta.failed_grade !== undefined && meta.passed_grade !== undefined) {
+                  activityHTML = '<span style="color:#ff4444;font-weight:600;">Failed (' + meta.failed_grade + '%)</span> -> <span style="color:#00cc66;font-weight:600;">Passed (' + meta.passed_grade + '%)</span><br/><span style="margin-left:20px;">' + activity + '</span>';
+                }
+                // Feedback Follower: Show improvement
+                else if(meta && meta.old_grade !== undefined && meta.new_grade !== undefined) {
+                  activityHTML = activity + ' <span style="color:#4ECDC4;font-weight:600;">(' + meta.old_grade + '% -> ' + meta.new_grade + '%)</span>';
+                }
+                // Regular activity
+                else {
+                  activityHTML = activity;
+                }
+
+                li.innerHTML = activityHTML;
+                activitiesList.appendChild(li);
+              });
+
+              console.log('Final activities list children:', activitiesList.children.length);
+              console.log('Final activities list HTML:', activitiesList.innerHTML);
+              activitiesDiv.style.display = 'block';
+              q('#apxBBadges').style.display = 'none';
+              
+            }
+          } else {
+            q('#apxBActivities').style.display = 'none';
+            q('#apxBBadges').style.display = 'none';
+          }
+        })
+        .catch((err) => {
+          q('#apxBActivities').style.display = 'none';
+          q('#apxBBadges').style.display = 'none';
+        });
+    }
+    // Don't hide activities here - let the fetch handler control visibility
+    
+    // Load the correct video for this badge (badgeId already declared above)
+    const videoFile = badgeVideos[badgeId] || 'reward_animation_2.mp4';
+    const videoUrl = M.cfg.wwwroot + '/local/ascend_rewards/pix/' + videoFile;
+    
+    if(video && videoSource){
+      videoSource.src = videoUrl;
+      video.load();
+      video.style.display='block';
+      video.currentTime=0;
+      video.play().catch(()=>{});
+      if(fullscreenBtn) fullscreenBtn.style.display='block';
+    }
+    modal.style.display='block';
+    backdrop.style.display='block';
+    document.body.style.overflow='hidden';
+  }
+  
+  function closeModal(){
+    modal.style.display='none';
+    backdrop.style.display='none';
+    document.body.style.overflow='';
+    if(video){
+      video.pause();
+      video.style.display='none';
+    }
+    if(fullscreenBtn) fullscreenBtn.style.display='none';
+  }
+  
+  document.querySelectorAll('.js-badge-detail').forEach(function(el){
+    el.addEventListener('click', function(){ openModal(el); });
+  });
+  
+  if(closeBtn) closeBtn.addEventListener('click', closeModal);
+  if(backdrop) backdrop.addEventListener('click', closeModal);
+  
+  // Fullscreen button handler
+  if(fullscreenBtn && video) {
+    fullscreenBtn.addEventListener('click', function() {
+      if(video.requestFullscreen) {
+        video.requestFullscreen();
+      } else if(video.webkitRequestFullscreen) {
+        video.webkitRequestFullscreen();
+      } else if(video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+      } else if(video.msRequestFullscreen) {
+        video.msRequestFullscreen();
+      }
+    });
+  }
+  
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape' && modal.style.display==='block') closeModal();
+  });
+})();
+
+// Leaderboard Context View
+(function() {
+  const btnTopView = document.getElementById('btnTopView');
+  const btnContextView = document.getElementById('btnContextView');
+  const leaderboardList = document.getElementById('leaderboardList');
+  const leaderboardMode = document.getElementById('leaderboardMode');
+  
+  let originalHTML = leaderboardList ? leaderboardList.innerHTML : '';
+  let isContextView = false;
+  
+  function switchToContextView() {
+    if (!leaderboardList) return;
+    
+    // Show loading
+    leaderboardList.innerHTML = '<li class="aa-muted" style="text-align:center;padding:20px;"><i class="fa-solid fa-spinner fa-spin"></i> {{#str}}leaderboard_loading_label, local_ascend_rewards{{/str}}</li>';
+    
+    // Fetch context data
+    const courseid = {{js.courseid}};
+    const baseUrl = {{{js.leaderboard_url}}};
+    const url = baseUrl + '?apex_action=get_leaderboard_context&courseid=' + courseid + '&sesskey=' + M.cfg.sesskey;
+    
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success || !data.users) {
+          leaderboardList.innerHTML = '<li class="aa-muted">{{#str}}leaderboard_context_error_label, local_ascend_rewards{{/str}}</li>';
+          return;
+        }
+        
+        let html = '';
+        data.users.forEach((user, idx) => {
+          const isCurrentUser = user.is_current_user;
+          const displayName = isCurrentUser ? '{{you_label}}' : '{{user_number_prefix}}' + user.userid;
+          const userIdBadge = isCurrentUser ? '<span class="user-id-badge">{{#str}}user_id_badge_label, local_ascend_rewards{{/str}} ' + {{js.user_id}} + '</span>' : '';
+          const medal = user.medal;
+          const xp = user.xp.toLocaleString();
+          const currentClass = isCurrentUser ? ' class="current-user"' : '';
+          const gradId = 'xpIconGradLBCtx' + idx;
+          
+          html += '<li' + currentClass + '>';
+          html += '<span class="pos">' + medal + '</span>';
+          html += '<strong>' + displayName + '</strong>';
+          html += userIdBadge;
+          html += '<div class="xp-display" style="display:flex;align-items:center;gap:8px;margin-left:auto;">';
+          html += '<svg width="24" height="24" viewBox="0 0 80 80" style="flex-shrink:0;">';
+          html += '<defs><linearGradient id="' + gradId + '" x1="0%" y1="0%" x2="100%" y2="100%">';
+          html += '<stop offset="0%" stop-color="#00D4FF" />';
+          html += '<stop offset="50%" stop-color="#FF00AA" />';
+          html += '<stop offset="100%" stop-color="#FF9500" /></linearGradient></defs>';
+          html += '<circle cx="40" cy="40" r="36" fill="url(#' + gradId + ')" />';
+          html += '<text x="40" y="52" text-anchor="middle" fill="#01142E" font-size="32" font-weight="800">X</text>';
+          html += '</svg>';
+          html += '<span class="aa-muted" style="font-weight:700;color:#e6e9f0;">' + xp + '</span>';
+          html += '</div>';
+          html += '</li>';
+        });
+        
+        leaderboardList.innerHTML = html;
+        const leaderboardRangeLabel = {{{js.leaderboard_range_label}}};
+        leaderboardMode.textContent = leaderboardRangeLabel
+          .replace('{start}', data.start_rank)
+          .replace('{end}', data.end_rank)
+          .replace('{total}', data.total_users);
+        
+        // Scroll to current user
+        setTimeout(() => {
+          const currentUserLi = leaderboardList.querySelector('li.current-user');
+          if (currentUserLi) {
+            currentUserLi.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
+        
+        isContextView = true;
+        btnTopView.classList.remove('active');
+        btnContextView.classList.add('active');
+        btnTopView.style.background = '#01142E';
+        btnTopView.style.border = '2px solid #ec4899';
+        btnTopView.style.color = '#ec4899';
+        btnContextView.style.background = '#06b6d4';
+        btnContextView.style.border = 'none';
+        btnContextView.style.color = '#fff';
+      })
+      .catch(err => {
+        leaderboardList.innerHTML = '<li class="aa-muted">{{#str}}leaderboard_context_view_error_label, local_ascend_rewards{{/str}}</li>';
+      });
+  }
+  
+  function switchToTopView() {
+    if (!leaderboardList) return;
+    
+    leaderboardList.innerHTML = originalHTML;
+    leaderboardMode.textContent = {{{js.leaderboard_mode_label}}};
+    
+    isContextView = false;
+    btnTopView.classList.add('active');
+    btnContextView.classList.remove('active');
+    btnTopView.style.background = '#ec4899';
+    btnTopView.style.border = 'none';
+    btnTopView.style.color = '#fff';
+    btnContextView.style.background = '#01142E';
+    btnContextView.style.border = '2px solid #06b6d4';
+    btnContextView.style.color = '#06b6d4';
+  }
+  
+  // Event listeners
+  if (btnContextView) {
+    btnContextView.addEventListener('click', switchToContextView);
+  }
+  
+  if (btnTopView) {
+    btnTopView.addEventListener('click', switchToTopView);
+  }
+})();
+</script>
+

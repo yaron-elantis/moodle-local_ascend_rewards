@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
  * This ensures cache data is up to date and validated.
  *
  * @package    local_ascend_rewards
- * @copyright  2026 Ascend
+ * @copyright 2026 Elantis (Pty) LTD
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rebuild_badge_cache extends \core\task\scheduled_task {
@@ -57,7 +57,7 @@ class rebuild_badge_cache extends \core\task\scheduled_task {
         // Verify existing cache entries (sample 500 random entries).
         // Note: Using RAND() for randomization instead of sql_random().
         $cachedentries = $DB->get_records_sql(
-            "SELECT * FROM {local_ascend_badge_cache}
+            "SELECT * FROM {local_ascend_rewards_badge_cache}
           ORDER BY RAND()
              LIMIT 500"
         );
@@ -81,7 +81,7 @@ class rebuild_badge_cache extends \core\task\scheduled_task {
                 $entry->activities = json_encode($fresh['activities']);
                 $entry->metadata = json_encode($fresh['metadata']);
                 $entry->timemodified = time();
-                $DB->update_record('local_ascend_badge_cache', $entry);
+                $DB->update_record('local_ascend_rewards_badge_cache', $entry);
 
                 $corrected++;
             }
@@ -92,7 +92,7 @@ class rebuild_badge_cache extends \core\task\scheduled_task {
         mtrace("Verified {$verified} cache entries, corrected {$corrected}");
 
         // Clean up old cache entries for deleted users/courses.
-        $sql = "DELETE FROM {local_ascend_badge_cache}
+        $sql = "DELETE FROM {local_ascend_rewards_badge_cache}
                  WHERE userid NOT IN (SELECT id FROM {user} WHERE deleted = 0)
                     OR courseid NOT IN (SELECT id FROM {course})";
         $DB->execute($sql);

@@ -20,7 +20,7 @@
  * Provides default coin values used on plugin installation.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

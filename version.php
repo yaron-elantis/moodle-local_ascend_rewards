@@ -18,14 +18,16 @@
  * Plugin version and metadata.
  *
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_ascend_rewards';
-$plugin->version   = 2026012800;
+$plugin->version   = 2026020200;
 $plugin->requires  = 2022041900;
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.2.2';
+$plugin->release   = '1.2.3';
+$plugin->copyright = '2026 Elantis (Pty) LTD';
+$plugin->license   = 'https://www.gnu.org/copyleft/gpl.html';

@@ -225,7 +225,7 @@ Copy-Item . -Destination "..\ascend_rewards_backup" -Recurse
 
 ---
 
-## Questions?
+## Questions
 
 All answers are in your documentation:
 - **For overview:** START_HERE.md

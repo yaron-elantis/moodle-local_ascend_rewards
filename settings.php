@@ -20,7 +20,7 @@
  * Defines admin settings for default coin values and admin pages.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -42,20 +42,20 @@ if ($hassiteconfig) {
 
     // Only active badges in DEMO version.
     $badgelabels = [
-        6  => 'Getting Started',
-        5  => 'Halfway Hero',
-        8  => 'Master Navigator',
-        13 => 'Feedback Follower',
-        15 => 'Steady Improver',
-        14 => 'Tenacious Tiger',
-        16 => 'Glory Guide',
+        6  => get_string('badge_name_getting_started', 'local_ascend_rewards'),
+        5  => get_string('badge_name_halfway_hero', 'local_ascend_rewards'),
+        8  => get_string('badge_name_master_navigator', 'local_ascend_rewards'),
+        13 => get_string('badge_name_feedback_follower', 'local_ascend_rewards'),
+        15 => get_string('badge_name_steady_improver', 'local_ascend_rewards'),
+        14 => get_string('badge_name_tenacious_tiger', 'local_ascend_rewards'),
+        16 => get_string('badge_name_glory_guide', 'local_ascend_rewards'),
     ];
 
     foreach ($badgelabels as $badgeid => $label) {
         $settings->add(new admin_setting_configtext(
             "local_ascend_rewards/coins_badge_{$badgeid}",
-            $label . ' — default coins',
-            'Default Ascend Assets awarded for this badge (used on install; can be changed anytime).',
+            get_string('default_coins_label', 'local_ascend_rewards', $label),
+            get_string('default_coins_desc', 'local_ascend_rewards'),
             (int)($defaults[$badgeid] ?? 0),
             PARAM_INT
         ));

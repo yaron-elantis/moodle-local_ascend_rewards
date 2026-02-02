@@ -20,7 +20,7 @@
  * Each badge earned gets its own gameboard. Meta badges allow 2 picks on their gameboard.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -81,10 +81,10 @@ class local_ascend_rewards_gameboard {
         [$week_start, $week_end] = self::get_week_range();
 
         $count = $DB->count_records_sql(
-            "SELECT COUNT(*) FROM {local_ascend_rewards_coins} 
-             WHERE userid = :uid 
+            "SELECT COUNT(*) FROM {local_ascend_rewards_coins}
+             WHERE userid = :uid
                AND badgeid > 0
-               AND timecreated >= :start 
+               AND timecreated >= :start
                AND timecreated <= :end",
             ['uid' => $userid, 'start' => $week_start, 'end' => $week_end]
         );
@@ -104,10 +104,10 @@ class local_ascend_rewards_gameboard {
 
         // Get badges earned this week
         $badges = $DB->get_records_sql(
-            "SELECT badgeid FROM {local_ascend_rewards_coins} 
-             WHERE userid = :uid 
+            "SELECT badgeid FROM {local_ascend_rewards_coins}
+             WHERE userid = :uid
                AND badgeid > 0
-               AND timecreated >= :start 
+               AND timecreated >= :start
                AND timecreated <= :end",
             ['uid' => $userid, 'start' => $week_start, 'end' => $week_end]
         );
@@ -202,7 +202,7 @@ class local_ascend_rewards_gameboard {
         global $DB;
 
         $total = $DB->get_field_sql(
-            "SELECT COALESCE(SUM(coins), 0) FROM {local_ascend_rewards_gameboard} 
+            "SELECT COALESCE(SUM(coins), 0) FROM {local_ascend_rewards_gameboard}
              WHERE userid = :uid",
             ['uid' => $userid]
         );

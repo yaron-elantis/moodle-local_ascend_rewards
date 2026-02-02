@@ -20,12 +20,10 @@
  * Tables are created via install.xml - this file handles post-install logic.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// phpcs:disable moodle.Files.MoodleInternal.MoodleInternalNotNeeded
-defined('MOODLE_INTERNAL') || die();
 // phpcs:disable moodle.Files.LineLength.MaxExceeded,moodle.Files.LineLength.TooLong
 // phpcs:disable moodle.Commenting.InlineComment.InvalidEndChar,moodle.Commenting.InlineComment.NotCapital
 
@@ -34,6 +32,8 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @return bool True on success
  */
+defined('MOODLE_INTERNAL') || die();
+
 function xmldb_local_ascend_rewards_install() {
     global $DB;
 
@@ -43,16 +43,16 @@ function xmldb_local_ascend_rewards_install() {
 
     foreach ($levelprefs as $pref) {
         $tokens = (int)$pref->value;
-        $existing = $DB->get_record('local_ascend_level_tokens', ['userid' => $pref->userid]);
+        $existing = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $pref->userid]);
 
         if ($existing) {
             if ((int)$existing->tokens_available < $tokens) {
                 $existing->tokens_available = $tokens;
                 $existing->timemodified = $now;
-                $DB->update_record('local_ascend_level_tokens', $existing);
+                $DB->update_record('local_ascend_rewards_level_tokens', $existing);
             }
         } else {
-            $DB->insert_record('local_ascend_level_tokens', (object) [
+            $DB->insert_record('local_ascend_rewards_level_tokens', (object) [
                 'userid' => $pref->userid,
                 'tokens_available' => $tokens,
                 'tokens_used' => 0,

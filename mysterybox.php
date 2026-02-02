@@ -20,27 +20,23 @@
  * Opens mystery boxes and awards random rewards (coins, tokens, avatars, or nothing).
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 // phpcs:disable moodle.Files.RequireLogin.Missing
 require_once(__DIR__ . '/../../config.php');
-if (!defined('CLI_SCRIPT')) {
-    require_login();
-}
-
+require_login();
 require_once(__DIR__ . '/classes/performance_cache.php');
 
 global $DB, $USER;
 
-// This endpoint contains extensive legacy logic and inline comments.
+header('Content-Type: application/json');
+
 // phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
 // phpcs:disable moodle.Commenting.InlineComment.InvalidEndChar,moodle.Commenting.InlineComment.NotCapital
 // phpcs:disable moodle.Files.LineLength.MaxExceeded,moodle.Files.LineLength.TooLong
 // phpcs:disable moodle.WhiteSpace.WhiteSpaceInStrings.EndLine,Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-
-header('Content-Type: application/json');
 
 // Verify POST request
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -54,8 +50,8 @@ $price = optional_param('price', 50, PARAM_INT);
 try {
     // Get user's coin balance (use safe fallback if read replica fails)
     try {
-        $sql = "SELECT COALESCE(SUM(coins), 0) as total_coins 
-                FROM {local_ascend_rewards_coins} 
+        $sql = "SELECT COALESCE(SUM(coins), 0) as total_coins
+                FROM {local_ascend_rewards_coins}
                 WHERE userid = :userid";
         $balance = $DB->get_field_sql($sql, ['userid' => $USER->id]);
     } catch (Exception $e) {
@@ -93,7 +89,7 @@ try {
     // Get user's current level (XP-based)
     // Get user's current XP from the separate XP table (safe fallback if aggregate read fails)
     try {
-        $user_xp = (int)$DB->get_field('local_ascend_xp', 'xp', ['userid' => $USER->id, 'courseid' => 0]);
+        $user_xp = (int)$DB->get_field('local_ascend_rewards_xp', 'xp', ['userid' => $USER->id, 'courseid' => 0]);
         if (!$user_xp) {
             $user_xp = 0;
         }
@@ -144,7 +140,7 @@ try {
     // Process based on box number
     switch ($box_number) {
         case 1:
-            // ✨ COINS: Demo version - random 100-500 coins
+            // COINS: Demo version - random 100-500 coins
             $coin_reward = mt_rand(100, 500);
 
             $reward_record = new stdClass();
@@ -160,24 +156,24 @@ try {
             break;
 
         case 2:
-            // ⭐ TOKENS: Random 1-2 tokens
+            // TOKENS: Random 1-2 tokens
             $token_reward = mt_rand(1, 2);
 
             // Get or create token record from database
-            $token_record = $DB->get_record('local_ascend_level_tokens', ['userid' => $USER->id]);
+            $token_record = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
             if (!$token_record) {
                 $token_record = new stdClass();
                 $token_record->userid = $USER->id;
                 $token_record->tokens_available = 0;
                 $token_record->tokens_used = 0;
                 $token_record->timemodified = time();
-                $token_record->id = $DB->insert_record('local_ascend_level_tokens', $token_record);
+                $token_record->id = $DB->insert_record('local_ascend_rewards_level_tokens', $token_record);
             }
 
             // Add the reward tokens
             $token_record->tokens_available += $token_reward;
             $token_record->timemodified = time();
-            $DB->update_record('local_ascend_level_tokens', $token_record);
+            $DB->update_record('local_ascend_rewards_level_tokens', $token_record);
 
             $new_tokens = $token_record->tokens_available - $token_record->tokens_used;
             $reward_type = 'tokens';
@@ -185,7 +181,7 @@ try {
             break;
 
         case 3:
-            // 👤 AVATAR: DEMO VERSION - Only Elf and Imp available
+            // AVATAR: DEMO VERSION - Only Elf and Imp available
             // Get user's XP level
             $max_level_by_xp = min($user_level, 8);
             $debug_max_level = $max_level_by_xp;
@@ -217,7 +213,7 @@ try {
                 $selected_avatar_level = $avatar_level;
 
                 // Check if user has this avatar already unlocked
-                $existing_unlock = $DB->get_record('local_ascend_avatar_unlocks', [
+                $existing_unlock = $DB->get_record('local_ascend_rewards_avatar_unlocks', [
                     'userid' => $USER->id,
                     'avatar_name' => $avatar_filename,
                 ]);
@@ -244,7 +240,7 @@ try {
             }
 
             if ($selected_avatar) {
-                // Guard: if avatar belongs to a level the user hasn’t unlocked yet, convert to coins
+                // Guard: if avatar belongs to a level the user hasn't unlocked yet, convert to coins
                 $is_locked_level = ($selected_avatar_level > $user_level);
 
                 if ($is_locked_level) {
@@ -268,7 +264,7 @@ try {
                     $avatar_unlock_record->avatar_level = $user_level;
                     $avatar_unlock_record->unlock_type = 'mystery_box';
                     $avatar_unlock_record->timecreated = time();
-                    $DB->insert_record('local_ascend_avatar_unlocks', $avatar_unlock_record);
+                    $DB->insert_record('local_ascend_rewards_avatar_unlocks', $avatar_unlock_record);
 
                     $reward_type = 'avatar_new';
                     $reward_message = 'YOU UNLOCKED A NEW HERO! Your new hero has been added to your collection!';
@@ -321,7 +317,7 @@ try {
     $total_coins = (int)$DB->get_field_sql("SELECT COALESCE(SUM(coins), 0) FROM {local_ascend_rewards_coins} WHERE userid = ?", [$USER->id]);
 
     // Get total tokens available
-    $token_record = $DB->get_record('local_ascend_level_tokens', ['userid' => $USER->id]);
+    $token_record = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
     $total_tokens_available = 0;
     if ($token_record) {
         $total_tokens_available = $token_record->tokens_available - $token_record->tokens_used;
@@ -366,4 +362,4 @@ try {
         'message' => 'Error opening mystery box. The error has been logged.',
     ]);
 }
-// End of script - response already sent above.
+

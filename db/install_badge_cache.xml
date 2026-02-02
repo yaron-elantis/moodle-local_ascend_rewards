@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <XMLDB PATH="local/ascend_rewards/db" VERSION="20251201" COMMENT="XMLDB file for badge activity cache"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="local_ascend_badge_cache" COMMENT="Caches badge qualifying activities for fast retrieval">
+    <TABLE NAME="local_ascend_rewards_badge_cache" COMMENT="Caches badge qualifying activities for fast retrieval">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -27,3 +27,4 @@
     </TABLE>
   </TABLES>
 </XMLDB>
+

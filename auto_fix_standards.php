@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 // phpcs:ignoreFile -- Development utility script (not part of runtime).
 /**
@@ -16,6 +15,8 @@
  * - Basic spacing issues
  *
  * @package local_ascend_rewards
+ * @copyright 2026 Elantis (Pty) LTD
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $directory = isset($argv[1]) ? $argv[1] : dirname(__FILE__);
@@ -49,7 +50,7 @@ $standard_header = '<?php
  * DESCRIPTION_NEEDED
  *
  * @package    local_ascend_rewards
- * @copyright  2025 Your Organization
+ * @copyright 2026 Elantis (Pty) LTD
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -87,7 +88,7 @@ function fix_php_file($filepath) {
     // Fix double quotes to single quotes for simple strings
     // Be careful - only fix obvious cases
     $content = preg_replace_callback(
-        '/(\s*=\s*)"([^"$]*?)"(;?)/',
+        '/(\s*=\s*)"([^"$]*)"(;)/',
         function ($matches) use (&$issues) {
             if (strpos($matches[2], '$') === false && strpos($matches[2], '{') === false) {
                 $issues++;
@@ -111,7 +112,7 @@ function fix_php_file($filepath) {
         $total_issues += $issues;
 
         $relative = str_replace(dirname(dirname(__FILE__)), '.', $filepath);
-        echo "  ✓ Fixed: $relative ($issues issues)\n";
+        echo "  Fixed: $relative ($issues issues)\n";
     }
 }
 
@@ -146,4 +147,4 @@ echo "- Long line breaks\n";
 echo "- PHPDoc blocks\n";
 echo "- Security validations\n";
 echo "\nRun check_standards.php again to see remaining issues.\n";
-?>
+>

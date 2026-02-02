@@ -84,7 +84,7 @@ Ready for fixes:  ✅ YES
                         ↓
         ┌───────────────┬───────────────┐
         ↓               ↓               ↓
-   Need Steps?    Need Details?    Need Reference?
+   Need Steps    Need Details    Need Reference
         ↓               ↓               ↓
  README_SUBMISSION  MOODLE_STANDARDS  QUICK_REFERENCE
         ↓               ↓               ↓
@@ -242,14 +242,14 @@ code START_HERE.md
 
 | Question | Answer |
 |----------|--------|
-| Where do I start? | START_HERE.md |
-| How do I fix X? | README_SUBMISSION.md |
-| What are all standards? | MOODLE_STANDARDS.md |
-| Need quick code reference? | QUICK_REFERENCE.md |
-| Want professional tools? | SETUP_CHECKER_TOOLS.md |
-| What's my current status? | Run check_standards.php |
-| How do I navigate docs? | DOCUMENTATION_INDEX.md |
-| Is setup complete? | Yes! See this file |
+| Where do I start | START_HERE.md |
+| How do I fix X | README_SUBMISSION.md |
+| What are all standards | MOODLE_STANDARDS.md |
+| Need quick code reference | QUICK_REFERENCE.md |
+| Want professional tools | SETUP_CHECKER_TOOLS.md |
+| What's my current status | Run check_standards.php |
+| How do I navigate docs | DOCUMENTATION_INDEX.md |
+| Is setup complete | Yes! See this file |
 
 ---
 
@@ -298,7 +298,7 @@ Total: ~25 hours of focused work
 
 ---
 
-## 🚀 Ready? Start Here:
+## 🚀 Ready Start Here:
 
 ### Option A: Read First (Recommended)
 ```

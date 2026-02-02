@@ -22,6 +22,8 @@
  * Run from your plugin directory: php check_standards.php
  *
  * @package local_ascend_rewards
+ * @copyright 2026 Elantis (Pty) LTD
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 // Directory to scan (current plugin directory)
@@ -72,7 +74,7 @@ function check_file($filepath) {
         }
 
         // Check for silenced errors @
-        if (strpos($line, '@') !== false && !preg_match('/@package|@copyright|@license|@param|@return|@throws|@var/', $line)) {
+        if (strpos($line, '@') !== false && !preg_match('/@package|@copyright|@license/', $line)) {
             $warnings[] = "$relative:$linenum - Silenced error operator (@) found - should be avoided";
         }
 
@@ -137,7 +139,7 @@ foreach ($php_files as $file) {
 echo "Checked $files_checked PHP files\n\n";
 
 if (count($errors) > 0) {
-    echo "❌ ERRORS (" . count($errors) . "):\n";
+    echo "ERRORS (" . count($errors) . "):\n";
     echo str_repeat("=", 60) . "\n";
     foreach ($errors as $error) {
         echo "  $error\n";
@@ -146,7 +148,7 @@ if (count($errors) > 0) {
 }
 
 if (count($warnings) > 0) {
-    echo "⚠️  WARNINGS (" . count($warnings) . "):\n";
+    echo "WARNINGS (" . count($warnings) . "):\n";
     echo str_repeat("=", 60) . "\n";
     foreach ($warnings as $warning) {
         echo "  $warning\n";
@@ -155,7 +157,7 @@ if (count($warnings) > 0) {
 }
 
 if (count($errors) === 0 && count($warnings) === 0) {
-    echo "✅ No issues found!\n";
+    echo "No issues found!\n";
 } else {
     echo "\nTotal issues: " . (count($errors) + count($warnings)) . "\n";
     echo "Critical errors: " . count($errors) . "\n";

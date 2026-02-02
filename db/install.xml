@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <XMLDB PATH="local/ascend_rewards/db" VERSION="20251210" COMMENT="Apex Rewards plugin"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
@@ -61,7 +61,7 @@ along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
         <INDEX NAME="userid_badge" UNIQUE="false" FIELDS="userid,badgeid,week" />
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_ascend_badge_cache" COMMENT="Cache for badge qualifying activities">
+    <TABLE NAME="local_ascend_rewards_badge_cache" COMMENT="Cache for badge qualifying activities">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" />
@@ -116,7 +116,7 @@ along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
         <INDEX NAME="user_time_idx" UNIQUE="false" FIELDS="userid,timecreated" />
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_ascend_mysterybox" COMMENT="Mystery box openings and rewards tracking">
+    <TABLE NAME="local_ascend_rewards_mysterybox" COMMENT="Mystery box openings and rewards tracking">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
@@ -135,7 +135,7 @@ along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
         <INDEX NAME="mbox_reward_type_idx" UNIQUE="false" FIELDS="reward_type" />
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_ascend_avatar_unlocks" COMMENT="Avatar, pet, and villain unlock tracking with level-based system">
+    <TABLE NAME="local_ascend_rewards_avatar_unlocks" COMMENT="Avatar, pet, and villain unlock tracking with level-based system">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
@@ -155,7 +155,7 @@ along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
         <INDEX NAME="user_level_idx" UNIQUE="false" FIELDS="userid,avatar_level" />
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_ascend_level_tokens" COMMENT="Level-up unlock tokens for avatars and pets">
+    <TABLE NAME="local_ascend_rewards_level_tokens" COMMENT="Level-up unlock tokens for avatars and pets">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
@@ -168,7 +168,7 @@ along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" UNIQUE="true" />
       </KEYS>
     </TABLE>
-    <TABLE NAME="local_ascend_xp" COMMENT="XP tracking - SEPARATE from coins. XP never decreases. Rankings use XP only.">
+    <TABLE NAME="local_ascend_rewards_xp" COMMENT="XP tracking - SEPARATE from coins. XP never decreases. Rankings use XP only.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
@@ -187,3 +187,4 @@ along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
     </TABLE>
   </TABLES>
 </XMLDB>
+

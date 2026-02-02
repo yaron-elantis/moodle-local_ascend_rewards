@@ -20,7 +20,7 @@
  * Caches expensive computations to improve page load times.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -54,7 +54,7 @@ class performance_cache {
         global $DB;
 
         // Get XP directly from dedicated XP table (most reliable)
-        $xp_record = $DB->get_record('local_ascend_xp', [
+        $xp_record = $DB->get_record('local_ascend_rewards_xp', [
             'userid' => $userid,
             'courseid' => $courseid,
         ]);
@@ -103,7 +103,7 @@ class performance_cache {
         }
 
         $sql = "SELECT x.userid, x.xp
-                FROM {local_ascend_xp} x
+                FROM {local_ascend_rewards_xp} x
                 JOIN {user} u ON u.id = x.userid
                 WHERE x.courseid = :cid AND x.xp > 0
                   AND u.suspended = 0 AND u.deleted = 0
@@ -132,8 +132,8 @@ class performance_cache {
 
         // Get rank directly - don't cache ranks as they change frequently
         $rankcount = (int)$DB->get_field_sql(
-            "SELECT COUNT(*) FROM {local_ascend_xp}
-             WHERE courseid = :cid 
+            "SELECT COUNT(*) FROM {local_ascend_rewards_xp}
+             WHERE courseid = :cid
                AND xp > 0
                AND ((xp > :uxp) OR (xp = :uxp2 AND userid < :uid))",
             ['cid' => $courseid, 'uxp' => $userxp, 'uxp2' => $userxp, 'uid' => $userid]

@@ -20,7 +20,7 @@ namespace local_ascend_rewards\hook_callbacks;
  * Hook callbacks for output.
  *
  * @package    local_ascend_rewards
- * @copyright  2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class output_callbacks {
@@ -35,7 +35,7 @@ class output_callbacks {
 
         global $CFG;
         require_once($CFG->dirroot . '/local/ascend_rewards/lib.php');
-        $output = \local_ascend_rewards_before_standard_top_of_body_html();
+        $output = \local_ascend_rewards_build_badge_notification_html();
         $hook->add_html($output);
     }
 }

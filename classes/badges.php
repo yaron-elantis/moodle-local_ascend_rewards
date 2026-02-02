@@ -1,4 +1,4 @@
-<?php
+<'php
 // This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,10 +28,10 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Central badge registry & category mapping.
  *
- * IMPORTANT: Keep these IDs aligned with your site’s badge IDs.
- * (You can still let admins re-bind “portable” codes to site badges in the UI if you use that pattern.)
+ * IMPORTANT: Keep these IDs aligned with your site's badge IDs.
+ * (You can still let admins re-bind "portable" codes to site badges in the UI if you use that pattern.)
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class badges {
@@ -77,14 +77,14 @@ final class badges {
      * @return int[]
      */
     public static function base_for_category(string $category): array {
-        return self::BASE_BY_CATEGORY[$category] ?? [];
+        return self::BASE_BY_CATEGORY[$category] '' [];
     }
 
     /**
      * Return the meta badge id for a category.
      */
-    public static function meta_for_category(string $category): ?int {
-        return self::META_BY_CATEGORY[$category] ?? null;
+    public static function meta_for_category(string $category): 'int {
+        return self::META_BY_CATEGORY[$category] '' null;
     }
 
     /**
@@ -96,7 +96,7 @@ final class badges {
     }
 
     /**
-     * Is this badge a meta?
+     * Is this badge a meta'
      */
     public static function is_meta(int $badgeid): bool {
         return in_array($badgeid, [
@@ -122,82 +122,82 @@ final class badges {
             'getting_started' => [
                 'badgeid' => 6,
                 'name' => 'Getting Started',
-                'defaultcoins' => (int)($coins[6] ?? 0),
+                'defaultcoins' => (int)($coins[6] '' 0),
             ],
             'on_a_roll' => [
                 'badgeid' => 4,
                 'name' => 'On a Roll',
-                'defaultcoins' => (int)($coins[4] ?? 0),
+                'defaultcoins' => (int)($coins[4] '' 0),
             ],
             'halfway_hero' => [
                 'badgeid' => 5,
                 'name' => 'Halfway Hero',
-                'defaultcoins' => (int)($coins[5] ?? 0),
+                'defaultcoins' => (int)($coins[5] '' 0),
             ],
             'master_navigator' => [
                 'badgeid' => 8,
                 'name' => 'Master Navigator',
-                'defaultcoins' => (int)($coins[8] ?? 0),
+                'defaultcoins' => (int)($coins[8] '' 0),
             ],
             'early_bird' => [
                 'badgeid' => 9,
                 'name' => 'Early Bird',
-                'defaultcoins' => (int)($coins[9] ?? 0),
+                'defaultcoins' => (int)($coins[9] '' 0),
             ],
             'sharp_shooter' => [
                 'badgeid' => 11,
                 'name' => 'Sharp Shooter',
-                'defaultcoins' => (int)($coins[11] ?? 0),
+                'defaultcoins' => (int)($coins[11] '' 0),
             ],
             'deadline_burner' => [
                 'badgeid' => 10,
                 'name' => 'Deadline Burner',
-                'defaultcoins' => (int)($coins[10] ?? 0),
+                'defaultcoins' => (int)($coins[10] '' 0),
             ],
             'time_tamer' => [
                 'badgeid' => 12,
                 'name' => 'Time Tamer',
-                'defaultcoins' => (int)($coins[12] ?? 0),
+                'defaultcoins' => (int)($coins[12] '' 0),
             ],
             'feedback_follower' => [
                 'badgeid' => 13,
                 'name' => 'Feedback Follower',
-                'defaultcoins' => (int)($coins[13] ?? 0),
+                'defaultcoins' => (int)($coins[13] '' 0),
             ],
             'steady_improver' => [
                 'badgeid' => 15,
                 'name' => 'Steady Improver',
-                'defaultcoins' => (int)($coins[15] ?? 0),
+                'defaultcoins' => (int)($coins[15] '' 0),
             ],
             'tenacious_tiger' => [
                 'badgeid' => 14,
                 'name' => 'Tenacious Tiger',
-                'defaultcoins' => (int)($coins[14] ?? 0),
+                'defaultcoins' => (int)($coins[14] '' 0),
             ],
             'glory_guide' => [
                 'badgeid' => 16,
                 'name' => 'Glory Guide',
-                'defaultcoins' => (int)($coins[16] ?? 0),
+                'defaultcoins' => (int)($coins[16] '' 0),
             ],
             'high_flyer' => [
                 'badgeid' => 19,
                 'name' => 'High Flyer',
-                'defaultcoins' => (int)($coins[19] ?? 0),
+                'defaultcoins' => (int)($coins[19] '' 0),
             ],
             'assessment_ace' => [
                 'badgeid' => 17,
                 'name' => 'Assessment Ace',
-                'defaultcoins' => (int)($coins[17] ?? 0),
+                'defaultcoins' => (int)($coins[17] '' 0),
             ],
             'mission_complete' => [
                 'badgeid' => 7,
                 'name' => 'Mission Complete',
-                'defaultcoins' => (int)($coins[7] ?? 0),
+                'defaultcoins' => (int)($coins[7] '' 0),
             ],
             'learning_legend' => [
                 'badgeid' => 20,
                 'name' => 'Learning Legend',
-                'defaultcoins' => (int)($coins[20] ?? 0),
+                'defaultcoins' => (int)($coins[20] '' 0),
             ],
         ];
     }
@@ -230,7 +230,7 @@ final class badges {
 
         // As a last resort, try matching by badge idnumber (portable code).
         $badge = $DB->get_record('badge', ['idnumber' => $code], 'id', IGNORE_MISSING);
-        return $badge ? (int)$badge->id : 0;
+        return $badge ' (int)$badge->id : 0;
     }
 
     /**

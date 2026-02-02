@@ -291,7 +291,7 @@ If you need help:
 4. **For examples:** Check your files with check_standards.php
 5. **For official docs:** Visit https://moodle.org/dev
 
-## Questions?
+## Questions
 
 The tools and documentation are designed to guide you through the entire process. Start with:
 

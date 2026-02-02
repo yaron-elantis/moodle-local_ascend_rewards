@@ -20,7 +20,7 @@
  * Contains callback functions for navigation, rendering, and plugin functionality.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,66 +35,12 @@ defined('MOODLE_INTERNAL') || die();
 // phpcs:disable Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 
 /**
- * Adds "Ascend Rewards" to the site navigation.
- *
- * @param global_navigation $nav Global navigation object
- */
-function local_ascend_rewards_extend_navigation(global_navigation $nav) {
-    global $USER;
-
-    if (isloggedin() && !isguestuser()) {
-        $nav->add(
-            navigation_node::create(
-                get_string('pluginname', 'local_ascend_rewards'),
-                new moodle_url('/local/ascend_rewards/index.php'),
-                navigation_node::TYPE_CUSTOM,
-                null,
-                'local_ascend_rewards'
-            )
-        );
-
-        // Cache warming - pre-load badges user is close to earning (once per hour)
-        try {
-            require_once(__DIR__ . '/classes/cache_warmer.php');
-            $last_warm = get_user_preferences('ascend_last_cache_warm', 0, $USER->id);
-            if (time() - $last_warm > 3600) {
-                \local_ascend_rewards\cache_warmer::warm_user_cache($USER->id);
-                set_user_preference('ascend_last_cache_warm', time(), $USER->id);
-            }
-        } catch (\Exception $e) {
-            // Silently fail - cache warming is not critical
-        }
-    }
-}
-
-/**
- * Adds "Ascend Rewards" to the user navigation (navbar).
- *
- * @param navigation_node $usernode User navigation node
- */
-function local_ascend_rewards_extend_navigation_user(navigation_node $usernode) {
-    global $USER;
-
-    if (isloggedin() && !isguestuser()) {
-        $usernode->add(
-            navigation_node::create(
-                get_string('pluginname', 'local_ascend_rewards'),
-                new moodle_url('/local/ascend_rewards/index.php'),
-                navigation_node::TYPE_CUSTOM,
-                null,
-                'local_ascend_rewards_navbar'
-            )
-        );
-    }
-}
-
-/**
- * Hook to inject badge notification on all pages.
+ * Build badge notification HTML for hook output.
  *
  * @return string HTML to inject at top of body
  */
-function local_ascend_rewards_before_standard_top_of_body_html() {
-    global $USER, $PAGE;
+function local_ascend_rewards_build_badge_notification_html() {
+    global $USER;
 
     if (!isloggedin() || isguestuser()) {
         return '';
@@ -141,13 +87,13 @@ function local_ascend_rewards_before_standard_top_of_body_html() {
     $badgeid = (int)($notification['badgeid'] ?? 0);
     $coins = (int)($notification['coins'] ?? 0);
     $xp = isset($notification['xp']) ? (int)$notification['xp'] : (int)floor($coins / 2);
-    $coursename = s($notification['coursename'] ?? 'Unknown Course');
+    $coursename = s($notification['coursename'] ?? get_string('unknown_course_label', 'local_ascend_rewards'));
     $activities = $notification['activities'] ?? [];
     $rank = isset($notification['rank']) ? (int)$notification['rank'] : 0;
     $total_users = isset($notification['total_users']) ? (int)$notification['total_users'] : 0;
     $rank_change = $notification['rank_change'] ?? null;
-    $badge_description = s($notification['description'] ?? 'See badge rules.');
-    $badge_category = s($notification['category'] ?? 'General');
+    $badge_description = s($notification['description'] ?? get_string('badge_desc_default', 'local_ascend_rewards'));
+    $badge_category = s($notification['category'] ?? get_string('badge_category_default', 'local_ascend_rewards'));
     $timestamp = isset($notification['timestamp']) ? (int)$notification['timestamp'] : time();
     $date_earned = userdate($timestamp, get_string('strftimedate', 'langconfig'));
     $rewardsurl = (new moodle_url('/local/ascend_rewards/index.php'))->out(false);
@@ -184,6 +130,23 @@ function local_ascend_rewards_before_standard_top_of_body_html() {
     $videourl = (new moodle_url('/local/ascend_rewards/pix/' . $video_filename))->out(false);
     $medalurl = (new moodle_url('/local/ascend_rewards/pix/medal_gold.png'))->out(false);
 
+    $badge_earned_title = get_string('badge_earned_title', 'local_ascend_rewards');
+    $badge_earned_subtitle = get_string('badge_earned_subtitle', 'local_ascend_rewards');
+    $close_label = get_string('close_label', 'local_ascend_rewards');
+    $fullscreen_label = get_string('fullscreen_label', 'local_ascend_rewards');
+    $badge_label = get_string('badge_label', 'local_ascend_rewards');
+    $xp_default_display = get_string('xp_default_display', 'local_ascend_rewards');
+    $experience_points_label = get_string('experience_points_label', 'local_ascend_rewards');
+    $assets_label = get_string('assets_label', 'local_ascend_rewards');
+    $coins_label = get_string('coins_label', 'local_ascend_rewards');
+    $course_label = get_string('course_label', 'local_ascend_rewards');
+    $earned_on_label = get_string('earned_on_label', 'local_ascend_rewards');
+    $achievement_details_label = get_string('achievement_details_label', 'local_ascend_rewards');
+    $qualifying_activities_label = get_string('qualifying_activities_label', 'local_ascend_rewards');
+    $view_my_progress_label = get_string('view_my_progress_label', 'local_ascend_rewards');
+    $rank_label = get_string('rank_label', 'local_ascend_rewards');
+    $of_label = get_string('of_label', 'local_ascend_rewards');
+
     // Output HTML and JavaScript for notification
     $output = <<<HTML
 <style>
@@ -212,7 +175,7 @@ function local_ascend_rewards_before_standard_top_of_body_html() {
   background: linear-gradient(145deg, #0a1832 0%, #0d1b35 100%);
   border: 2px solid #ff9500;
   border-radius: 20px;
-  box-shadow: 
+  box-shadow:
     0 25px 50px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 149, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -228,11 +191,11 @@ function local_ascend_rewards_before_standard_top_of_body_html() {
 }
 
 @keyframes slideUp {
-  from { 
+  from {
     opacity: 0;
     transform: translate(-50%, -60%);
   }
-  to { 
+  to {
     opacity: 1;
     transform: translate(-50%, -50%);
   }
@@ -254,7 +217,7 @@ function local_ascend_rewards_before_standard_top_of_body_html() {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
+  background:
     radial-gradient(circle at 20% 20%, rgba(255, 149, 0, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
   pointer-events: none;
@@ -529,7 +492,7 @@ function local_ascend_rewards_before_standard_top_of_body_html() {
 }
 
 .apex-reward-description::before {
-  content: '📋';
+  content: '';
   position: absolute;
   left: -8px;
   top: 2px;
@@ -573,7 +536,7 @@ function local_ascend_rewards_before_standard_top_of_body_html() {
 }
 
 .apex-reward-activities::before {
-  content: '🎯';
+  content: '';
   position: absolute;
   left: -8px;
   top: 2px;
@@ -649,7 +612,7 @@ function local_ascend_rewards_before_standard_top_of_body_html() {
 }
 
 .apex-reward-activity-item::before {
-  content: '✅';
+  content: '';
   color: #00ff88;
   font-weight: 800;
   font-size: 0.9rem;
@@ -674,7 +637,7 @@ function local_ascend_rewards_before_standard_top_of_body_html() {
 }
 
 .apex-reward-rank::before {
-  content: '🏅';
+  content: '';
   position: absolute;
   right: 16px;
   top: 50%;
@@ -776,29 +739,29 @@ function local_ascend_rewards_before_standard_top_of_body_html() {
 <div id="apexRewardBackdrop" class="apex-reward-modal-backdrop"></div>
 <div id="apexRewardModal" class="apex-reward-modal">
   <div class="apex-reward-header">
-    <h1 class="apex-reward-title">🏆 Badge Earned!</h1>
-    <p class="apex-reward-subtitle">Congratulations on your achievement</p>
+    <h1 class="apex-reward-title">{$badge_earned_title}</h1>
+    <p class="apex-reward-subtitle">{$badge_earned_subtitle}</p>
     <div class="apex-reward-progress"></div>
-    <button class="apex-reward-close" onclick="closeApexRewardModal()" aria-label="Close">
+    <button class="apex-reward-close" onclick="closeApexRewardModal()" aria-label="{$close_label}">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
   </div>
-  
+
   <div class="apex-reward-body">
     <!-- Video Section -->
     <div class="apex-reward-video-container">
       <video id="apexRewardVideo" class="apex-reward-video" playsinline loop>
         <source src="{$videourl}" type="video/mp4">
       </video>
-      <button class="apex-reward-fullscreen-btn" id="apexRewardFullscreen" title="Fullscreen">⛶</button>
+      <button class="apex-reward-fullscreen-btn" id="apexRewardFullscreen" title="{$fullscreen_label}"></button>
     </div>
-    
+
     <!-- Badge Name -->
     <div style="text-align: center; margin-bottom: 24px;">
       <h2 style="font-size: 1.5rem; font-weight: 800; color: #00d4ff; margin: 0; text-shadow: 0 2px 4px rgba(0, 212, 255, 0.3);">{$badgename}</h2>
-      <p style="font-size: 0.9rem; color: #a5b4d6; margin: 4px 0 0; font-weight: 500;">{$badge_category} Badge</p>
+      <p style="font-size: 0.9rem; color: #a5b4d6; margin: 4px 0 0; font-weight: 500;">{$badge_category} {$badge_label}</p>
     </div>
-    
+
     <!-- Stats -->
     <div class="apex-reward-stats">
       <div class="apex-reward-stat-card">
@@ -809,52 +772,54 @@ function local_ascend_rewards_before_standard_top_of_body_html() {
             <text x="40" y="52" text-anchor="middle" fill="#01142E" font-size="32" font-weight="800">X</text>
           </svg>
         </div>
-        <div class="apex-reward-stat-value" id="apexRewardXP">+0 XP</div>
-        <div class="apex-reward-stat-label">Experience Points</div>
+        <div class="apex-reward-stat-value" id="apexRewardXP">{$xp_default_display}</div>
+        <div class="apex-reward-stat-label">{$experience_points_label}</div>
       </div>
-      
+
       <div class="apex-reward-stat-card">
         <div class="apex-reward-stat-icon">
           <img id="apexRewardMedal" src="" alt="Medal" style="width: 24px; height: 24px;" onerror="this.style.display='none';">
         </div>
-        <div class="apex-reward-stat-value">+{$coins} Coins</div>
-        <div class="apex-reward-stat-label">Ascend Assets</div>
+        <div class="apex-reward-stat-value">+{$coins} {$coins_label}</div>
+        <div class="apex-reward-stat-label">{$assets_label}</div>
       </div>
     </div>
-    
+
     <!-- Info Grid -->
     <div class="apex-reward-info">
       <div class="apex-reward-info-grid">
         <div class="apex-reward-info-item">
-          <div class="apex-reward-info-label">Course</div>
+          <div class="apex-reward-info-label">{$course_label}</div>
           <div class="apex-reward-info-value">{$coursename}</div>
         </div>
         <div class="apex-reward-info-item">
-          <div class="apex-reward-info-label">Earned On</div>
+          <div class="apex-reward-info-label">{$earned_on_label}</div>
           <div class="apex-reward-info-value" id="apexRewardDate">{$date_earned}</div>
         </div>
       </div>
     </div>
-    
+
     <!-- Description -->
     <div class="apex-reward-description">
-      <h3 class="apex-reward-description-title">Achievement Details</h3>
+      <h3 class="apex-reward-description-title">{$achievement_details_label}</h3>
       <p class="apex-reward-description-text" id="apexRewardDescription">{$badge_description}</p>
     </div>
-    
+
     <!-- Activities -->
 HTML;
 
     // Add qualifying activities if available
     if (!empty($activities)) {
         $output .= '<div class="apex-reward-activities">';
-        $output .= '<h3 class="apex-reward-activities-title">Qualifying Activities</h3>';
+        $output .= '<h3 class="apex-reward-activities-title">' . $qualifying_activities_label . '</h3>';
         $output .= '<ul class="apex-reward-activities-list">';
         $activity_count = 0;
         foreach ($activities as $activity) {
             if ($activity_count >= 10) {
                 $remaining = count($activities) - $activity_count;
-                $output .= '<li class="apex-reward-activity-item" style="color: #ffd700; font-weight: 600;">...and ' . $remaining . ' more activities</li>';
+                $output .= '<li class="apex-reward-activity-item" style="color: #ffd700; font-weight: 600;">' .
+                    get_string('more_activities_label', 'local_ascend_rewards', $remaining) .
+                    '</li>';
                 break;
             }
             $output .= '<li class="apex-reward-activity-item">' . s($activity) . '</li>';
@@ -871,15 +836,15 @@ HTML;
         if ($rank_change !== null && $rank_change != 0) {
             if ($rank_change > 0) {
                 $rank_change_class = 'up';
-                $rank_change_text = ' ↑ +' . abs($rank_change);
+                $rank_change_text = '  +' . abs($rank_change);
             } else if ($rank_change < 0) {
                 $rank_change_class = 'down';
-                $rank_change_text = ' ↓ ' . abs($rank_change);
+                $rank_change_text = '  ' . abs($rank_change);
             }
         }
 
         $output .= '<div class="apex-reward-rank">';
-        $output .= '<div class="apex-reward-rank-text">🏆 Rank: <strong>#' . $rank . ' of ' . $total_users . '</strong></div>';
+        $output .= '<div class="apex-reward-rank-text"> ' . $rank_label . ' <strong>#' . $rank . ' ' . $of_label . ' ' . $total_users . '</strong></div>';
         if ($rank_change_text) {
             $output .= '<div class="apex-reward-rank-change ' . $rank_change_class . '">' . $rank_change_text . '</div>';
         }
@@ -889,7 +854,7 @@ HTML;
     $output .= <<<HTML
     <!-- Actions -->
     <div class="apex-reward-actions">
-      <a href="{$rewardsurl}" class="apex-reward-btn apex-reward-btn-primary">View My Progress</a>
+      <a href="{$rewardsurl}" class="apex-reward-btn apex-reward-btn-primary">{$view_my_progress_label}</a>
     </div>
   </div>
 </div>
@@ -908,27 +873,27 @@ HTML;
   // XP value comes directly from the notification payload (not derived from coins)
   var coins = {$coins};
   var badgeXp = {$xp};
-  
+
   // Set XP display
   if(xpElement) {
     xpElement.textContent = '+' + badgeXp + ' XP';
   }
-  
+
   // Set medal icon URL
   if(medalImg) {
     medalImg.src = '{$medalurl}';
   }
-  
+
   // Set description
   if(descriptionElement) {
     descriptionElement.textContent = '{$badge_description}';
   }
-  
+
   // Set date
   if(dateElement) {
     dateElement.textContent = '{$date_earned}';
   }
-  
+
   // Fullscreen button functionality
   if(fullscreenBtn && video) {
     fullscreenBtn.addEventListener('click', function(e) {
@@ -1088,6 +1053,9 @@ function local_ascend_rewards_show_levelup_modal() {
     $videourl = (new moodle_url('/local/ascend_rewards/pix/' . $video_filename))->out(false);
     $soundurl = (new moodle_url('/local/ascend_rewards/pix/level_up.mp3'))->out(false);
 
+    $levelup_title = get_string('levelup_modal_title', 'local_ascend_rewards');
+    $levelup_subtitle = get_string('levelup_modal_subtitle', 'local_ascend_rewards');
+
     // Output HTML and JavaScript for level-up notification
     $output = <<<HTML
 <style>
@@ -1153,7 +1121,7 @@ function local_ascend_rewards_show_levelup_modal() {
 }
 
 .apex-levelup-close:before{
-    content:'✕';
+    content:'×';
     font-weight:400;
     line-height:1;
 }
@@ -1222,7 +1190,7 @@ function local_ascend_rewards_show_levelup_modal() {
 <div class="apex-levelup-modal" id="apexLevelupModal">
     <div class="apex-levelup-header">
         <button class="apex-levelup-close" onclick="closeApexLevelup()" aria-label="Close" title="Close"></button>
-        <h2 class="apex-levelup-title">🎉 Level Up! 🎉</h2>
+        <h2 class="apex-levelup-title"> {$levelup_title} </h2>
     </div>
     <div class="apex-levelup-body">
         <video id="apexLevelupVideo" class="apex-levelup-video" playsinline loop>
@@ -1231,7 +1199,7 @@ function local_ascend_rewards_show_levelup_modal() {
     </div>
     <div class="apex-levelup-footer">
         <div class="apex-levelup-level">LEVEL {$level}</div>
-        <div class="apex-levelup-subtitle">Keep climbing to the top!</div>
+        <div class="apex-levelup-subtitle">{$levelup_subtitle}</div>
     </div>
 </div>
 
@@ -1295,7 +1263,7 @@ function local_ascend_rewards_show_levelup_modal() {
   // Loop video 3 times
   var levelupLoopCount = 0;
   var levelupMaxLoops = 3;
-  
+
   if(video) {
     video.addEventListener('ended', function() {
       levelupLoopCount++;
@@ -1310,13 +1278,13 @@ function local_ascend_rewards_show_levelup_modal() {
 
   // Make showLevelup globally accessible for badge modal to trigger
   window.showApexLevelup = showLevelup;
-  
+
   console.log('Level-up modal initialized, checking for badge notification...');
-  
+
   // Show level-up after page loads
   // Check if badge notification exists, only show immediately if no badge
   var hasBadgeNotif = document.getElementById('apexToast');
-  
+
   if(!hasBadgeNotif) {
     // No badge notification, show level-up immediately
     console.log('No badge notification, showing level-up immediately');

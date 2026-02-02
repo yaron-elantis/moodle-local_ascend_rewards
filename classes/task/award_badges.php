@@ -23,7 +23,7 @@ defined('MOODLE_INTERNAL') || die();
  * Award badges on a schedule.
  *
  * @package    local_ascend_rewards
- * @copyright  2026 Ascend
+ * @copyright 2026 Elantis (Pty) LTD
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class award_badges extends \core\task\scheduled_task {

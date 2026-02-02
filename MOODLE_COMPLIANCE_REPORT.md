@@ -1,4 +1,4 @@
-# Moodle Plugin Repository Compliance Report
+﻿# Moodle Plugin Repository Compliance Report
 
 ## Ascend Rewards (local_ascend_rewards) v1.2.1
 
@@ -68,8 +68,8 @@
    - Package and copyright information in all files
 
 3. **Copyright Information** - Standardized:
-   - Changed from "Your Name" and "Apex Rewards" to "Ascend Rewards"
-   - Year: 2025
+   - Changed ownership to "Elantis (Pty) LTD"
+   - Year: 2026
    - License: GNU GPL v3 or later
 
 4. **Namespace Usage** - Proper:
@@ -131,34 +131,34 @@
 
 ```
 local/ascend_rewards/
-├── README.md                   ✅ Created
-├── CHANGES.md                  ✅ Created
-├── version.php                 ✅ Compliant
-├── thirdpartylibs.xml          ✅ Created
-├── lib.php                     ✅ Has GPL header
-├── settings.php                ✅ Has GPL header
-├── index.php                   ✅ Main page (⚠️ inline CSS)
-├── classes/
-│   ├── badge_awarder.php       ✅ PHPDoc added
-│   ├── observer.php            ✅ PHPDoc added
-│   ├── gameboard.php           ✅ PHPDoc added
-│   ├── navigation.php          ✅ PHPDoc added
-│   ├── privacy/
-│   │   └── provider.php        ✅ Implements privacy API
-│   └── task/
-│       └── *.php               ✅ Scheduled tasks
-├── db/
-│   ├── install.xml             ✅ Schema definition
-│   ├── install.php             ✅ PHPDoc added
-│   ├── upgrade.php             ✅ PHPDoc added
-│   ├── access.php              ✅ Capabilities
-│   ├── tasks.php               ✅ Scheduled tasks
-│   ├── events.php              ✅ Event observers
-│   └── caches.php              ✅ Cache definitions
-├── lang/
-│   └── en/
-│       └── local_ascend_rewards.php  ✅ All strings + privacy strings
-└── pix/                        ✅ Images organized by type
+â”œâ”€â”€ README.md                   ✅ Created
+â”œâ”€â”€ CHANGES.md                  ✅ Created
+â”œâ”€â”€ version.php                 ✅ Compliant
+â”œâ”€â”€ thirdpartylibs.xml          ✅ Created
+â”œâ”€â”€ lib.php                     ✅ Has GPL header
+â”œâ”€â”€ settings.php                ✅ Has GPL header
+â”œâ”€â”€ index.php                   ✅ Main page (⚠️ inline CSS)
+â”œâ”€â”€ classes/
+â”‚   â”œâ”€â”€ badge_awarder.php       ✅ PHPDoc added
+â”‚   â”œâ”€â”€ observer.php            ✅ PHPDoc added
+â”‚   â”œâ”€â”€ gameboard.php           ✅ PHPDoc added
+â”‚   â”œâ”€â”€ navigation.php          ✅ PHPDoc added
+â”‚   â”œâ”€â”€ privacy/
+â”‚   â”‚   â””â”€â”€ provider.php        ✅ Implements privacy API
+â”‚   â””â”€â”€ task/
+â”‚       â””â”€â”€ *.php               ✅ Scheduled tasks
+â”œâ”€â”€ db/
+â”‚   â”œâ”€â”€ install.xml             ✅ Schema definition
+â”‚   â”œâ”€â”€ install.php             ✅ PHPDoc added
+â”‚   â”œâ”€â”€ upgrade.php             ✅ PHPDoc added
+â”‚   â”œâ”€â”€ access.php              ✅ Capabilities
+â”‚   â”œâ”€â”€ tasks.php               ✅ Scheduled tasks
+â”‚   â”œâ”€â”€ events.php              ✅ Event observers
+â”‚   â””â”€â”€ caches.php              ✅ Cache definitions
+â”œâ”€â”€ lang/
+â”‚   â””â”€â”€ en/
+â”‚       â””â”€â”€ local_ascend_rewards.php  ✅ All strings + privacy strings
+â””â”€â”€ pix/                        ✅ Images organized by type
 ```
 
 ---
@@ -196,7 +196,7 @@ The plugin now meets all **required** Moodle plugin repository standards:
 - ✅ Capability system implemented
 - ✅ Security best practices followed
 
-### 📝 OPTIONAL IMPROVEMENTS
+### ðŸ“ OPTIONAL IMPROVEMENTS
 
 For better code quality (not blockers):
 
@@ -218,3 +218,6 @@ For better code quality (not blockers):
 ---
 
 **Plugin is now compliant with Moodle plugin repository requirements and ready for submission!**
+
+
+

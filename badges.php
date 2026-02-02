@@ -18,11 +18,16 @@
  * Admin badge mapping page for Ascend Rewards.
  *
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_ascend_rewards;
+
+use context_system;
+use html_table;
+use html_writer;
+use moodle_url;
 
 require_once(__DIR__ . '/../../config.php');
 require_login();
@@ -37,8 +42,8 @@ require_capability('moodle/site:config', $context);
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/ascend_rewards/badges.php'));
 $PAGE->set_pagelayout('admin');
-$PAGE->set_title('Manage Apex Rewards Badges');
-$PAGE->set_heading('Manage Apex Rewards Badges');
+$PAGE->set_title(get_string('managebadges', 'local_ascend_rewards'));
+$PAGE->set_heading(get_string('managebadges', 'local_ascend_rewards'));
 global $DB, $OUTPUT;
 $action = optional_param('action', '', PARAM_ALPHA);
 $courseid = optional_param('courseid', 0, PARAM_INT);
@@ -53,12 +58,30 @@ echo html_writer::tag('h3', get_string('managebadges', 'local_ascend_rewards'));
 echo $OUTPUT->single_button(new moodle_url('/local/ascend_rewards/badges.php', ['action' => 'seed', 'courseid' => $courseid, 'sesskey' => sesskey()]), get_string('createbadges', 'local_ascend_rewards'), 'post');
 $defs = \local_ascend_rewards\badges::definitions();
 $table = new html_table();
-$table->head = ['Code', 'Name', 'idnumber', 'Current badgeid', 'Map to badge'];
+$table->head = [
+    get_string('badge_code_label', 'local_ascend_rewards'),
+    get_string('badge_name_label', 'local_ascend_rewards'),
+    get_string('badge_idnumber_label', 'local_ascend_rewards'),
+    get_string('badge_current_id_label', 'local_ascend_rewards'),
+    get_string('badge_map_label', 'local_ascend_rewards'),
+];
 $table->data = [];
 foreach ($defs as $code => $def) {
     $currentid = \local_ascend_rewards\badges::get_badgeid_by_code($code, $courseid, false);
-    $select = html_writer::select(\local_ascend_rewards\util::badge_options($courseid), 'map_' . $code, $currentid ?: 0, ['0' => '- Not mapped -'], ['form' => 'apex-map-form']);
-    $table->data[] = new html_table_row([ html_writer::tag('code', s($code)), s($def['name']), s($code), $currentid ? (int)$currentid : html_writer::span('—', 'dimmed_text'), $select ]);
+    $select = html_writer::select(
+        \local_ascend_rewards\util::badge_options($courseid),
+        'map_' . $code,
+        ($currentid ?: 0),
+        ['0' => get_string('badge_not_mapped_label', 'local_ascend_rewards')],
+        ['form' => 'apex-map-form']
+    );
+    $table->data[] = new html_table_row([
+        html_writer::tag('code', s($code)),
+        s($def['name']),
+        s($code),
+        $currentid ? (int)$currentid : html_writer::span('-', 'dimmed_text'),
+        $select,
+    ]);
 }
 echo html_writer::table($table);
 echo html_writer::start_tag('form', ['method' => 'post', 'id' => 'apex-map-form', 'action' => new moodle_url('/local/ascend_rewards/badges.php')]);
@@ -105,7 +128,7 @@ class util { public static function badge_options(int $courseid = 0): array {
         $out = [];
         $rs = $DB->get_records('badge', ['courseid' => $courseid], 'name ASC', 'id,name,idnumber');
         foreach ($rs as $b) {
-            $label = $b->name . ' [#' . $b->id . ']' . ($b->idnumber ? ' (' . $b->idnumber . ')' : '');
+            $label = $b->name . ' [#' . $b->id . ']' . ($b->idnumber ? (' (' . $b->idnumber . ')') : '');
             $out[$b->id] = $label;
         }
         return $out;

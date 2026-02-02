@@ -1,0 +1,30 @@
+name: Moodle Plugin CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        moodle-branch: [MOODLE_402_STABLE]
+        php: ['8.1']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - name: Install moodle-plugin-ci
+        run: composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci
+      - name: Moodle Plugin CI Install
+        run: ci/bin/moodle-plugin-ci install --moodle=${{ matrix.moodle-branch }}
+      - name: PHP Lint
+        run: ci/bin/moodle-plugin-ci phplint
+      - name: Moodle PHPCS
+        run: ci/bin/moodle-plugin-ci phpcs --standard=moodle

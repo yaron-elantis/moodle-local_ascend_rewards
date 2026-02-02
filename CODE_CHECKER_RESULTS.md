@@ -1,4 +1,4 @@
-# Moodle Code Checker Results - Ascend Rewards Plugin
+﻿# Moodle Code Checker Results - Ascend Rewards Plugin
 
 **Date:** January 26, 2026  
 **Plugin:** local_ascend_rewards v1.2.1  
@@ -26,7 +26,7 @@
 - ✅ Now only shows 7 active badges in settings
 
 **db/access.php**
-- ✅ Fixed copyright from "Elantis" to "Ascend Rewards"
+- ✅ Fixed copyright owner to "Elantis (Pty) LTD" for 2026
 - ✅ Standardized PHPDoc formatting
 
 **db/events.php**
@@ -36,11 +36,11 @@
 - ✅ Added file-level PHPDoc with package, copyright, and license
 
 **db/caches.php**
-- ✅ Fixed copyright year from 2026 to 2025
+- ✅ Fixed copyright owner to "Elantis (Pty) LTD" for 2026
 - ✅ Standardized package name formatting
 
 **db/hooks.php**
-- ✅ Fixed copyright year from 2026 to 2025
+- ✅ Fixed copyright owner to "Elantis (Pty) LTD" for 2026
 - ✅ Standardized package name formatting
 
 **classes/coin_map.php**
@@ -48,17 +48,17 @@
 - ✅ Improved class-level documentation
 
 **classes/performance_cache.php**
-- ✅ Fixed copyright year from 2026 to 2025
+- ✅ Fixed copyright owner to "Elantis (Pty) LTD" for 2026
 - ✅ Improved file-level and class-level PHPDoc
 
 **mysterybox.php**
 - ✅ Added full GPL header (was missing)
 - ✅ Added proper file-level PHPDoc
-- ✅ Fixed copyright from "2024 Apex Rewards" to "2025 Ascend Rewards"
+- ✅ Fixed copyright owner to "Elantis (Pty) LTD" for 2026
 
 **store_section.php**
 - ✅ Fixed file-level PHPDoc formatting
-- ✅ Fixed copyright from "Ascend" to "Ascend Rewards"
+- ✅ Fixed copyright owner to "Elantis (Pty) LTD" for 2026
 - ✅ Standardized license URL
 
 ---
@@ -66,7 +66,7 @@
 ## 2. Copyright Consistency
 
 All files now use consistent copyright:
-- **Copyright:** 2025 Ascend Rewards
+- **Copyright:** 2026 Elantis (Pty) LTD
 - **License:** GNU GPL v3 or later
 
 ### Files Fixed:
@@ -216,3 +216,5 @@ Select: local_ascend_rewards
 ---
 
 **All Moodle coding standards issues have been resolved!** ✅
+
+

@@ -20,7 +20,7 @@
  * Processes pet adoptions using tokens or coins.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -42,7 +42,7 @@ $unlock_type = required_param('unlock_type', PARAM_TEXT); // 'token' or 'coin'
 try {
     // Validate user is logged in
     if (!$USER->id) {
-        throw new Exception('User not logged in');
+        throw new Exception(get_string('unlock_user_not_logged_in', 'local_ascend_rewards'));
     }
 
     // Validate unlock type
@@ -64,18 +64,18 @@ try {
     $pet_data = $pet_catalog[$pet_id];
 
     // Check if pet is already owned
-    $existing = $DB->get_record('local_ascend_avatar_unlocks', [
+    $existing = $DB->get_record('local_ascend_rewards_avatar_unlocks', [
         'userid' => $USER->id,
         'pet_id' => $pet_id,
         'villain_id' => null,
     ]);
 
     if ($existing) {
-        throw new Exception('Pet already adopted');
+        throw new Exception(get_string('unlock_pet_already_adopted', 'local_ascend_rewards'));
     }
 
     // Check if user has unlocked the required avatar
-    $avatar_unlocked = $DB->record_exists('local_ascend_avatar_unlocks', [
+    $avatar_unlocked = $DB->record_exists('local_ascend_rewards_avatar_unlocks', [
         'userid' => $USER->id,
         'avatar_name' => $pet_data['avatar'],
         'pet_id' => null,
@@ -83,7 +83,8 @@ try {
     ]);
 
     if (!$avatar_unlocked) {
-        throw new Exception('Avatar not unlocked. You must unlock the ' . pathinfo($pet_data['avatar'], PATHINFO_FILENAME) . ' avatar first.');
+        $avatar_name = pathinfo($pet_data['avatar'], PATHINFO_FILENAME);
+        throw new Exception(get_string('unlock_pet_avatar_required', 'local_ascend_rewards', $avatar_name));
     }
 
     $new_balance = null;
@@ -94,9 +95,9 @@ try {
     try {
         if ($unlock_type === 'token') {
             // Token unlock
-            $token_record = $DB->get_record('local_ascend_level_tokens', ['userid' => $USER->id]);
+            $token_record = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
             if (!$token_record) {
-                throw new Exception('No token record found');
+                throw new Exception(get_string('unlock_no_token_record', 'local_ascend_rewards'));
             }
 
             $tokens_available = $token_record->tokens_available - $token_record->tokens_used;
@@ -107,7 +108,7 @@ try {
             // Increment tokens_used
             $token_record->tokens_used++;
             $token_record->timemodified = time();
-            $DB->update_record('local_ascend_level_tokens', $token_record);
+            $DB->update_record('local_ascend_rewards_level_tokens', $token_record);
         } else {
             // Coin unlock
             $price = $pet_data['price'];
@@ -120,7 +121,8 @@ try {
             }
 
             if ($total_coins < $price) {
-                throw new Exception('Insufficient coins. Need ' . $price . ', have ' . $total_coins);
+                throw new Exception(get_string('unlock_pet_insufficient_coins', 'local_ascend_rewards', 
+                    (object)['need' => $price, 'have' => $total_coins]));
             }
 
             // Deduct coins by inserting a negative record (preserves XP/level)
@@ -148,14 +150,14 @@ try {
         $unlock_record->unlock_type = $unlock_type;
         $unlock_record->timecreated = time();
 
-        $DB->insert_record('local_ascend_avatar_unlocks', $unlock_record);
+        $DB->insert_record('local_ascend_rewards_avatar_unlocks', $unlock_record);
 
         // Commit transaction
         $transaction->allow_commit();
 
         $response = [
             'success' => true,
-            'message' => 'Pet adopted successfully!',
+            'message' => get_string('unlock_pet_success', 'local_ascend_rewards'),
         ];
 
         if ($unlock_type === 'coin') {

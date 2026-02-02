@@ -20,7 +20,7 @@
  * Observes activity completion events and triggers badge awarding logic.
  *
  * @package   local_ascend_rewards
- * @copyright 2025 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -248,7 +248,7 @@ class observer {
 
         // Get all badges awarded to this user (optionally filtered by course)
         $awarded_badges = $DB->get_records_sql(
-            "SELECT * FROM {local_ascend_rewards_coins} 
+            "SELECT * FROM {local_ascend_rewards_coins}
              WHERE userid = :userid {$coursewhere}",
             $params
         );

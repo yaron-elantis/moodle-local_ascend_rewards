@@ -18,7 +18,7 @@
  * AJAX endpoint returning activities contributing to a badge.
  *
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once(__DIR__ . '/../../config.php');
@@ -42,7 +42,7 @@ header('Content-Type: application/json');
  * Helper function to get activity name by course module id.
  *
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @param int $cmid Course module id.
  * @return string|null
@@ -83,7 +83,7 @@ if ($courseid <= 0 || $badgeid <= 0) {
 // Try to get from cache first (unless forced to recalculate)
 $cache_start = microtime(true);
 if (!$force_recalculate) {
-    $cached = $DB->get_record('local_ascend_badge_cache', [
+    $cached = $DB->get_record('local_ascend_rewards_badge_cache', [
         'userid' => $USER->id,
         'courseid' => $courseid,
         'badgeid' => $badgeid,
@@ -554,7 +554,7 @@ if (in_array($badgeid, $meta_badges)) {
             }
             break;
 
-        case 15: // Steady Improver - each failed→passed activity awards badge, show with x1, x2, x3
+        case 15: // Steady Improver - each failed->passed activity awards badge, show with x1, x2, x3
             $pref_key = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
             $awarded_ids = get_user_preferences($pref_key, '', $USER->id);
 
@@ -739,7 +739,7 @@ if (in_array($badgeid, $meta_badges)) {
 
 // Cache the results for fast future retrieval
 $now = time();
-$cache_record = $DB->get_record('local_ascend_badge_cache', [
+$cache_record = $DB->get_record('local_ascend_rewards_badge_cache', [
     'userid' => $USER->id,
     'courseid' => $courseid,
     'badgeid' => $badgeid,
@@ -750,10 +750,10 @@ if ($cache_record) {
     $cache_record->activities = json_encode($activities);
     $cache_record->metadata = json_encode($metadata);
     $cache_record->timemodified = $now;
-    $DB->update_record('local_ascend_badge_cache', $cache_record);
+    $DB->update_record('local_ascend_rewards_badge_cache', $cache_record);
 } else {
     // Insert new cache
-    $DB->insert_record('local_ascend_badge_cache', (object)[
+    $DB->insert_record('local_ascend_rewards_badge_cache', (object)[
         'userid' => $USER->id,
         'courseid' => $courseid,
         'badgeid' => $badgeid,

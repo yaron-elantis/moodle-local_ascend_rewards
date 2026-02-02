@@ -18,7 +18,7 @@
  * Hook callbacks for navigation.
  *
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -40,6 +40,19 @@ class navigation_callbacks {
     public static function primary_extend(\core\hook\navigation\primary_extend $hook): void {
         if (!isloggedin() || isguestuser()) {
             return;
+        }
+
+        // Cache warming - pre-load badges user is close to earning (once per hour).
+        try {
+            global $USER, $CFG;
+            require_once($CFG->dirroot . '/local/ascend_rewards/classes/cache_warmer.php');
+            $lastwarm = get_user_preferences('ascend_last_cache_warm', 0, $USER->id);
+            if (time() - $lastwarm > 3600) {
+                \local_ascend_rewards\cache_warmer::warm_user_cache($USER->id);
+                set_user_preference('ascend_last_cache_warm', time(), $USER->id);
+            }
+        } catch (\Throwable $e) {
+            debugging('Ascend Rewards cache warm failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
         }
 
         $primary = $hook->get_primaryview();

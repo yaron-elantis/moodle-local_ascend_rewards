@@ -18,7 +18,7 @@
  * Privacy provider for Ascend Rewards.
  *
  * @package   local_ascend_rewards
- * @copyright 2026 Ascend Rewards
+ * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -73,29 +73,29 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
             'timecreated' => 'privacy:metadata:timecreated',
         ], 'privacy:metadata:local_ascend_rewards_coins');
 
-        $items->add_database_table('local_ascend_badge_cache', [
+        $items->add_database_table('local_ascend_rewards_badge_cache', [
             'userid' => 'privacy:metadata:userid',
             'courseid' => 'privacy:metadata:courseid',
             'badgeid' => 'privacy:metadata:badgeid',
             'timecreated' => 'privacy:metadata:timecreated',
         ], 'privacy:metadata:local_ascend_rewards_coins');
 
-        $items->add_database_table('local_ascend_mysterybox', [
+        $items->add_database_table('local_ascend_rewards_mysterybox', [
             'userid' => 'privacy:metadata:userid',
             'timecreated' => 'privacy:metadata:timecreated',
         ], 'privacy:metadata:local_ascend_rewards_coins');
 
-        $items->add_database_table('local_ascend_avatar_unlocks', [
+        $items->add_database_table('local_ascend_rewards_avatar_unlocks', [
             'userid' => 'privacy:metadata:userid',
             'timecreated' => 'privacy:metadata:timecreated',
         ], 'privacy:metadata:local_ascend_rewards_coins');
 
-        $items->add_database_table('local_ascend_level_tokens', [
+        $items->add_database_table('local_ascend_rewards_level_tokens', [
             'userid' => 'privacy:metadata:userid',
             'timecreated' => 'privacy:metadata:timecreated',
         ], 'privacy:metadata:local_ascend_rewards_coins');
 
-        $items->add_database_table('local_ascend_xp', [
+        $items->add_database_table('local_ascend_rewards_xp', [
             'userid' => 'privacy:metadata:userid',
             'courseid' => 'privacy:metadata:courseid',
             'timecreated' => 'privacy:metadata:timecreated',
@@ -132,12 +132,12 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
                            AND courseid > 0
                         UNION
                         SELECT courseid
-                          FROM {local_ascend_badge_cache}
+                          FROM {local_ascend_rewards_badge_cache}
                          WHERE userid = :userid
                            AND courseid > 0
                         UNION
                         SELECT courseid
-                          FROM {local_ascend_xp}
+                          FROM {local_ascend_rewards_xp}
                          WHERE userid = :userid
                            AND courseid > 0
                   ) c
@@ -188,22 +188,22 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
                         'timecreated ASC',
                     )),
                     'mysterybox' => array_values($DB->get_records(
-                        'local_ascend_mysterybox',
+                        'local_ascend_rewards_mysterybox',
                         ['userid' => $userid],
                         'timecreated ASC',
                     )),
                     'avatarunlock' => array_values($DB->get_records(
-                        'local_ascend_avatar_unlocks',
+                        'local_ascend_rewards_avatar_unlocks',
                         ['userid' => $userid],
                         'timecreated ASC',
                     )),
                     'leveltokens' => array_values($DB->get_records(
-                        'local_ascend_level_tokens',
+                        'local_ascend_rewards_level_tokens',
                         ['userid' => $userid],
                         'timecreated ASC',
                     )),
                     'xp' => array_values($DB->get_records(
-                        'local_ascend_xp',
+                        'local_ascend_rewards_xp',
                         ['userid' => $userid, 'courseid' => 0],
                         'timemodified ASC',
                     )),
@@ -230,12 +230,12 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
                     'timecreated ASC',
                 )),
                 'badgecache' => array_values($DB->get_records(
-                    'local_ascend_badge_cache',
+                    'local_ascend_rewards_badge_cache',
                     ['userid' => $userid, 'courseid' => $courseid],
                     'timemodified ASC',
                 )),
                 'xp' => array_values($DB->get_records(
-                    'local_ascend_xp',
+                    'local_ascend_rewards_xp',
                     ['userid' => $userid, 'courseid' => $courseid],
                     'timemodified ASC',
                 )),
@@ -259,12 +259,12 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
         if ($context->contextlevel === CONTEXT_SYSTEM) {
             $DB->delete_records('local_ascend_rewards_coins', ['courseid' => 0]);
             $DB->delete_records('local_ascend_rewards_gameboard', ['courseid' => 0]);
-            $DB->delete_records('local_ascend_badge_cache', ['courseid' => 0]);
+            $DB->delete_records('local_ascend_rewards_badge_cache', ['courseid' => 0]);
             $DB->delete_records('local_ascend_rewards_badgerlog');
-            $DB->delete_records('local_ascend_mysterybox');
-            $DB->delete_records('local_ascend_avatar_unlocks');
-            $DB->delete_records('local_ascend_level_tokens');
-            $DB->delete_records('local_ascend_xp', ['courseid' => 0]);
+            $DB->delete_records('local_ascend_rewards_mysterybox');
+            $DB->delete_records('local_ascend_rewards_avatar_unlocks');
+            $DB->delete_records('local_ascend_rewards_level_tokens');
+            $DB->delete_records('local_ascend_rewards_xp', ['courseid' => 0]);
             return;
         }
 
@@ -275,8 +275,8 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
         $courseid = (int)$context->instanceid;
         $DB->delete_records('local_ascend_rewards_coins', ['courseid' => $courseid]);
         $DB->delete_records('local_ascend_rewards_gameboard', ['courseid' => $courseid]);
-        $DB->delete_records('local_ascend_badge_cache', ['courseid' => $courseid]);
-        $DB->delete_records('local_ascend_xp', ['courseid' => $courseid]);
+        $DB->delete_records('local_ascend_rewards_badge_cache', ['courseid' => $courseid]);
+        $DB->delete_records('local_ascend_rewards_xp', ['courseid' => $courseid]);
     }
 
     /**
@@ -304,15 +304,15 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
                     'userid' => $userid,
                     'courseid' => 0,
                 ]);
-                $DB->delete_records('local_ascend_badge_cache', [
+                $DB->delete_records('local_ascend_rewards_badge_cache', [
                     'userid' => $userid,
                     'courseid' => 0,
                 ]);
                 $DB->delete_records('local_ascend_rewards_badgerlog', ['userid' => $userid]);
-                $DB->delete_records('local_ascend_mysterybox', ['userid' => $userid]);
-                $DB->delete_records('local_ascend_avatar_unlocks', ['userid' => $userid]);
-                $DB->delete_records('local_ascend_level_tokens', ['userid' => $userid]);
-                $DB->delete_records('local_ascend_xp', ['userid' => $userid, 'courseid' => 0]);
+                $DB->delete_records('local_ascend_rewards_mysterybox', ['userid' => $userid]);
+                $DB->delete_records('local_ascend_rewards_avatar_unlocks', ['userid' => $userid]);
+                $DB->delete_records('local_ascend_rewards_level_tokens', ['userid' => $userid]);
+                $DB->delete_records('local_ascend_rewards_xp', ['userid' => $userid, 'courseid' => 0]);
                 continue;
             }
 
@@ -329,11 +329,11 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
                 'userid' => $userid,
                 'courseid' => $courseid,
             ]);
-            $DB->delete_records('local_ascend_badge_cache', [
+            $DB->delete_records('local_ascend_rewards_badge_cache', [
                 'userid' => $userid,
                 'courseid' => $courseid,
             ]);
-            $DB->delete_records('local_ascend_xp', [
+            $DB->delete_records('local_ascend_rewards_xp', [
                 'userid' => $userid,
                 'courseid' => $courseid,
             ]);
@@ -355,13 +355,13 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
                       FROM {local_ascend_rewards_badgerlog}
                     UNION
                     SELECT userid
-                      FROM {local_ascend_mysterybox}
+                      FROM {local_ascend_rewards_mysterybox}
                     UNION
                     SELECT userid
-                      FROM {local_ascend_avatar_unlocks}
+                      FROM {local_ascend_rewards_avatar_unlocks}
                     UNION
                     SELECT userid
-                      FROM {local_ascend_level_tokens}
+                      FROM {local_ascend_rewards_level_tokens}
                     UNION
                     SELECT userid
                       FROM {local_ascend_rewards_coins}
@@ -372,7 +372,7 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
                      WHERE courseid = 0
                     UNION
                     SELECT userid
-                      FROM {local_ascend_xp}
+                      FROM {local_ascend_rewards_xp}
                      WHERE courseid = 0";
             $userlist->add_from_sql('userid', $sql, []);
             return;
@@ -392,11 +392,11 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
                  WHERE courseid = :courseid
                 UNION
                 SELECT userid
-                  FROM {local_ascend_badge_cache}
+                  FROM {local_ascend_rewards_badge_cache}
                  WHERE courseid = :courseid
                 UNION
                 SELECT userid
-                  FROM {local_ascend_xp}
+                  FROM {local_ascend_rewards_xp}
                  WHERE courseid = :courseid";
         $userlist->add_from_sql('userid', $sql, $params);
     }
@@ -419,9 +419,9 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
 
         if ($context->contextlevel === CONTEXT_SYSTEM) {
             $DB->delete_records_select('local_ascend_rewards_badgerlog', "userid {$insql}", $inparams);
-            $DB->delete_records_select('local_ascend_mysterybox', "userid {$insql}", $inparams);
-            $DB->delete_records_select('local_ascend_avatar_unlocks', "userid {$insql}", $inparams);
-            $DB->delete_records_select('local_ascend_level_tokens', "userid {$insql}", $inparams);
+            $DB->delete_records_select('local_ascend_rewards_mysterybox', "userid {$insql}", $inparams);
+            $DB->delete_records_select('local_ascend_rewards_avatar_unlocks', "userid {$insql}", $inparams);
+            $DB->delete_records_select('local_ascend_rewards_level_tokens', "userid {$insql}", $inparams);
             $DB->delete_records_select(
                 'local_ascend_rewards_coins',
                 "userid {$insql} AND (courseid IS NULL OR courseid = 0)",
@@ -433,7 +433,7 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
                 $inparams,
             );
             $DB->delete_records_select(
-                'local_ascend_xp',
+                'local_ascend_rewards_xp',
                 "userid {$insql} AND courseid = 0",
                 $inparams,
             );
@@ -457,12 +457,12 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
             $params,
         );
         $DB->delete_records_select(
-            'local_ascend_badge_cache',
+            'local_ascend_rewards_badge_cache',
             "userid {$insql} AND courseid = :courseid",
             $params,
         );
         $DB->delete_records_select(
-            'local_ascend_xp',
+            'local_ascend_rewards_xp',
             "userid {$insql} AND courseid = :courseid",
             $params,
         );
@@ -480,9 +480,9 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
         $params = ['userid' => $userid];
         $systemtables = [
             'local_ascend_rewards_badgerlog',
-            'local_ascend_mysterybox',
-            'local_ascend_avatar_unlocks',
-            'local_ascend_level_tokens',
+            'local_ascend_rewards_mysterybox',
+            'local_ascend_rewards_avatar_unlocks',
+            'local_ascend_rewards_level_tokens',
         ];
 
         foreach ($systemtables as $table) {
@@ -510,6 +510,6 @@ class provider implements \core_privacy\local\metadata\provider, core_userlist_p
             return true;
         }
 
-        return $DB->record_exists('local_ascend_xp', ['userid' => $userid, 'courseid' => 0]);
+        return $DB->record_exists('local_ascend_rewards_xp', ['userid' => $userid, 'courseid' => 0]);
     }
 }

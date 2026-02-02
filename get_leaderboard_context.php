@@ -18,7 +18,7 @@
  * Get leaderboard context view (20 above, user, 20 below user's rank)
  *
  * @package    local_ascend_rewards
- * @copyright  2025 Apex Fusion
+ * @copyright 2026 Elantis (Pty) LTD
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -118,13 +118,13 @@ $context_users = array_values($context_users);
 // Medal helper
 function get_medal_for_rank($rank) {
     if ($rank === 1) {
-        return '🥇';
+        return '1st';
     }
     if ($rank === 2) {
-        return '🥈';
+        return '2nd';
     }
     if ($rank === 3) {
-        return '🥉';
+        return '3rd';
     }
     return '#' . $rank;
 }

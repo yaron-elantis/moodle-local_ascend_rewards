@@ -209,4 +209,4 @@
 
 ---
 
-**Ready to get started?** Open [START_HERE.md](START_HERE.md) now!
+**Ready to get started** Open [START_HERE.md](START_HERE.md) now!
