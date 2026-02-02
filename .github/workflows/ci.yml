@@ -23,7 +23,7 @@ jobs:
       - name: Install moodle-plugin-ci
         run: composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci
       - name: Moodle Plugin CI Install
-        run: ci/bin/moodle-plugin-ci install --moodle=${{ matrix.moodle-branch }}
+        run: ci/bin/moodle-plugin-ci install --plugin . --moodle=${{ matrix.moodle-branch }}
       - name: PHP Lint
         run: ci/bin/moodle-plugin-ci phplint
       - name: Moodle PHPCS
