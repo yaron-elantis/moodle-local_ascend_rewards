@@ -1,0 +1,72 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+@template local_ascend_rewards/admin_dashboard_audit
+@copyright 2026 Elantis (Pty) LTD
+@license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+<h2>{{audit_heading}}</h2>
+<div class="card">
+  <form method="get" class="aa-admin-form-row aa-admin-form-row-wrap">
+    <input type="hidden" name="tab" value="audit">
+    <div class="form-group aa-admin-form-group">
+      <label class="form-label">{{user_label}}:</label>
+      <input type="text" name="userid" class="form-input aa-admin-input-medium" list="audit_users" value="{{userid_str}}" placeholder="{{user_search_placeholder}}">
+      <datalist id="audit_users">
+        {{#users_list}}
+          <option value="{{label}}"></option>
+        {{/users_list}}
+      </datalist>
+    </div>
+    <div class="form-group aa-admin-form-group">
+      <label class="form-label">{{badge_label}}:</label>
+      <input type="text" name="badgeid" class="form-input aa-admin-input-medium" list="audit_badges" value="{{badgeid_str}}" placeholder="{{badge_search_placeholder}}">
+      <datalist id="audit_badges">
+        {{#badges_list}}
+          <option value="{{label}}"></option>
+        {{/badges_list}}
+      </datalist>
+    </div>
+    <button type="submit" class="btn btn-primary">{{search_label}}</button>
+  </form>
+
+  {{#audit_records}}
+    <h3>{{audit_records_heading}}</h3>
+    <table class="table">
+      <tr>
+        {{#audit_headers}}
+          <th>{{.}}</th>
+        {{/audit_headers}}
+      </tr>
+      {{#audit_rows}}
+        <tr>
+          <td>{{id}}</td>
+          <td>{{userid}}</td>
+          <td>{{username}}</td>
+          <td>{{badgeid}}</td>
+          <td>{{badgename}}</td>
+          <td>{{status}}</td>
+          <td>{{message}}</td>
+          <td>{{timecreated}}</td>
+        </tr>
+      {{/audit_rows}}
+    </table>
+  {{/audit_records}}
+
+  {{^audit_records}}
+    <p>{{no_audit_records_label}}</p>
+  {{/audit_records}}
+</div>

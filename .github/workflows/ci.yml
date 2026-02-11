@@ -1,0 +1,40 @@
+name: Moodle Plugin CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+    strategy:
+      fail-fast: false
+      matrix:
+        moodle-branch: [MOODLE_402_STABLE]
+        php: ['8.3']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          ini-values: max_input_vars=5000
+      - name: Install moodle-plugin-ci
+        run: composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci
+      - name: Moodle Plugin CI Install
+        run: ci/bin/moodle-plugin-ci install --plugin . --branch main --db-type pgsql --db-host 127.0.0.1 --db-user postgres --no-init --moodle=${{ matrix.moodle-branch }}
+      - name: Remove CI from installed plugin before linting
+        run: find . -path "*local/ascend_rewards/ci" -type d -exec rm -rf {} + 2>/dev/null || true
+      - name: PHP Lint
+        run: ci/bin/moodle-plugin-ci phplint

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/ascend_rewards/db" VERSION="20251122" COMMENT="XMLDB file for Moodle local/ascend_rewards - Gameboard Coins"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="local_ascend_rewards_gameboard" COMMENT="Tracks gameboard picks and coin rewards separately from regular badge coins">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User ID"/>
+        <FIELD NAME="badgeid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Badge ID that unlocked this gameboard"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course ID where badge was earned"/>
+        <FIELD NAME="week" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Week identifier (YYYY-WW format)"/>
+        <FIELD NAME="position" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Card position (0-15)"/>
+        <FIELD NAME="coins" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Coins earned from pick"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of pick"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid_week" UNIQUE="false" FIELDS="userid, week" COMMENT="Index for user weekly lookups"/>
+        <INDEX NAME="userid_badge" UNIQUE="false" FIELDS="userid, badgeid, week" COMMENT="Index for badge gameboard lookups"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

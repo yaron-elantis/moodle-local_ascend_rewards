@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libraries>
+  <library>
+    <location>html/data/core-js.3.0.0.js</location>
+    <name>core-js</name>
+    <version>3.0.0</version>
+    <license>MIT</license>
+  </library>
+  <library>
+    <location>html/data/mathjax_be81f723</location>
+    <name>MathJax</name>
+    <version>3.x (bundled)</version>
+    <license>Apache</license>
+    <licenseversion>2.0</licenseversion>
+  </library>
+  <library>
+    <location>html/data/mathlive_0d9e1d3d</location>
+    <name>MathLive</name>
+    <version>0.x (bundled)</version>
+    <license>MIT</license>
+  </library>
+  <library>
+    <location>html/data/static</location>
+    <name>Ascend Instructions static assets bundle</name>
+    <version>20260127</version>
+    <license>Mixed</license>
+  </library>
+</libraries>

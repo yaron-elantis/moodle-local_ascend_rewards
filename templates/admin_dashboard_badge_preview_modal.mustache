@@ -1,0 +1,90 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+@template local_ascend_rewards/admin_dashboard_badge_preview_modal
+@copyright 2026 Elantis (Pty) LTD
+@license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}<audio id="levelUpSound" preload="auto">
+  <source src="{{level_up_sound_url}}" type="audio/mpeg">
+</audio>
+<div id="apxModalBackdrop" class="apx-modal-backdrop"></div>
+<div id="apxModal" class="apx-modal" role="dialog" aria-modal="true" aria-labelledby="apxModalTitle">
+  <button class="apx-modal-close" id="apxModalClose" aria-label="{{close_label}}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  </button>
+  <div class="apx-modal-header" id="apxModalTitle"></div>
+  <div class="apx-modal-body">
+    <div class="apx-visual-container">
+      <div class="apx-badge-image-placeholder"></div>
+      <video id="apxRewardVideo" class="apx-badge-video" playsinline loop>
+        <source id="apxRewardVideoSource" src="" type="video/mp4">
+      </video>
+      <button id="apxVideoFullscreen" class="apx-video-fullscreen-btn" title="{{fullscreen_label}}"></button>
+    </div>
+    <div class="apx-badge-title-block">
+      <h2 id="apxBName" class="apx-badge-name">{{badge_name_placeholder}}</h2>
+      <div class="apx-detail-category">
+        <span class="apx-label">{{category_label}}:</span>
+        <span id="apxBCategory">{{badge_category_default}}</span>
+      </div>
+    </div>
+    <div class="apx-modal-xp-coins">
+      <div class="apx-modal-stat">
+        <svg width="32" height="32" viewBox="0 0 80 80">
+          <defs>
+            <linearGradient id="xpIconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00D4FF" />
+              <stop offset="50%" stop-color="#FF00AA" />
+              <stop offset="100%" stop-color="#FF9500" />
+            </linearGradient>
+          </defs>
+          <circle cx="40" cy="40" r="36" fill="url(#xpIconGrad)" />
+          <text x="40" y="50" text-anchor="middle" fill="#01142E" font-size="32" font-weight="800">X</text>
+        </svg>
+        <span id="apxBXP" class="apx-stat-value">{{xp_default_display}}</span>
+        <span class="apx-stat-label">{{experience_points_label}}</span>
+      </div>
+      <div class="apx-modal-stat">
+        <img src="{{medal_url}}" alt="{{assets_label}}" class="apx-coin-icon" onerror="this.style.display='none';">
+        <span id="apxBCoins" class="apx-stat-value">{{assets_default_display}}</span>
+        <span class="apx-stat-label">{{assets_earned_label}}</span>
+      </div>
+    </div>
+    <hr class="apx-divider"/>
+    <div class="apx-secondary-info-grid">
+      <div class="apx-detail-item"><span class="apx-label">{{course_label}}:</span> <span id="apxBCourse"></span></div>
+      <div class="apx-detail-item"><span class="apx-label">{{achieved_on_label}}:</span> <span id="apxBWhen"></span></div>
+    </div>
+    <div class="apx-detail-why-block">
+      <h3 class="apx-why-title">{{admin_badge_why_heading}}:</h3>
+      <p id="apxBWhy" class="apx-why-text"></p>
+    </div>
+    <hr class="apx-divider"/>
+    <div id="apxBActivities" class="apx-collapsible-section aa-hidden">
+      <strong class="apx-section-title cyan-accent">{{qualifying_activities_label}}:</strong>
+      <ul id="apxBActivitiesList" class="apx-list-activities"></ul>
+    </div>
+    <div id="apxBBadges" class="apx-collapsible-section aa-hidden">
+      <strong class="apx-section-title magenta-accent">{{contributing_badges_label}}:</strong>
+      <ul id="apxBBadgesList" class="apx-list-badges"></ul>
+    </div>
+    <div id="apxBRank" class="apx-rank-info aa-hidden"></div>
+  </div>
+</div>
+

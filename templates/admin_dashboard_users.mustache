@@ -1,0 +1,108 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+@template local_ascend_rewards/admin_dashboard_users
+@copyright 2026 Elantis (Pty) LTD
+@license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+<div class="card">
+  <div class="aa-admin-search-tabs">
+    <button type="button" class="btn aa-admin-search-btn {{#search_user}}is-active{{/search_user}}" data-search-tab="user">{{search_by_user_label}}</button>
+    <button type="button" class="btn aa-admin-search-btn {{#search_badge}}is-active{{/search_badge}}" data-search-tab="badge">{{search_by_badge_label}}</button>
+  </div>
+
+  {{#search_user}}
+    <form method="get" class="aa-admin-form-row">
+      <input type="hidden" name="tab" value="users">
+      <input type="hidden" name="search_type" value="user">
+      <div class="form-group aa-admin-form-group">
+        <label class="form-label">{{user_label}}:</label>
+        <input type="text" name="userid" class="form-input aa-admin-input-wide" list="users_list" value="{{userid_str}}" placeholder="{{user_search_placeholder}}">
+        <datalist id="users_list">
+          {{#users_list}}
+            <option value="{{label}}"></option>
+          {{/users_list}}
+        </datalist>
+      </div>
+      <button type="submit" class="btn btn-primary">{{view_label}}</button>
+    </form>
+
+    {{#user_results}}
+      <h3>{{user_badges_heading}}</h3>
+      <table class="table aa-admin-table">
+        <tr class="aa-admin-table-head">
+          <th class="aa-admin-table-cell aa-admin-table-head-cell">{{badge_name_label}}</th>
+          <th class="aa-admin-table-cell aa-admin-table-head-cell">{{course_name_label}}</th>
+          <th class="aa-admin-table-cell aa-admin-table-head-cell">{{coins_label}}</th>
+          <th class="aa-admin-table-cell aa-admin-table-head-cell">{{date_awarded_label}}</th>
+        </tr>
+        {{#user_badges_rows}}
+          <tr class="aa-admin-table-row">
+            <td class="aa-admin-table-cell">{{name}}</td>
+            <td class="aa-admin-table-cell">{{course}}</td>
+            <td class="aa-admin-table-cell">{{coins}}</td>
+            <td class="aa-admin-table-cell">{{date}}</td>
+          </tr>
+        {{/user_badges_rows}}
+      </table>
+    {{/user_results}}
+    {{#user_no_badges}}
+      <p>{{user_no_badges}}</p>
+    {{/user_no_badges}}
+  {{/search_user}}
+
+  {{#search_badge}}
+    <form method="get" class="aa-admin-form-row">
+      <input type="hidden" name="tab" value="users">
+      <input type="hidden" name="search_type" value="badge">
+      <div class="form-group aa-admin-form-group">
+        <label class="form-label">{{badge_label}}:</label>
+        <input type="text" name="badgeid_search" class="form-input aa-admin-input-wide" list="badges_list" value="{{badgeid_str}}" placeholder="{{badge_search_placeholder}}">
+        <datalist id="badges_list">
+          {{#badges_list}}
+            <option value="{{label}}"></option>
+          {{/badges_list}}
+        </datalist>
+      </div>
+      <button type="submit" class="btn btn-primary">{{view_label}}</button>
+    </form>
+
+    {{#badge_results}}
+      <h3>{{badge_recipients_heading}}</h3>
+      <table class="table aa-admin-table">
+        <tr class="aa-admin-table-head">
+          <th class="aa-admin-table-cell aa-admin-table-head-cell">{{user_label}}</th>
+          <th class="aa-admin-table-cell aa-admin-table-head-cell">{{email_label}}</th>
+          <th class="aa-admin-table-cell aa-admin-table-head-cell">{{course_label}}</th>
+          <th class="aa-admin-table-cell aa-admin-table-head-cell">{{coins_label}}</th>
+          <th class="aa-admin-table-cell aa-admin-table-head-cell">{{date_awarded_label}}</th>
+        </tr>
+        {{#badge_recipients_rows}}
+          <tr class="aa-admin-table-row">
+            <td class="aa-admin-table-cell">{{name}}</td>
+            <td class="aa-admin-table-cell">{{email}}</td>
+            <td class="aa-admin-table-cell">{{course}}</td>
+            <td class="aa-admin-table-cell">{{coins}}</td>
+            <td class="aa-admin-table-cell">{{date}}</td>
+          </tr>
+        {{/badge_recipients_rows}}
+      </table>
+    {{/badge_results}}
+    {{#badge_no_recipients}}
+      <p>{{badge_no_recipients}}</p>
+    {{/badge_no_recipients}}
+  {{/search_badge}}
+</div>

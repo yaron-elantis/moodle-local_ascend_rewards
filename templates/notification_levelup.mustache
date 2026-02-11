@@ -1,0 +1,40 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+@template local_ascend_rewards/notification_levelup
+@copyright 2026 Elantis (Pty) LTD
+@license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}<div class="apex-levelup-backdrop" id="apexLevelupBackdrop"></div>
+<div class="apex-levelup-modal" id="apexLevelupModal">
+  <div class="apex-levelup-header">
+    <button class="apex-levelup-close" id="apexLevelupClose" aria-label="{{close_label}}" title="{{close_label}}"></button>
+    <h2 class="apex-levelup-title">{{levelup_title}}</h2>
+  </div>
+  <div class="apex-levelup-body">
+    <video id="apexLevelupVideo" class="apex-levelup-video" playsinline loop>
+      <source src="{{videourl}}" type="video/mp4">
+    </video>
+  </div>
+  <div class="apex-levelup-footer">
+    <div class="apex-levelup-level">{{level_label_upper}} {{level}}</div>
+    <div class="apex-levelup-subtitle">{{levelup_subtitle}}</div>
+  </div>
+</div>
+
+<audio id="apexLevelupSound" preload="auto">
+  <source src="{{soundurl}}" type="audio/mpeg">
+</audio>
+

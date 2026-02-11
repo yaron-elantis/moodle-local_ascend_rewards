@@ -1,0 +1,142 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+@template local_ascend_rewards/admin_dashboard_debug
+@copyright 2026 Elantis (Pty) LTD
+@license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+<h2>{{debug_heading}}</h2>
+<div class="card">
+  <form method="get" class="aa-admin-form-row aa-admin-form-row-wrap">
+    <input type="hidden" name="tab" value="debug">
+    <div class="form-group aa-admin-form-group">
+      <label class="form-label">{{user_label}}:</label>
+      <input type="text" name="userid" class="form-input aa-admin-input-medium" list="debug_users" value="{{userid_str}}" placeholder="{{user_search_placeholder}}">
+      <datalist id="debug_users">
+        {{#users_list}}
+          <option value="{{label}}"></option>
+        {{/users_list}}
+      </datalist>
+    </div>
+    <div class="form-group aa-admin-form-group">
+      <label class="form-label">{{course_label}}:</label>
+      <input type="text" name="courseid" class="form-input aa-admin-input-medium" list="debug_courses" value="{{courseid_str}}" placeholder="{{course_search_placeholder}}">
+      <datalist id="debug_courses">
+        <option value="{{global_course_option}}"></option>
+        {{#courses_list}}
+          <option value="{{label}}"></option>
+        {{/courses_list}}
+      </datalist>
+    </div>
+    <div class="form-group aa-admin-form-group">
+      <label class="form-label">{{badge_label}}:</label>
+      <input type="text" name="badgeid" class="form-input aa-admin-input-medium" list="debug_badges" value="{{badgeid_str}}" placeholder="{{badge_search_placeholder}}">
+      <datalist id="debug_badges">
+        {{#badges_list}}
+          <option value="{{label}}"></option>
+        {{/badges_list}}
+      </datalist>
+    </div>
+    <button type="submit" class="btn btn-primary">{{debug_button_label}}</button>
+  </form>
+
+  {{#debug_selected}}
+    {{#debug_invalid_badge}}
+      <p>{{debug_invalid_badge}}</p>
+    {{/debug_invalid_badge}}
+
+    {{^debug_invalid_badge}}
+      <h3>{{debug_badge_heading}}</h3>
+      <p><strong>{{user_label}}:</strong> {{user_display}} | <strong>{{course_label}}:</strong> {{course_display}}</p>
+
+      {{#award_present}}
+        <div class="alert alert-success">
+          <h4>{{award_times_heading}}</h4>
+          {{#award_rows}}
+            <p><strong>{{label}}</strong> {{details}}</p>
+          {{/award_rows}}
+        </div>
+      {{/award_present}}
+
+      {{^award_present}}
+        <div class="alert alert-error">
+          <h4>{{award_none_heading}}</h4>
+          <p>{{award_none_desc}}</p>
+        </div>
+      {{/award_present}}
+
+      <h4>{{debug_step1_heading}}</h4>
+      <p>{{debug_found_activities_text}}</p>
+
+      {{#has_completions}}
+        <table class="table">
+          <tr>
+            {{#completion_headers}}
+              <th>{{.}}</th>
+            {{/completion_headers}}
+          </tr>
+          {{#completion_rows}}
+            <tr>
+              {{#show_course_column}}
+                <td>{{course}}</td>
+              {{/show_course_column}}
+              <td>{{activity}}</td>
+              <td>{{type}}</td>
+              <td>{{completed}}</td>
+              <td>{{grade}}</td>
+              <td>{{pass_grade}}</td>
+              <td>{{passed}}</td>
+              <td>{{due_date}}</td>
+              <td>{{before_deadline}}</td>
+              <td>{{early}}</td>
+            </tr>
+          {{/completion_rows}}
+        </table>
+      {{/has_completions}}
+
+      <h4>{{debug_step2_heading}}</h4>
+      <p><strong>{{requirement_label}}:</strong> {{requirement_text}}</p>
+      <p><strong>{{detection_method_label}}:</strong> {{detection_method}}</p>
+      <p>{{qualification_reason}}</p>
+
+      {{#qualifies}}
+        <div class="alert alert-success">
+          <h4>{{qualification_pass_heading}}</h4>
+          <p>{{qualification_pass_desc}}</p>
+          <form method="post" class="aa-admin-form-inline">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="userid" value="{{userid_str}}">
+            <input type="hidden" name="courseid" value="{{courseid_str}}">
+            <input type="hidden" name="badgeid" value="{{badgeid_str}}">
+            <input type="hidden" name="action" value="award">
+            <button type="submit" class="btn btn-primary">{{award_this_badge_button}}</button>
+          </form>
+        </div>
+      {{/qualifies}}
+
+      {{^qualifies}}
+        <div class="alert alert-error">
+          <h4>{{qualification_fail_heading}}</h4>
+          <p>{{qualification_fail_desc}}</p>
+        </div>
+      {{/qualifies}}
+    {{/debug_invalid_badge}}
+  {{/debug_selected}}
+
+  {{^debug_selected}}
+    <p>{{debug_select_prompt}}</p>
+  {{/debug_selected}}
+</div>

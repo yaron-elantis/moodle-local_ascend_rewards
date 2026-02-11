@@ -1,0 +1,368 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+@template local_ascend_rewards/avatar_section_new
+@copyright 2026 Elantis (Pty) LTD
+@license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+<!-- ============================================================================
+     CUSTOM FONTS
+     ============================================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap" rel="stylesheet">
+
+<!-- ============================================================================
+     MAIN SECTION
+     ============================================================================ -->
+<section class="aa-panel" id="a_avatars">
+    <div class="aa-panel-head">
+        <h3>
+            <img src="{{avatar_icon_url}}" 
+                 alt="{{ascend_universe_label}}" 
+                 class="aa-section-icon">
+            {{ascend_universe_label}}
+            {{#show_tokens_available}}
+                <span class="aa-token-badge">
+                    {{tokens_available_badge_text}}
+                </span>
+            {{/show_tokens_available}}
+        </h3>
+        <i class="fa-solid fa-chevron-down"></i>
+    </div>
+    
+    <div class="aa-panel-content">
+        <!-- User Stats -->
+        <p class="aa-muted aa-avatar-stats">
+            {{you_are_level_label}} {{level}}. {{you_have_label}} 
+            <strong>{{unlocked_avatars_count}}</strong> {{hero_label}}{{#heroes_plural}}es{{/heroes_plural}} {{unlocked_label}}, 
+            <strong>{{owned_pets_count}}</strong> {{pet_label}}{{#pets_plural}}s{{/pets_plural}} {{adopted_label}}, {{and_label}} 
+            <strong>{{owned_villains_count}}</strong> {{villain_label}}{{#villains_plural}}s{{/villains_plural}} {{unlocked_label}}.
+            {{#show_tokens_available}}
+                <span class="aa-token-text">
+                    {{{tokens_available_text}}}
+                </span>
+            {{/show_tokens_available}}
+        </p>
+        
+        {{#levels}}
+        <div class="avatar-level-block">
+            <h4 class="avatar-level-header" data-level="{{level_number}}" data-header-color="{{header_color}}">
+                <i class="fa-solid fa-chevron-down level-chevron"></i>
+                {{level_label}} {{level_number}}: {{world_name}}
+                {{^can_access}}
+                    <i class="fa-solid fa-lock avatar-lock-icon"></i> {{locked_until_label}} {{level_number}}
+                {{/can_access}}
+            </h4>
+            
+            <div class="avatar-level-content" data-level="{{level_number}}" data-content-opacity="{{content_opacity}}" data-content-pointer="{{content_pointer}}">
+                {{#sets}}
+                <div class="avatar-set">
+                    <!-- HERO -->
+                    <div class="avatar-group">
+                        {{#is_first_column}}
+                        <h5 class="avatar-group-title avatar-group-title-hero"><img src="{{hero_icon_url}}" alt="{{heroes_label}}" class="avatar-group-icon">{{heroes_label}}</h5>
+                        {{/is_first_column}}
+                        {{^is_first_column}}
+                        <div class="avatar-group-spacer"></div>
+                        {{/is_first_column}}
+                        <div class="avatar-card avatar-card-hero {{hero.card_class}}" 
+                             data-avatar="{{hero.filename}}"
+                             data-name="{{hero.display_name}}"
+                             data-level="{{level_number}}">
+                            <div class="avatar-card-frame avatar-card-frame-hero">
+                                <img src="{{hero.image_url}}" 
+                                     alt="{{hero.display_name}}" 
+                                     class="avatar-card-image"
+                                     data-filter="{{hero.filter}}">
+                                {{^hero.unlocked}}
+                                    <div class="avatar-lock-overlay">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-lg"></i>
+                                    </div>
+                                {{/hero.unlocked}}
+                            </div>
+                        </div>
+                        <div class="avatar-card-name avatar-card-name-hero" data-font-family="{{font_family}}">
+                            {{hero.display_name}}
+                        </div>
+                    </div>
+                    
+                    <!-- PET -->
+                    {{#pet}}
+                    <div class="avatar-group">
+                        {{#is_first_column}}
+                        <h5 class="avatar-group-title avatar-group-title-pet"><img src="{{pet_icon_url}}" alt="{{pets_label}}" class="avatar-group-icon">{{pets_label}}</h5>
+                        {{/is_first_column}}
+                        {{^is_first_column}}
+                        <div class="avatar-group-spacer"></div>
+                        {{/is_first_column}}
+                        <div class="pet-card {{card_class}}" 
+                             data-pet-id="{{id}}"
+                             data-pet-name="{{name}}"
+                             data-pet-price="{{price}}"
+                             data-pet-avatar="{{avatar}}"
+                             data-can-unlock="{{can_unlock_flag}}"
+                             data-cursor="{{cursor}}">
+                            <div class="avatar-card-frame avatar-card-frame-pet">
+                                <img src="{{image_url}}" 
+                                     alt="{{name}}"
+                                     class="avatar-card-image"
+                                     data-filter="{{filter}}">
+                                
+                                {{#show_lock_overlay}}
+                                    <div class="avatar-lock-overlay">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-md"></i>
+                                    </div>
+                                {{/show_lock_overlay}}
+                                {{#show_price_overlay}}
+                                    <div class="avatar-price-overlay">
+                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" class="avatar-price-icon" data-coin-size="{{coin_stack_size}}">
+                                        <div class="avatar-price-text avatar-price-text-gold">{{price}}</div>
+                                    </div>
+                                {{/show_price_overlay}}
+                            </div>
+                            
+                            {{#show_avatar_badge}}
+                            <div class="avatar-badge avatar-badge-hero">
+                                <img src="{{avatar_badge_url}}" 
+                                     alt="{{avatar}}"
+                                     class="avatar-badge-image">
+                            </div>
+                            {{/show_avatar_badge}}
+                        </div>
+                        <div class="avatar-card-name avatar-card-name-pet" data-font-family="{{font_family}}">
+                            {{name}}
+                        </div>
+                    </div>
+                    {{/pet}}
+                    
+                    <!-- VILLAIN -->
+                    {{#villain}}
+                    <div class="avatar-group">
+                        {{#is_first_column}}
+                        <h5 class="avatar-group-title avatar-group-title-villain"><img src="{{villain_icon_url}}" alt="{{villains_label}}" class="avatar-group-icon">{{villains_label}}</h5>
+                        {{/is_first_column}}
+                        {{^is_first_column}}
+                        <div class="avatar-group-spacer"></div>
+                        {{/is_first_column}}
+                        <div class="villain-card {{card_class}}" 
+                             data-villain-id="{{id}}"
+                             data-villain-name="{{name}}"
+                             data-villain-price="{{price}}"
+                             data-villain-pet="{{pet_id}}"
+                             data-villain-icon="{{icon_name}}"
+                             data-can-unlock="{{can_unlock_flag}}"
+                             data-cursor="{{cursor}}">
+                            <div class="avatar-card-frame avatar-card-frame-villain">
+                                <img src="{{image_url}}" 
+                                     alt="{{name}}"
+                                     class="avatar-card-image"
+                                     data-filter="{{filter}}">
+                                
+                                {{#show_lock_overlay}}
+                                    <div class="avatar-lock-overlay">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-md"></i>
+                                    </div>
+                                {{/show_lock_overlay}}
+                                {{#show_price_overlay}}
+                                    <div class="avatar-price-overlay">
+                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" class="avatar-price-icon" data-coin-size="{{coin_stack_size}}">
+                                        <div class="avatar-price-text avatar-price-text-red">{{price}}</div>
+                                    </div>
+                                {{/show_price_overlay}}
+                            </div>
+                            
+                            {{#show_pet_badge}}
+                            <div class="avatar-badge avatar-badge-pet">
+                                <img src="{{pet_badge_url}}" alt="{{pet_label}}" class="avatar-badge-image">
+                            </div>
+                            {{/show_pet_badge}}
+                            
+                            {{#show_avatar_badge}}
+                            <div class="avatar-badge avatar-badge-hero avatar-badge-left">
+                                <img src="{{avatar_badge_url}}" alt="{{hero_label}}" class="avatar-badge-image">
+                            </div>
+                            {{/show_avatar_badge}}
+                        </div>
+                        <div class="avatar-card-name avatar-card-name-villain" data-font-family="{{font_family}}">
+                            {{name}}
+                        </div>
+                        
+                        {{#story}}
+                        <button class="watch-story-btn avatar-story-btn" 
+                                data-set-name="{{set_name}}"
+                                data-youtube-id="{{youtube_id}}">
+                            <img src="{{storybook_url}}" 
+                                 alt="{{watch_story_label}}" 
+                                 class="avatar-story-icon">
+                            <span class="avatar-story-label" data-font-family="{{font_family}}">{{watch_story_label}}</span>
+                        </button>
+                        {{/story}}
+                    </div>
+                    {{/villain}}
+                </div>
+                {{/sets}}
+            </div>
+        </div>
+        {{/levels}}
+        
+        {{#epic_levels}}
+        <div class="avatar-level-block avatar-level-block-epic">
+            <h4 class="avatar-level-header" data-level="{{level_number}}" data-header-color="{{header_color}}">
+                <i class="fa-solid fa-chevron-down level-chevron"></i>
+                {{epic_level_label}} {{level_number}} {{collection_label}}
+                {{^can_access}}
+                    <i class="fa-solid fa-lock avatar-lock-icon"></i> {{locked_until_label}} {{level_number}}
+                {{/can_access}}
+            </h4>
+            
+            <div class="avatar-level-content" data-level="{{level_number}}" data-content-opacity="{{content_opacity}}" data-content-pointer="{{content_pointer}}">
+                <!-- HERO COLUMN -->
+                <div>
+                    <h5 class="avatar-group-title avatar-group-title-hero avatar-group-title-epic"><img src="{{hero_icon_url}}" alt="{{heroes_label}}" class="avatar-group-icon avatar-group-icon-epic">{{heroes_label}}</h5>
+                    {{#heroes}}
+                    <div class="avatar-epic-item">
+                        <div class="avatar-card avatar-card-hero {{card_class}}" 
+                             data-avatar="{{filename}}"
+                             data-name="{{display_name}}"
+                             data-level="{{level_number}}">
+                            <div class="avatar-card-frame avatar-card-frame-hero">
+                                <img src="{{image_url}}" 
+                                     alt="{{display_name}}" 
+                                     class="avatar-card-image"
+                                     data-filter="{{filter}}">
+                                {{^unlocked}}
+                                    <div class="avatar-lock-overlay avatar-lock-overlay-strong">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-lg"></i>
+                                    </div>
+                                {{/unlocked}}
+                            </div>
+                        </div>
+                        <div class="avatar-card-name avatar-card-name-hero" data-font-family="{{font_family}}">
+                            {{display_name}}
+                        </div>
+                    </div>
+                    {{/heroes}}
+                </div>
+                
+                <!-- PET COLUMN -->
+                <div>
+                    <h5 class="avatar-group-title avatar-group-title-pet avatar-group-title-epic"><img src="{{pet_icon_url}}" alt="{{pets_label}}" class="avatar-group-icon avatar-group-icon-epic">{{pets_label}}</h5>
+                    {{#pets}}
+                    <div class="avatar-epic-item">
+                        <div class="pet-card {{card_class}}" 
+                             data-pet-id="{{id}}"
+                             data-pet-name="{{name}}"
+                             data-pet-price="{{price}}"
+                             data-pet-avatar="{{avatar}}"
+                             data-can-unlock="{{can_unlock_flag}}"
+                             data-cursor="{{cursor}}">
+                            <div class="avatar-card-frame avatar-card-frame-pet">
+                                <img src="{{image_url}}" 
+                                     alt="{{name}}"
+                                     class="avatar-card-image"
+                                     data-filter="{{filter}}">
+                                
+                                {{#show_lock_overlay}}
+                                    <div class="avatar-lock-overlay avatar-lock-overlay-strong">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-md"></i>
+                                    </div>
+                                {{/show_lock_overlay}}
+                                {{#show_price_overlay}}
+                                    <div class="avatar-price-overlay">
+                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" class="avatar-price-icon" data-coin-size="{{coin_stack_size}}">
+                                        <div class="avatar-price-text avatar-price-text-gold">{{price}}</div>
+                                    </div>
+                                {{/show_price_overlay}}
+                            </div>
+                            
+                            {{#show_avatar_badge}}
+                            <div class="avatar-badge avatar-badge-hero">
+                                <img src="{{avatar_badge_url}}" 
+                                     alt="{{avatar}}"
+                                     class="avatar-badge-image">
+                            </div>
+                            {{/show_avatar_badge}}
+                        </div>
+                        <div class="avatar-card-name avatar-card-name-pet" data-font-family="{{font_family}}">
+                            {{name}}
+                        </div>
+                    </div>
+                    {{/pets}}
+                </div>
+                
+                <!-- VILLAIN COLUMN -->
+                <div>
+                    <h5 class="avatar-group-title avatar-group-title-villain avatar-group-title-epic"><img src="{{villain_icon_url}}" alt="{{villains_label}}" class="avatar-group-icon avatar-group-icon-epic">{{villains_label}}</h5>
+                    {{#villains}}
+                    <div class="avatar-epic-item">
+                        <div class="villain-card {{card_class}}" 
+                             data-villain-id="{{id}}"
+                             data-villain-name="{{name}}"
+                             data-villain-price="{{price}}"
+                             data-villain-pet="{{pet_id}}"
+                             data-villain-icon="{{icon_name}}"
+                             data-can-unlock="{{can_unlock_flag}}"
+                             data-cursor="{{cursor}}">
+                            <div class="avatar-card-frame avatar-card-frame-villain">
+                                <img src="{{image_url}}" 
+                                     alt="{{name}}"
+                                     class="avatar-card-image"
+                                     data-filter="{{filter}}">
+                                
+                                {{#show_lock_overlay}}
+                                    <div class="avatar-lock-overlay avatar-lock-overlay-strong">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-md"></i>
+                                    </div>
+                                {{/show_lock_overlay}}
+                                {{#show_price_overlay}}
+                                    <div class="avatar-price-overlay">
+                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" class="avatar-price-icon" data-coin-size="{{coin_stack_size}}">
+                                        <div class="avatar-price-text avatar-price-text-red">{{price}}</div>
+                                    </div>
+                                {{/show_price_overlay}}
+                            </div>
+                            
+                            {{#show_pet_badge}}
+                            <div class="avatar-badge avatar-badge-pet avatar-badge-bottom-left">
+                                <img src="{{pet_badge_url}}" alt="{{pet_label}}" class="avatar-badge-image">
+                            </div>
+                            {{/show_pet_badge}}
+                            
+                            {{#show_avatar_badge}}
+                            <div class="avatar-badge avatar-badge-hero">
+                                <img src="{{avatar_badge_url}}" alt="{{hero_label}}" class="avatar-badge-image">
+                            </div>
+                            {{/show_avatar_badge}}
+                        </div>
+                        <div class="avatar-card-name avatar-card-name-villain" data-font-family="{{font_family}}">
+                            {{name}}
+                        </div>
+                    </div>
+                    {{/villains}}
+                </div>
+            </div>
+        </div>
+        {{/epic_levels}}
+        
+    </div>
+</section>
+
+{{#js}}
+require(['local_ascend_rewards/avatar_section'], function(mod) {
+  mod.init({{{avatar_js_config}}});
+});
+{{/js}}

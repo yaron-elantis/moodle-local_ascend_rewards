@@ -1,0 +1,121 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+@template local_ascend_rewards/notification_badge
+@copyright 2026 Elantis (Pty) LTD
+@license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}<div id="apexRewardBackdrop" class="apex-reward-modal-backdrop"></div>
+<div id="apexRewardModal" class="apex-reward-modal">
+  <div class="apex-reward-header">
+    <h1 class="apex-reward-title">{{badge_earned_title}}</h1>
+    <p class="apex-reward-subtitle">{{badge_earned_subtitle}}</p>
+    <div class="apex-reward-progress"></div>
+    <button class="apex-reward-close" id="apexRewardClose" aria-label="{{close_label}}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <div class="apex-reward-body">
+    <div class="apex-reward-video-container">
+      <video id="apexRewardVideo" class="apex-reward-video" playsinline loop>
+        <source src="{{videourl}}" type="video/mp4">
+      </video>
+      <button class="apex-reward-fullscreen-btn" id="apexRewardFullscreen" title="{{fullscreen_label}}"></button>
+    </div>
+
+    <div class="apex-reward-badge-name">
+      <h2 class="apex-reward-badge-title">{{badgename}}</h2>
+      <p class="apex-reward-badge-subtitle">{{badge_category}} {{badge_label}}</p>
+    </div>
+
+    <div class="apex-reward-stats">
+      <div class="apex-reward-stat-card">
+        <div class="apex-reward-stat-icon">
+          <svg width="48" height="48" viewBox="0 0 80 80">
+            <defs>
+              <linearGradient id="xpIconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00D4FF" />
+                <stop offset="50%" stop-color="#FF00AA" />
+                <stop offset="100%" stop-color="#FF9500" />
+              </linearGradient>
+            </defs>
+            <circle cx="40" cy="40" r="36" fill="url(#xpIconGrad)" />
+            <text x="40" y="52" text-anchor="middle" fill="#01142E" font-size="32" font-weight="800">X</text>
+          </svg>
+        </div>
+        <div class="apex-reward-stat-value" id="apexRewardXP">+{{xp}} {{xp_label}}</div>
+        <div class="apex-reward-stat-label">{{experience_points_label}}</div>
+      </div>
+
+      <div class="apex-reward-stat-card">
+        <div class="apex-reward-stat-icon">
+          <img id="apexRewardMedal" src="{{medalurl}}" alt="{{medal_label}}" class="apex-reward-medal-icon" onerror="this.style.display='none';">
+        </div>
+        <div class="apex-reward-stat-value">+{{coins}} {{coins_label}}</div>
+        <div class="apex-reward-stat-label">{{assets_label}}</div>
+      </div>
+    </div>
+
+    <div class="apex-reward-info">
+      <div class="apex-reward-info-grid">
+        <div class="apex-reward-info-item">
+          <div class="apex-reward-info-label">{{course_label}}</div>
+          <div class="apex-reward-info-value">{{coursename}}</div>
+        </div>
+        <div class="apex-reward-info-item">
+          <div class="apex-reward-info-label">{{earned_on_label}}</div>
+          <div class="apex-reward-info-value" id="apexRewardDate">{{date_earned}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="apex-reward-description">
+      <h3 class="apex-reward-description-title">{{achievement_details_label}}</h3>
+      <p class="apex-reward-description-text" id="apexRewardDescription">{{badge_description}}</p>
+    </div>
+
+    {{#has_activities}}
+      <div class="apex-reward-activities">
+        <h3 class="apex-reward-activities-title">{{qualifying_activities_label}}</h3>
+        <ul class="apex-reward-activities-list">
+          {{#activities_items}}
+            <li class="apex-reward-activity-item">{{.}}</li>
+          {{/activities_items}}
+          {{#activities_more_label}}
+            <li class="apex-reward-activity-item apex-reward-activity-item-more">{{activities_more_label}}</li>
+          {{/activities_more_label}}
+        </ul>
+      </div>
+    {{/has_activities}}
+
+    {{#has_rank}}
+      <div class="apex-reward-rank">
+        <div class="apex-reward-rank-text">{{rank_label}} <strong>#{{rank}} {{of_label}} {{total_users}}</strong></div>
+        {{#rank_change_text}}
+          <div class="apex-reward-rank-change {{rank_change_class}}">{{rank_change_text}}</div>
+        {{/rank_change_text}}
+      </div>
+    {{/has_rank}}
+
+    <div class="apex-reward-actions">
+      <a href="{{rewardsurl}}" class="apex-reward-btn apex-reward-btn-primary">{{view_my_progress_label}}</a>
+    </div>
+  </div>
+</div>
+

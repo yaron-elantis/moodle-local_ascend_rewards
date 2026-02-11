@@ -1,0 +1,411 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+@template local_ascend_rewards/index
+@copyright 2026 Elantis (Pty) LTD
+@license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+<div class="aa-wrap container">
+<div class="ascendrewards ascendrewards-index">
+
+  <!-- Instructions -->
+  <div class="section section--instructions aa-card">
+    <p><a href="{{instructions_url}}" target="_blank" class="js-instructions-link" data-window-name="ascend_instructions" data-window-features="width=1600,height=900,scrollbars=yes,resizable=yes">
+      <img class="instruction-icon" src="{{instructions_icon_url}}" alt="" onerror="this.style.display='none';"/>
+      {{instructions_text}}
+    </a></p>
+  </div>
+
+  <!-- Celebration Banner -->
+  {{#show_congrats}}
+    <div class="aa-congrats">
+      <video autoplay muted loop playsinline><source src="{{reward_video_url}}" type="video/mp4"></video>
+      <div><div class="aa-congrats-title">{{congrats_title}}</div>
+      <div class="aa-muted">{{congrats_subtext}}</div></div>
+    </div>
+  {{/show_congrats}}
+
+  <!-- Balance & Rank Bars -->
+  <div class="aa-balance-rank-container">
+    <div class="aa-balance-bar">
+      <img src="{{coinimgurl}}" alt="" onerror="this.src='{{coinimg_fallback_url}}'">
+      <div><div class="aa-muted">{{current_balance_label}}</div><div class="rank-main">{{coin_balance_display}} {{assets_label}}</div></div>
+    </div>
+    
+    <div class="aa-rank-bar">
+      <img src="{{stackimgurl}}" alt="" onerror="this.src='{{stackimg_fallback_url}}'">
+      <div><div class="aa-muted">{{current_rank_label}}</div><div class="rank-main">{{rank_display}}</div></div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="aa-filter-bar">
+    <h3>{{filter_by_course_label}}</h3>
+    <form method="get">
+      <select name="courseid">
+        <option value="">{{all_courses_label}}</option>
+        {{#courseoptions}}
+          <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+        {{/courseoptions}}
+      </select>
+      <button type="submit">{{apply_label}}</button>
+      {{#has_course_filter}}<a href="{{reset_url}}">{{reset_label}}</a>{{/has_course_filter}}
+    </form>
+  </div>
+
+  <div class="aa-kpis">
+    <div class="aa-card">
+      <img src="{{medal_gold_url}}" alt="" class="aa-kpi-icon">
+      <div class="aa-kpi-label">{{coins_earned_label}}</div>
+      <div class="aa-kpi-value">{{coins_earned_display}}</div>
+      {{#has_course_filter}}<div class="aa-muted">{{in_this_course_label}}</div>{{/has_course_filter}}
+    </div>
+    <div class="aa-card">
+      <img src="{{medal_silver_url}}" alt="" class="aa-kpi-icon">
+      <div class="aa-kpi-label">{{badges_earned_label}}</div>
+      <div class="aa-kpi-value">{{badges_earned_display}}</div>
+      {{#has_course_filter}}<div class="aa-muted">{{in_this_course_label}}</div>{{/has_course_filter}}
+    </div>
+    <div class="aa-rank-card">
+      <img src="{{medal_bronze_url}}" alt="" class="aa-kpi-icon">
+      <div class="aa-kpi-label">{{ranking_label}}</div>
+      <div class="aa-kpi-value">{{rank_display}}</div>
+      {{#has_course_filter}}<div class="aa-muted">{{in_this_course_label}}</div>{{/has_course_filter}}
+    </div>
+    <div class="aa-xp-card">
+      <div class="xp-ring-container {{#show_level_up}}level-up-flash{{/show_level_up}}">
+        <svg class="xp-ring" viewBox="0 0 80 80" data-final-offset="{{xp_final_offset}}">
+          <defs>
+            <linearGradient id="xpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00D4FF" />
+              <stop offset="50%" stop-color="#FF00AA" />
+              <stop offset="100%" stop-color="#FF9500" />
+            </linearGradient>
+          </defs>
+          <circle cx="40" cy="40" r="36" class="bg-ring" />
+          <circle class="progress" cx="40" cy="40" r="36" />
+        </svg>
+        <div class="xp-level">L{{level}}</div>
+      </div>
+      <div class="aa-kpi-value aa-kpi-value-top">{{xp_display}} {{xp_label}}</div>
+      <div class="aa-kpi-subtitle">{{level_label}} <span class="aa-kpi-level">{{level}}</span></div>
+    </div>
+  </div>
+
+  <!-- Leaderboard -->
+  <section class="aa-panel aa-leaderboard-wrap">
+    <div class="aa-panel-head">
+      <h3><img class="section-title-icon" src="{{icon_leaderboard_url}}" alt=""> {{leaderboard_label}} <span id="leaderboardMode" class="aa-leaderboard-mode">({{leaderboard_mode_label}})</span></h3>
+      <i class="fa-solid fa-chevron-down"></i>
+    </div>
+    <div class="aa-panel-content">
+      <!-- User ID Info (spiced-up) -->
+      <div class="leaderboard-banner" role="status" aria-live="polite">
+        <div class="banner-icon">
+          <svg viewBox="0 0 80 80" aria-hidden="true" fill="none" stroke="#01142E" stroke-width="3">
+            <circle cx="40" cy="40" r="30"></circle>
+            <text x="40" y="50" text-anchor="middle" fill="#01142E" font-size="32" font-weight="800">{{banner_icon_text}}</text>
+          </svg>
+        </div>
+        <div class="banner-text">
+          <div class="banner-row">
+            <span class="banner-label">{{your_id_label}}</span>
+            <span class="banner-value banner-value-highlight">{{user_id}}</span>
+            {{#has_rank}}
+              <span class="aa-banner-sep">|</span>
+              <span class="banner-label">{{rank_label}}</span>
+              <span class="banner-value">#{{rank_value}}</span>
+              <span class="aa-banner-muted">{{of_label}} {{total_learners}} {{learners_label}}</span>
+            {{/has_rank}}
+          </div>
+          <div class="banner-row">
+            <span class="banner-context">{{leaderboard_context_label}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="leaderboard-view-actions">
+        <button id="btnTopView" class="leaderboard-view-btn leaderboard-view-btn-top is-active">
+          <i class="fa-solid fa-trophy"></i> {{top10_label}}
+        </button>
+        <button id="btnContextView" class="leaderboard-view-btn leaderboard-view-btn-context">
+          <i class="fa-solid fa-location-crosshairs"></i> {{my_position_label}}
+        </button>
+      </div>
+      
+      <ul class="leaderboard" id="leaderboardList">
+        {{^top10}}
+          <li class="aa-muted">{{leaderboard_empty_label}}</li>
+        {{/top10}}
+        {{#top10}}
+          <li{{#is_current_user}} class="current-user"{{/is_current_user}}>
+            <span class="pos">{{pos_label}}</span>
+            <strong>{{display_name}}</strong>
+            {{#is_current_user}}
+              <span class="user-id-badge">{{#str}}user_id_badge_label, local_ascend_rewards{{/str}} {{user_id}}</span>
+            {{/is_current_user}}
+            <div class="xp-display xp-display-right">
+              <svg width="28" height="28" viewBox="0 0 80 80" aria-hidden="true">
+                <defs><linearGradient id="{{grad_id}}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00D4FF" /><stop offset="50%" stop-color="#FF00AA" /><stop offset="100%" stop-color="#FF9500" /></linearGradient></defs>
+                <circle cx="40" cy="40" r="36" fill="url(#{{grad_id}})" />
+                <text x="40" y="52" text-anchor="middle" fill="#01142E" font-size="34" font-weight="800">X</text>
+              </svg>
+              <span class="aa-muted aa-xp-value">{{xp_display}}</span>
+            </div>
+          </li>
+        {{/top10}}
+        {{#current_user_entry}}
+          <li class="current-user leaderboard-current-user">
+            <span class="pos">{{pos_label}}</span>
+            <strong>{{you_label}}</strong>
+            <span class="user-id-badge">{{#str}}user_id_badge_label, local_ascend_rewards{{/str}} {{user_id}}</span>
+            <div class="xp-display xp-display-right">
+              <svg width="28" height="28" viewBox="0 0 80 80" class="xp-icon">
+                <defs><linearGradient id="xpIconGradLBCurrent" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00D4FF" /><stop offset="50%" stop-color="#FF00AA" /><stop offset="100%" stop-color="#FF9500" /></linearGradient></defs>
+                <circle cx="40" cy="40" r="36" fill="url(#xpIconGradLBCurrent)" />
+                <text x="40" y="52" text-anchor="middle" fill="#01142E" font-size="34" font-weight="800">X</text>
+              </svg>
+              <span class="aa-muted aa-xp-value">{{xp_display}}</span>
+            </div>
+          </li>
+        {{/current_user_entry}}
+      </ul>
+    </div>
+  </section>
+  <section class="aa-panel" id="a_all_badges">
+    <div class="aa-panel-head">
+      <h3><img class="section-title-icon" src="{{icon_badges_course_url}}" alt="" onerror="this.style.display='none';"> {{badges_earned_label}}</h3>
+      <i class="fa-solid fa-chevron-down"></i>
+    </div>
+    <div class="aa-panel-content">
+      {{^badges_by_course}}
+        <div class="aa-muted">{{no_badges_label}}</div>
+      {{/badges_by_course}}
+      {{#badges_by_course}}
+        <div class="aa-course-group">
+          <div class="aa-course-title">{{course_name}}</div>
+          {{#categories}}
+            <div class="aa-category-block">
+              <div class="aa-category-title {{color_class}}">{{{name}}}</div>
+              <div class="badge-grid">
+                {{#badges}}
+                  <div class="badge-card js-badge-detail" data-badge="{{badge_name_raw}}" data-badgeid="{{badge_id}}" data-courseid="{{course_id}}" data-course="{{course_name}}" data-when="{{formatted_date}}" data-coins="{{coins_text}}" data-xp="{{xp}}" data-level="{{level}}" data-xp-percent="{{xp_percent}}" data-why="{{why}}" data-category="{{category}}">
+                    {{#earn_count_gt1}}
+                      <div class="aa-badge-count">x{{earn_count}}</div>
+                    {{/earn_count_gt1}}
+                    <img src="{{icon_url}}" alt="{{badge_name_raw}}" onerror="this.src='{{fallback_icon_url}}'">
+                    <div><div class="aa-badge-title">{{badge_name}}</div><div class="aa-muted">{{earned_text}}</div></div>
+                  </div>
+                {{/badges}}
+              </div>
+            </div>
+          {{/categories}}
+        </div>
+      {{/badges_by_course}}
+    </div>
+  </section>
+  <!-- PERSONALIZED CHALLENGES SECTION DISABLED -->
+
+
+
+{{#gameboard.available}}
+        <section class="aa-panel" id="a_weekly_gameboard">
+            <div class="aa-panel-head">
+                <h3><img class="section-title-icon" src="{{gameboard.icon_url}}" alt="" onerror="this.style.display='none';"> {{weekly_gameboard_label}} <span class="aa-muted aa-week-range">({{gameboard.week_range_label}})</span></h3>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="aa-panel-content">
+            <div class="gameboard-summary">
+                <div class="gameboard-summary-row">
+                    <div>
+                        <div class="gameboard-summary-label">{{picks_available_label}}</div>
+                        <div class="gameboard-summary-value gameboard-summary-value-lg">{{gameboard.remaining_picks}}</div>
+                    </div>
+                    <div>
+                        <div class="gameboard-summary-label">{{normal_badges_label}}</div>
+                        <div class="gameboard-summary-value">{{normal_picks_label}} {{gameboard.available_picks_normal}}</div>
+                    </div>
+                    <div>
+                        <div class="gameboard-summary-label">{{meta_badges_label}}</div>
+                        <div class="gameboard-summary-value">{{meta_picks_label}} {{gameboard.available_picks_meta}}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="gameboardGrid" class="gameboard-grid">
+                {{#gameboard.cards}}
+                    <div class="gameboard-card {{#picked}}picked{{/picked}}" 
+                         data-position="{{position}}">
+                        
+                        {{#picked}}
+                            <div class="gameboard-card-content">
+                                <img src="{{coin_icon_url}}" 
+                                     alt="{{coin_label}}" 
+                                     class="gameboard-card-icon">
+                                <div class="gameboard-card-value">{{coin_value}}</div>
+                            </div>
+                        {{/picked}}
+                        {{^picked}}
+                            <div class="card-content gameboard-card-content">
+                                <img src="{{badge_image_url}}" 
+                                     alt="{{badge_name}}" 
+                                     class="gameboard-card-badge">
+                            </div>
+                            <div class="card-hover gameboard-card-hover">
+                                <img src="{{hover_coin_url}}" 
+                                     alt="{{pick_label}}" 
+                                     class="gameboard-card-hover-icon">
+                            </div>
+                        {{/picked}}
+                    </div>
+                {{/gameboard.cards}}
+            </div>
+        </div>
+    
+        </div>
+    </section>
+    
+    
+    
+{{/gameboard.available}}
+{{^gameboard.available}}
+    <section class="aa-panel" id="a_weekly_gameboard">
+        <div class="aa-panel-head">
+            <h3><img class="section-title-icon" src="{{gameboard.icon_url}}" alt="" onerror="this.style.display='none';"> {{weekly_gameboard_label}}</h3>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="aa-panel-content">
+            <div class="aa-muted">{{gameboard_locked_label}}</div>
+        </div>
+    </section>
+{{/gameboard.available}}
+
+{{#avatar}}
+  {{> local_ascend_rewards/avatar_section_new}}
+{{/avatar}}
+
+{{#store}}
+  {{> local_ascend_rewards/store_section}}
+{{/store}}
+
+</div>
+</div>
+
+<audio id="levelUpSound" preload="auto"><source src="{{level_up_audio_url}}" type="audio/mpeg"></audio>
+<div id="apxModalBackdrop" class="apx-modal-backdrop"></div>
+<div id="apxModal" class="apx-modal" role="dialog" aria-modal="true" aria-labelledby="apxModalTitle">
+  <div class="apx-modal-header">
+    <h1 class="apx-modal-title" id="apxModalTitle">{{#str}}badge_earned_title, local_ascend_rewards{{/str}}</h1>
+    <p class="apx-modal-subtitle">{{#str}}badge_earned_subtitle, local_ascend_rewards{{/str}}</p>
+    <div class="apx-modal-progress"></div>
+    <button class="apx-modal-close" id="apxModalClose" aria-label="{{#str}}close_label, local_ascend_rewards{{/str}}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  </div>
+  
+  <div class="apx-modal-body">
+    <!-- Video Section -->
+    <div class="apx-video-container">
+      <video id="apxRewardVideo" class="apx-badge-video" playsinline loop>
+        <source id="apxRewardVideoSource" src="" type="video/mp4">
+      </video>
+      <button class="apx-video-fullscreen-btn" id="apxVideoFullscreen" title="{{#str}}fullscreen_label, local_ascend_rewards{{/str}}" aria-label="{{#str}}fullscreen_label, local_ascend_rewards{{/str}}">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+          <path d="M16 3h3a2 2 0 0 1 2 2v3" />
+          <path d="M8 21H5a2 2 0 0 1-2-2v-3" />
+          <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Badge Name -->
+    <div class="apx-badge-name-section">
+      <h2 id="apxBName" class="apx-badge-name">{{#str}}badge_name_label, local_ascend_rewards{{/str}}</h2>
+      <p class="apx-badge-category"><span id="apxBCategory">{{#str}}badge_category_default, local_ascend_rewards{{/str}}</span> {{#str}}badge_label, local_ascend_rewards{{/str}}</p>
+    </div>
+    
+    <!-- Stats -->
+    <div class="apx-stats-grid">
+      <div class="apx-stat-card">
+        <div class="apx-stat-icon">
+          <svg width="48" height="48" viewBox="0 0 80 80">
+            <defs><linearGradient id="xpIconGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00D4FF" /><stop offset="50%" stop-color="#FF00AA" /><stop offset="100%" stop-color="#FF9500" /></linearGradient></defs>
+            <circle cx="40" cy="40" r="36" fill="url(#xpIconGrad)" />
+            <text x="40" y="52" text-anchor="middle" fill="#01142E" font-size="32" font-weight="800">X</text>
+          </svg>
+        </div>
+        <div id="apxBXP" class="apx-stat-value">{{#str}}xp_default_display, local_ascend_rewards{{/str}}</div>
+        <div class="apx-stat-label">{{#str}}experience_points_label, local_ascend_rewards{{/str}}</div>
+      </div>
+      
+      <div class="apx-stat-card">
+        <div class="apx-stat-icon">
+          <img id="apxCoinIcon" src="{{stack_fallback_url}}" alt="Coins" class="apx-coin-icon" onerror="this.style.display='none';">
+        </div>
+        <div id="apxBCoins" class="apx-stat-value">{{#str}}coins_default_display, local_ascend_rewards{{/str}}</div>
+        <div class="apx-stat-label">{{assets_label}}</div>
+      </div>
+    </div>
+    
+    <!-- Info Grid -->
+    <div class="apx-info-section">
+      <div class="apx-info-grid">
+        <div class="apx-info-item">
+          <div class="apx-info-label">{{#str}}course_label, local_ascend_rewards{{/str}}</div>
+          <div id="apxBCourse" class="apx-info-value"></div>
+        </div>
+        <div class="apx-info-item">
+          <div class="apx-info-label">{{#str}}earned_on_label, local_ascend_rewards{{/str}}</div>
+          <div id="apxBWhen" class="apx-info-value"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Description -->
+    <div class="apx-description-section">
+      <h3 class="apx-description-title">{{#str}}badge_description_label, local_ascend_rewards{{/str}}</h3>
+      <p id="apxBWhy" class="apx-description-text"></p>
+    </div>
+
+    <div class="apx-achievement-section">
+      <h3 class="apx-achievement-title">{{#str}}achievement_details_label, local_ascend_rewards{{/str}}</h3>
+    </div>
+    
+    <!-- Activities -->
+    <div id="apxBActivities" class="apx-activities-section aa-hidden">
+      <h3 class="apx-activities-title">{{#str}}qualifying_activities_label, local_ascend_rewards{{/str}}</h3>
+      <ul id="apxBActivitiesList" class="apx-activities-list"></ul>
+    </div>
+
+    <!-- Contributing Badges -->
+    <div id="apxBBadges" class="apx-badges-section aa-hidden">
+      <h3 class="apx-badges-title">{{#str}}contributing_badges_label, local_ascend_rewards{{/str}}</h3>
+      <ul id="apxBBadgesList" class="apx-badges-list"></ul>
+    </div>
+    
+    <!-- Rank -->
+  <div id="apxBRank" class="apx-rank-section aa-hidden"></div>
+  </div>
+</div>
+
+{{#js}}
+require(['local_ascend_rewards/index_page'], function(mod) {
+  mod.init({{{index_js_config}}});
+});
+{{/js}}
+
+

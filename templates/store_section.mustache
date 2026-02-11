@@ -1,0 +1,344 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+@template local_ascend_rewards/store_section
+@copyright 2026 Elantis (Pty) LTD
+@license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+<!-- Fonts for store -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap" rel="stylesheet">
+
+<!-- DEBUG MARKER: Template Updated on 2026-01-31 -->
+<!-- DEBUG MARKER: Template Loaded Successfully on 2026-01-31 -->
+
+<!-- ========== ASCEND STORE SECTION ========== -->
+<section class="aa-panel" id="a_store">
+    <div class="aa-panel-head">
+        <h3>
+            <img src="{{store_icon_url}}" 
+                 alt="{{store_label}}" 
+                 class="aa-section-icon">
+            {{store_label}}
+            <span class="aa-store-balance">({{coin_balance_display}} {{coins_available_label}})</span>
+        </h3>
+        <i class="fa-solid fa-chevron-down"></i>
+    </div>
+    
+    <div class="aa-panel-content">
+        <!-- XP Multiplier Active Notice -->
+        {{#xp_multiplier_active}}
+            <div class="aa-store-xp-banner">
+                <div class="aa-store-xp-title">{{xp_multiplier_active_label}}</div>
+                <div class="aa-store-xp-subtitle">{{xp_multiplier_expires_label}} <strong id="xpMultiplierTimer_store" data-expires="{{xp_multiplier_expires}}"></strong></div>
+            </div>
+        {{/xp_multiplier_active}}
+        
+        <!-- ============================================================================
+             POWER-UPS & MYSTERY BOX SECTION
+             ============================================================================ -->
+        <div class="aa-store-section">
+            <h4 class="aa-store-section-title aa-store-section-title--powerups">
+                {{powerups_title_label}}
+            </h4>
+            
+            <div class="aa-store-grid">
+                <!-- XP Multiplier -->
+                <div class="store-card store-card-xp {{#xp_item.can_afford}}is-affordable{{/xp_item.can_afford}}{{^xp_item.can_afford}}is-unaffordable{{/xp_item.can_afford}}">
+                    <div class="aa-store-card-header">
+                        <img src="{{xp_item.icon_url}}" 
+                             alt="{{xp_item.name}}" 
+                             class="aa-store-card-icon aa-store-card-icon--xp">
+                        <div class="aa-store-card-title">{{xp_item.name}}</div>
+                        <div class="aa-store-card-desc">{{xp_item.description}}</div>
+                    </div>
+                    
+                    <div class="aa-store-price-box">
+                        <div class="aa-store-price-row">
+                            <img src="{{coin_icon_url}}" 
+                                 alt="{{coins_label}}" 
+                                 class="aa-store-coin-icon aa-store-coin-icon--sm">
+                            <span class="aa-store-price">{{xp_item.price_display}}</span>
+                        </div>
+                        
+                        {{#xp_item.show_disabled}}
+                            <button disabled class="store-btn store-btn--full">
+                                {{not_enough_coins_label}}
+                            </button>
+                        {{/xp_item.show_disabled}}
+                        {{#xp_item.show_buy}}
+                            <button class="store-buy-btn store-btn" 
+                                data-item-id="{{xp_item.id}}"
+                                data-item-name="{{xp_item.short_name}}"
+                                data-item-price="{{xp_item.price}}">
+                                {{xp_item.buy_label}}
+                            </button>
+                        {{/xp_item.show_buy}}
+                        {{#xp_item.show_activate}}
+                            <button class="store-activate-btn" 
+                                data-item-id="{{xp_item.id}}"
+                                data-item-name="{{xp_item.short_name}}">
+                                {{xp_item.activate_label}} ({{xp_item.inventory_count}} {{available_label}})
+                            </button>
+                        {{/xp_item.show_activate}}
+                    </div>
+                </div>
+                
+                <!-- Mystery Box Card -->
+                <div class="store-card store-card-mystery {{#mystery_box.can_afford}}is-affordable{{/mystery_box.can_afford}}{{^mystery_box.can_afford}}is-unaffordable{{/mystery_box.can_afford}}">
+                    <div class="aa-store-card-header">
+                        <img src="{{mystery_box.image_url}}" alt="{{mystery_box.label}}" class="aa-store-card-icon aa-store-card-icon--mystery">
+                        <div class="aa-store-card-title">{{mystery_box.label}}</div>
+                        <div class="aa-store-card-desc">{{mystery_box.description}}</div>
+                    </div>
+
+                    <div class="aa-store-price-box">
+                        <div class="aa-store-price-row">
+                            <img src="{{coin_icon_url}}" 
+                                 alt="{{coins_label}}" 
+                                 class="aa-store-coin-icon aa-store-coin-icon--sm">
+                            <span class="aa-store-price">{{mystery_box.price_display}}</span>
+                        </div>
+
+                        {{^mystery_box.can_afford}}
+                            <button disabled class="store-btn store-btn--full">
+                                {{not_enough_coins_label}}
+                            </button>
+                        {{/mystery_box.can_afford}}
+                        {{#mystery_box.can_afford}}
+                            <button class="mysterybox-open-btn store-btn" 
+                                data-price="{{mystery_box.price}}">
+                                {{mystery_box.open_label}}
+                            </button>
+                        {{/mystery_box.can_afford}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ============================================================================
+             PETS SECTION
+             ============================================================================ -->
+        <div class="aa-store-section">
+            <h4 class="aa-store-section-title aa-store-section-title--pets">
+                <img src="{{pets_icon_url}}" alt="{{pets_label}}" class="aa-store-section-icon">
+                {{pets_label}}
+            </h4>
+            
+            {{#no_pets}}
+                <div class="aa-store-empty aa-store-empty--pets">
+                    <div class="aa-store-empty-icon">{{empty_state_icon}}</div>
+                    <div class="aa-store-empty-title">{{no_pets_title}}</div>
+                    <div class="aa-store-empty-desc">
+                        {{no_pets_description}}
+                    </div>
+                    <div class="aa-store-empty-tip">
+                        {{no_pets_tip}}
+                    </div>
+                </div>
+            {{/no_pets}}
+            {{^no_pets}}
+                <div class="aa-store-grid">
+                    {{#pets}}
+                    <div class="store-card store-card-pet {{#can_afford}}is-affordable{{/can_afford}}{{^can_afford}}is-unaffordable{{/can_afford}}">
+                        <div class="aa-store-card-header">
+                            <div class="store-frame store-frame-pet" role="button" tabindex="0" aria-label="{{aria_label}}">
+                                <img src="{{image_url}}" 
+                                     alt="{{name}}" 
+                                     class="store-frame-img store-frame-img--pet">
+                            </div>
+                            <div class="aa-store-card-name">
+                                {{name}}
+                            </div>
+                            <div class="aa-store-card-level">{{level_label}} {{level}} {{pet_label}}</div>
+                            
+                            {{#avatar_badge_url}}
+                                <div class="aa-store-linked-row">
+                                    <div class="aa-store-linked-label">{{linked_hero_label}}</div>
+                                    <div class="aa-store-linked-avatar aa-store-linked-avatar--hero">
+                                        <img src="{{avatar_badge_url}}" alt="{{hero_label}}" class="aa-store-linked-img">
+                                    </div>
+                                </div>
+                            {{/avatar_badge_url}}
+                        </div>
+                        
+                        <div class="aa-store-price-box">
+                            <div class="aa-store-price-row">
+                                <img src="{{coin_stack_url}}" 
+                                     alt="{{coins_label}}" 
+                                     class="aa-store-coin-icon">
+                                <span class="aa-store-price">{{price_display}}</span>
+                            </div>
+                            
+                            {{^can_afford}}
+                                <button disabled class="store-btn store-btn--full">
+                                    {{not_enough_coins_label}}
+                                </button>
+                            {{/can_afford}}
+                            {{#can_afford}}
+                                <button class="pet-buy-btn store-btn" 
+                                        data-item-id="{{id}}"
+                                        data-item-name="{{name}}"
+                                        data-item-price="{{price}}">
+                                    {{buy_label}}
+                                </button>
+                            {{/can_afford}}
+                        </div>
+                    </div>
+                    {{/pets}}
+                </div>
+            {{/no_pets}}
+        </div>
+        
+        <!-- ============================================================================
+             VILLAINS SECTION
+             ============================================================================ -->
+        <div class="aa-store-section">
+            <h4 class="aa-store-section-title aa-store-section-title--villains">
+                <img src="{{villain_icon_url}}" alt="{{villains_label}}" class="aa-store-section-icon">
+                {{villains_label}}
+            </h4>
+            
+            {{#no_villains}}
+                <div class="aa-store-empty aa-store-empty--villains">
+                    <div class="aa-store-empty-icon">{{empty_state_icon}}</div>
+                    <div class="aa-store-empty-title">{{no_villains_title}}</div>
+                    <div class="aa-store-empty-desc">
+                        {{no_villains_description}}
+                    </div>
+                    <div class="aa-store-empty-tip">
+                        {{no_villains_tip}}
+                    </div>
+                </div>
+            {{/no_villains}}
+            {{^no_villains}}
+                <div class="aa-store-grid">
+                    {{#villains}}
+                    <div class="store-card store-card-villain {{#can_afford}}is-affordable{{/can_afford}}{{^can_afford}}is-unaffordable{{/can_afford}}">
+                        <div class="aa-store-card-header">
+                            <div class="store-frame store-frame-villain" role="button" tabindex="0" aria-label="{{aria_label}}">
+                                <img src="{{image_url}}" 
+                                     alt="{{name}}" 
+                                     class="store-frame-img store-frame-img--villain">
+                            </div>
+                            <div class="aa-store-card-name">
+                                {{name}}
+                            </div>
+                            <div class="aa-store-card-level">{{level_label}} {{level}} {{villain_label}}</div>
+                            
+                            {{#avatar_badge_url}}
+                                <div class="aa-store-linked-row">
+                                    <div class="aa-store-linked-label">{{linked_hero_label}}</div>
+                                    <div class="aa-store-linked-avatar aa-store-linked-avatar--hero">
+                                        <img src="{{avatar_badge_url}}" alt="{{hero_label}}" class="aa-store-linked-img">
+                                    </div>
+                                </div>
+                            {{/avatar_badge_url}}
+                            {{#pet_badge_url}}
+                                <div class="aa-store-linked-row">
+                                    <div class="aa-store-linked-label">{{linked_pet_label}}</div>
+                                    <div class="aa-store-linked-avatar aa-store-linked-avatar--pet">
+                                        <img src="{{pet_badge_url}}" alt="{{pet_label}}" class="aa-store-linked-img">
+                                    </div>
+                                </div>
+                            {{/pet_badge_url}}
+                        </div>
+                        
+                        <div class="aa-store-price-box">
+                            <div class="aa-store-price-row">
+                                <img src="{{coin_stack_url}}" 
+                                     alt="{{coins_label}}" 
+                                     class="aa-store-coin-icon">
+                                <span class="aa-store-price">{{price_display}}</span>
+                            </div>
+                            
+                            {{^can_afford}}
+                                <button disabled class="store-btn store-btn--full">
+                                    {{not_enough_coins_label}}
+                                </button>
+                            {{/can_afford}}
+                            {{#can_afford}}
+                                <button class="villain-buy-btn store-btn" 
+                                        data-item-id="{{id}}"
+                                        data-item-name="{{name}}"
+                                        data-item-price="{{price}}"
+                                        data-villain-icon="{{icon_name}}"
+                                        >
+                                    {{buy_label}}
+                                </button>
+                            {{/can_afford}}
+                        </div>
+                    </div>
+                    {{/villains}}
+                </div>
+            {{/no_villains}}
+        </div>
+        
+
+    </div>
+</section>
+
+<!-- Mystery Box Animation Modal -->
+<div id="mysteryBoxModal" class="mystery-modal">
+    <div class="mystery-modal-content">
+        <!-- 4 Mystery Boxes Container -->
+        <div id="boxesContainer" class="mystery-boxes">
+            <div class="mystery-box" data-box="1">
+                <div class="mystery-box-inner">
+                    <img src="{{mystery_box.image_url}}" alt="{{mystery_box.label}}" class="mystery-box-image">
+                </div>
+                <div class="mystery-box-label">{{box_label_1}}</div>
+            </div>
+            <div class="mystery-box" data-box="2">
+                <div class="mystery-box-inner">
+                    <img src="{{mystery_box.image_url}}" alt="{{mystery_box.label}}" class="mystery-box-image">
+                </div>
+                <div class="mystery-box-label">{{box_label_2}}</div>
+            </div>
+            <div class="mystery-box" data-box="3">
+                <div class="mystery-box-inner">
+                    <img src="{{mystery_box.image_url}}" alt="{{mystery_box.label}}" class="mystery-box-image">
+                </div>
+                <div class="mystery-box-label">{{box_label_3}}</div>
+            </div>
+            <div class="mystery-box" data-box="4">
+                <div class="mystery-box-inner">
+                    <img src="{{mystery_box.image_url}}" alt="{{mystery_box.label}}" class="mystery-box-image">
+                </div>
+                <div class="mystery-box-label">{{box_label_4}}</div>
+            </div>
+        </div>
+        
+        <!-- Result Display -->
+        <div id="resultDisplay" class="mystery-result">
+            <div class="mystery-result-icon" id="resultIcon"></div>
+            <div class="mystery-result-message" id="resultMessage"></div>
+            <button id="closeModalBtn" class="mystery-close-btn">{{continue_label}}</button>
+        </div>
+    </div>
+</div>
+
+{{#js}}
+require(['local_ascend_rewards/store_section'], function(mod) {
+  mod.init({{{store_js_config}}});
+});
+{{/js}}
+
+
+
+
+
