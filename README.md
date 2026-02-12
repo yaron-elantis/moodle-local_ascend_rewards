@@ -2,6 +2,14 @@
 
 A Moodle local plugin that gamifies learning through a comprehensive badge, coin, and reward system.
 
+## Latest Evaluation Release
+
+- **Version:** `1.2.10`
+- **Tag:** `v1.2.10`
+- **Branch for evaluation work:** `master`
+- **Release date:** `2026-02-12`
+- **Notes:** Use `v1.2.10` as the current baseline for Moodle evaluation and any follow-up fixes.
+
 ## Description
 
 Ascend Rewards is a gamification plugin that automatically awards badges to students based on their learning activities and achievements. Students earn coins and experience points (XP) which they can use to unlock avatars, pets, and defeat villains. The plugin includes:
