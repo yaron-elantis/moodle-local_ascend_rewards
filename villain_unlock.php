@@ -44,9 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 try {
     require_sesskey();
 
-    $villain_id = required_param('villain_id', PARAM_INT);
-    $unlock_type = required_param('unlock_type', PARAM_TEXT);
-    $result = \local_ascend_rewards\ajax_service::villain_unlock($villain_id, $unlock_type);
+    $villainid = required_param('villain_id', PARAM_INT);
+    $unlocktype = required_param('unlock_type', PARAM_TEXT);
+    $result = \local_ascend_rewards\ajax_service::villain_unlock($villainid, $unlocktype);
     echo json_encode($result);
 } catch (\Throwable $e) {
     http_response_code(500);

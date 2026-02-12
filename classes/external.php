@@ -267,12 +267,12 @@ class external extends external_api {
     /**
      * Purchase a store item.
      *
-     * @param int $item_id
+     * @param int $itemid
      * @return array
      */
-    public static function store_purchase(int $item_id): array {
+    public static function store_purchase(int $itemid): array {
         $params = self::validate_parameters(self::store_purchase_parameters(), [
-            'item_id' => $item_id,
+            'item_id' => $itemid,
         ]);
 
         require_login();
@@ -317,12 +317,12 @@ class external extends external_api {
     /**
      * Activate a store item.
      *
-     * @param int $item_id
+     * @param int $itemid
      * @return array
      */
-    public static function store_activate(int $item_id): array {
+    public static function store_activate(int $itemid): array {
         $params = self::validate_parameters(self::store_activate_parameters(), [
-            'item_id' => $item_id,
+            'item_id' => $itemid,
         ]);
 
         require_login();
@@ -397,7 +397,7 @@ class external extends external_api {
      * @return external_single_structure
      */
     public static function mysterybox_open_returns(): external_single_structure {
-        $reward_data = new external_single_structure([
+        $rewarddata = new external_single_structure([
             'avatar_filename' => new external_value(PARAM_TEXT, 'Avatar filename', VALUE_OPTIONAL),
             'avatar_level' => new external_value(PARAM_INT, 'Avatar level', VALUE_OPTIONAL),
         ], 'Reward data', VALUE_OPTIONAL);
@@ -417,7 +417,7 @@ class external extends external_api {
             'new_balance' => new external_value(PARAM_INT, 'New coin balance', VALUE_OPTIONAL),
             'total_tokens' => new external_value(PARAM_INT, 'Total tokens available', VALUE_OPTIONAL),
             'balance' => new external_value(PARAM_INT, 'Balance when insufficient', VALUE_OPTIONAL),
-            'reward_data' => $reward_data,
+            'reward_data' => $rewarddata,
             'debug' => $debug,
         ]);
     }
@@ -490,14 +490,14 @@ class external extends external_api {
     /**
      * Unlock a pet.
      *
-     * @param int $pet_id
-     * @param string $unlock_type
+     * @param int $petid
+     * @param string $unlocktype
      * @return array
      */
-    public static function pet_unlock(int $pet_id, string $unlock_type): array {
+    public static function pet_unlock(int $petid, string $unlocktype): array {
         $params = self::validate_parameters(self::pet_unlock_parameters(), [
-            'pet_id' => $pet_id,
-            'unlock_type' => $unlock_type,
+            'pet_id' => $petid,
+            'unlock_type' => $unlocktype,
         ]);
 
         require_login();
@@ -544,14 +544,14 @@ class external extends external_api {
     /**
      * Unlock a villain.
      *
-     * @param int $villain_id
-     * @param string $unlock_type
+     * @param int $villainid
+     * @param string $unlocktype
      * @return array
      */
-    public static function villain_unlock(int $villain_id, string $unlock_type): array {
+    public static function villain_unlock(int $villainid, string $unlocktype): array {
         $params = self::validate_parameters(self::villain_unlock_parameters(), [
-            'villain_id' => $villain_id,
-            'unlock_type' => $unlock_type,
+            'villain_id' => $villainid,
+            'unlock_type' => $unlocktype,
         ]);
 
         require_login();

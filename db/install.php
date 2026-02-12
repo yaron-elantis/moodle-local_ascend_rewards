@@ -23,9 +23,6 @@
  * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
 // phpcs:disable moodle.Files.LineLength.MaxExceeded,moodle.Files.LineLength.TooLong
 // phpcs:disable moodle.Commenting.InlineComment.InvalidEndChar,moodle.Commenting.InlineComment.NotCapital
 
@@ -39,8 +36,10 @@ function xmldb_local_ascend_rewards_install() {
 
     $dbman = $DB->get_manager();
 
-    if (!$dbman->table_exists('user_preferences') ||
-            !$dbman->table_exists('local_ascend_rewards_level_tokens')) {
+    if (
+        !$dbman->table_exists('user_preferences') ||
+        !$dbman->table_exists('local_ascend_rewards_level_tokens')
+    ) {
         return true;
     }
 

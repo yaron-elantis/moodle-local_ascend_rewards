@@ -528,4 +528,3 @@ $templatecontext = [
 
 echo $OUTPUT->render_from_template('local_ascend_rewards/admin_dashboard', $templatecontext);
 echo $OUTPUT->footer();
-

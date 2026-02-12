@@ -5,6 +5,15 @@ All notable changes to the Ascend Rewards plugin will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.9] - 2026-02-12
+
+### Fixed
+- Rewards instructions link now opens `instructions.php` instead of removed legacy `html/index.html`
+- Unlock journey modal copy finalized for hero -> pet -> villain -> storybook progression
+
+### Changed
+- Release metadata updated for Moodle/GitHub submission (`$plugin->release = 1.2.9`)
+
 ## [1.2.8] - 2026-02-10
 
 ### Fixed

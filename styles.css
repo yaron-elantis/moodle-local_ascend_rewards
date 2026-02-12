@@ -20,10 +20,10 @@
 .path-local-ascend_rewards #page.drawers .main-inner{max-width:70%;width:100%;margin:0 auto;border-radius:.5rem;background-color:#fff;padding:1.5rem .5rem;margin-top:.5rem;margin-bottom:3rem;flex:1 0 auto;}
 body#page-local-ascend_rewards-admin_dashboard.path-local-ascend_rewards #page.drawers .main-inner{max-width:90%;}
   .path-local-ascend_rewards #page-debug,.path-local-ascend_rewards .debug,.path-local-ascend_rewards .notifytiny{display:none!important;}
-  
+
   /* Main wrapper inside region-main */
   .aa-wrap{padding:12px 0;color:#e6e9f0;}
-  
+
   /* Base card styles */
   .aa-filter-bar,.aa-congrats,.section--instructions,.aa-card,.aa-panel,.aa-balance-bar,.aa-rank-bar{
     background:linear-gradient(to bottom,#01142E 0%,#010828 100%);
@@ -33,7 +33,7 @@ body#page-local-ascend_rewards-admin_dashboard.path-local-ascend_rewards #page.d
     padding:var(--aa-pad);
     margin-bottom:var(--aa-gap);
   }
-  
+
   /* Balance and Rank bars */
   .aa-balance-rank-container{display:grid;grid-template-columns:1fr 1fr;gap:var(--aa-gap);margin-bottom:var(--aa-gap);}
   .aa-balance-bar,.aa-rank-bar{display:flex;flex-direction:column;align-items:center;text-align:center;}
@@ -42,7 +42,7 @@ body#page-local-ascend_rewards-admin_dashboard.path-local-ascend_rewards #page.d
   .aa-balance-bar > div,.aa-rank-bar > div{display:flex;flex-direction:column;align-items:center;}
   .rank-main{font-size:28px;font-weight:800;min-height:38px;display:flex;align-items:center;justify-content:center;}
   @media (max-width:768px){.aa-balance-rank-container{grid-template-columns:1fr;}}
-  
+
   .aa-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--aa-gap);margin:16px 0;}
   @media (max-width:1200px){.aa-kpis{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:600px){.aa-kpis{grid-template-columns:1fr}}
@@ -112,7 +112,7 @@ body#page-local-ascend_rewards-admin_dashboard.path-local-ascend_rewards #page.d
   .recent-list li:hover{background:rgba(255,255,255,.04);padding-left:4px;padding-right:-4px;}
   .recent-list li:last-child{border-bottom:0}
   .earned-badge-icon{height:90px;width:90px;border-radius:6px;background:rgba(255,255,255,.05);object-fit:contain;border:1px solid rgba(255,255,255,.1)}
-  
+
   /* Badge & Challenge grids */
   .badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
   .badge-card{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px;transition:all 0.2s ease;cursor:pointer;}
@@ -141,9 +141,9 @@ body#page-local-ascend_rewards-admin_dashboard.path-local-ascend_rewards #page.d
   .apex-rank-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(0,212,255,0.2) 0%,rgba(255,0,170,0.2) 100%);border:1px solid #00D4FF;padding:8px 12px;border-radius:8px;font-size:13px;margin-top:8px;}
   .apex-rank-up{color:#00FF88;font-weight:800;}
   .apex-rank-down{color:#FF4444;font-weight:800;}
-  
 
-  
+
+
   /* Modern Badge Notification Modal (matches site-wide modal) */
   .apx-modal-backdrop{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:9998;display:none;animation:fadeIn 0.3s ease-out;}
   @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
@@ -253,7 +253,7 @@ body#page-local-ascend_rewards-admin_dashboard.path-local-ascend_rewards #page.d
   .section--instructions a:hover{background:rgba(255,255,255,0.1);}
   .instruction-icon{height:60px;object-fit:contain;}
   .section-title-icon{height:60px;width:auto;vertical-align:middle;}
-  
+
   /* Responsive */
   @media (max-width: 768px) {
     .ascendrewards-kpis { grid-template-columns: 1fr 1fr; }
@@ -1375,6 +1375,124 @@ body#page-local-ascend_rewards-admin_dashboard.path-local-ascend_rewards #page.d
 .path-local-ascend_rewards .ascendrewards-admin .aa-admin-btn-spaced{margin-left:10px;}
 .path-local-ascend_rewards .ascendrewards-admin .aa-admin-form-inline{display:inline;}
 
+.path-local-ascend_rewards .local-ascend-instructions {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__icon {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__section {
+  padding: 0;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__grid--features {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__group-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__group-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__group-header {
+  margin-bottom: 16px;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__badge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 12px;
+  padding: 12px 10px;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__badge-card img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 8px;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__badge-name {
+  font-weight: 600;
+  color: #1d2125;
+  margin-bottom: 4px;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__badge-desc {
+  font-size: 0.82rem;
+  color: #556070;
+  margin-bottom: 8px;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__badge-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__badge-meta span {
+  background: #e2e8f0;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__card-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  background: #f4f7fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.path-local-ascend_rewards .local-ascend-instructions__card-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 /* Audit page helpers */
 .path-local-ascend_rewards .aa-audit-filter-panel{margin-bottom:20px;padding:15px;background:#f9f9f9;border-radius:5px;}
 .path-local-ascend_rewards .aa-audit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;}
@@ -1463,10 +1581,57 @@ body#page-local-ascend_rewards-admin_dashboard.path-local-ascend_rewards #page.d
 .path-local-ascend_rewards .villain-card.locked:hover{border-color:#dc2626;}
 
 /* YouTube modal */
-.path-local-ascend_rewards .aa-youtube-modal-backdrop{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:10000;display:flex;align-items:center;justify-content:center;}
-.path-local-ascend_rewards .aa-youtube-modal{position:relative;width:90%;max-width:1000px;background:#000;border-radius:8px;overflow:hidden;box-shadow:0 10px 50px rgba(0,0,0,0.8);}
-.path-local-ascend_rewards .aa-youtube-modal-close{position:absolute;top:10px;right:10px;background:#FF4444;color:#fff;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:24px;font-weight:bold;z-index:10001;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
-.path-local-ascend_rewards .aa-youtube-modal-iframe{display:block;}
+.path-local-ascend_rewards .aa-youtube-modal .modal-dialog{
+  max-width:min(1100px,96vw);
+  margin:1.2rem auto;
+}
+.path-local-ascend_rewards .aa-youtube-modal .modal-content{
+  background:#000;
+  border:2px solid rgba(6,182,212,0.65);
+  border-radius:14px;
+  box-shadow:0 24px 70px rgba(0,0,0,0.7);
+  overflow:hidden;
+}
+.path-local-ascend_rewards .aa-youtube-modal .modal-header{
+  border-bottom:1px solid rgba(6,182,212,0.35);
+  background:linear-gradient(135deg,#01142E 0%,#010828 100%);
+  color:#e6e9f0;
+}
+.path-local-ascend_rewards .aa-youtube-modal .modal-title{
+  color:#06b6d4;
+  font-weight:700;
+}
+.path-local-ascend_rewards .aa-youtube-modal .modal-header .close{
+  color:#fff;
+  opacity:0.9;
+}
+.path-local-ascend_rewards .aa-youtube-modal .modal-body{
+  padding:0;
+  background:#000;
+}
+.path-local-ascend_rewards .aa-youtube-modal-body{
+  position:relative;
+  width:100%;
+  aspect-ratio:16 / 9;
+  background:#000;
+}
+.path-local-ascend_rewards .aa-youtube-modal-iframe{
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+}
+@media (max-width:767px){
+  .path-local-ascend_rewards .aa-youtube-modal .modal-dialog{
+    max-width:100vw;
+    margin:0;
+    min-height:100dvh;
+  }
+  .path-local-ascend_rewards .aa-youtube-modal .modal-content{
+    border-radius:0;
+    min-height:100dvh;
+  }
+}
 
 /* Store section */
 .path-local-ascend_rewards .aa-store-balance{color:#ec4899;font-size:14px;font-weight:600;margin-left:8px;}
@@ -1573,4 +1738,3 @@ body#page-local-ascend_rewards-admin_dashboard.path-local-ascend_rewards #page.d
 .apex-reward-badge-subtitle{font-size:0.9rem;color:#a5b4d6;margin:4px 0 0;font-weight:500;}
 .apex-reward-medal-icon{width:24px;height:24px;}
 .apex-reward-activity-item-more{color:#ffd700;font-weight:600;}
-

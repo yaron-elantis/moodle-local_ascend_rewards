@@ -47,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 try {
     require_sesskey();
 
-    $item_id = required_param('item_id', PARAM_INT);
-    $result = \local_ascend_rewards\ajax_service::store_purchase($item_id);
+    $itemid = required_param('item_id', PARAM_INT);
+    $result = \local_ascend_rewards\ajax_service::store_purchase($itemid);
     echo json_encode($result);
 } catch (\Throwable $t) {
     http_response_code(500);

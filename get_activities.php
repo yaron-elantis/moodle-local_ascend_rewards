@@ -18,18 +18,19 @@
  * AJAX endpoint returning activities contributing to a badge.
  *
  * This file remains as a shared implementation used by ajax_service in
- * include-mode (`$return_data = true`) and as a backward-compatible
+ * include-mode (`$returndata = true`) and as a backward-compatible
  * direct endpoint.
  *
  * @package   local_ascend_rewards
  * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-if (empty($return_data)) {
+// phpcs:disable moodle.Files.MoodleInternal.MoodleInternalGlobalState
+if (empty($returndata)) {
     define('AJAX_SCRIPT', true);
 }
+// phpcs:enable moodle.Files.MoodleInternal.MoodleInternalGlobalState
 require_once(__DIR__ . '/../../config.php');
-defined('MOODLE_INTERNAL') || die();
 require_login();
 $context = context_system::instance();
 require_capability('local/ascend_rewards:view', $context);
@@ -37,8 +38,6 @@ require_capability('local/ascend_rewards:view', $context);
 // phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
 // phpcs:disable moodle.Commenting.InlineComment.InvalidEndChar
 // phpcs:disable moodle.Files.LineLength.MaxExceeded,moodle.Files.LineLength.TooLong
-// phpcs:disable moodle.Files.MoodleInternal.MoodleInternalGlobalState
-
 $perfstart = microtime(true);
 $perflog = [];
 
@@ -46,7 +45,7 @@ global $DB, $USER;
 
 $perflog['init'] = round((microtime(true) - $perfstart) * 1000, 2);
 
-if (empty($return_data)) {
+if (empty($returndata)) {
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     if ($method !== 'POST') {
         http_response_code(405);
@@ -92,12 +91,12 @@ function local_ascend_rewards_get_activity_name_by_cmid($cmid) {
 
 $courseid = isset($courseid) ? (int)$courseid : optional_param('courseid', 0, PARAM_INT);
 $badgeid = isset($badgeid) ? (int)$badgeid : optional_param('badgeid', 0, PARAM_INT);
-$force_recalculate = isset($force_recalculate) ? (bool)$force_recalculate : optional_param('force', 0, PARAM_BOOL);
-$debug_timing = isset($debug_timing) ? (bool)$debug_timing : optional_param('debug', 0, PARAM_BOOL);
+$forcerecalculate = isset($forcerecalculate) ? (bool)$forcerecalculate : optional_param('force', 0, PARAM_BOOL);
+$debugtiming = isset($debugtiming) ? (bool)$debugtiming : optional_param('debug', 0, PARAM_BOOL);
 
 if ($courseid <= 0 || $badgeid <= 0) {
     $response = ['activities' => [], 'metadata' => []];
-    if (!empty($return_data)) {
+    if (!empty($returndata)) {
         return $response;
     }
     echo json_encode($response);
@@ -105,35 +104,35 @@ if ($courseid <= 0 || $badgeid <= 0) {
 }
 
 // Try to get from cache first (unless forced to recalculate)
-$cache_start = microtime(true);
-if (!$force_recalculate) {
+$cachestart = microtime(true);
+if (!$forcerecalculate) {
     $cached = $DB->get_record('local_ascend_rewards_badge_cache', [
         'userid' => $USER->id,
         'courseid' => $courseid,
         'badgeid' => $badgeid,
     ]);
 
-    $perflog['cache_check'] = round((microtime(true) - $cache_start) * 1000, 2);
+    $perflog['cache_check'] = round((microtime(true) - $cachestart) * 1000, 2);
 
     if ($cached) {
-        $decode_start = microtime(true);
-        $activities_data = json_decode($cached->activities, true);
-        $metadata_data = json_decode($cached->metadata, true);
-        $perflog['decode'] = round((microtime(true) - $decode_start) * 1000, 2);
+        $decodestart = microtime(true);
+        $activitiesdata = json_decode($cached->activities, true);
+        $metadatadata = json_decode($cached->metadata, true);
+        $perflog['decode'] = round((microtime(true) - $decodestart) * 1000, 2);
         $perflog['total'] = round((microtime(true) - $perfstart) * 1000, 2);
 
         // Return cached data
         $response = [
-            'activities' => $activities_data,
-            'metadata' => $metadata_data,
+            'activities' => $activitiesdata,
+            'metadata' => $metadatadata,
             'cached' => true,
         ];
 
-        if ($debug_timing) {
+        if ($debugtiming) {
             $response['performance'] = $perflog;
         }
 
-        if (!empty($return_data)) {
+        if (!empty($returndata)) {
             return $response;
         }
         echo json_encode($response);
@@ -150,42 +149,42 @@ $metadata = []; // Store additional info like groups, pass/fail status, improvem
 // Calculate actual qualifying activities based on badge type
 {
     // Meta badges show contributing badges instead of activities
-    $meta_badges = [8, 12, 16, 20]; // Master Navigator, Time Tamer, Glory Guide, Learning Legend
+    $metabadges = [8, 12, 16, 20]; // Master Navigator, Time Tamer, Glory Guide, Learning Legend
 
-if (in_array($badgeid, $meta_badges)) {
+if (in_array($badgeid, $metabadges)) {
     // Get contributing badges for meta badges
-    $contributing_badge_ids = [];
+    $contributingbadgeids = [];
     switch ($badgeid) {
         case 8: // Master Navigator
-            $contributing_badge_ids = [6, 4, 5]; // Getting Started, On a Roll, Halfway Hero
+            $contributingbadgeids = [6, 4, 5]; // Getting Started, On a Roll, Halfway Hero
             break;
         case 12: // Time Tamer
-            $contributing_badge_ids = [9, 11, 10]; // Early Bird, Sharp Shooter, Deadline Burner
+            $contributingbadgeids = [9, 11, 10]; // Early Bird, Sharp Shooter, Deadline Burner
             break;
         case 16: // Glory Guide
-            $contributing_badge_ids = [13, 15, 14]; // Feedback Follower, Steady Improver, Tenacious Tiger
+            $contributingbadgeids = [13, 15, 14]; // Feedback Follower, Steady Improver, Tenacious Tiger
             break;
         case 20: // Learning Legend
-            $contributing_badge_ids = [19, 17, 7]; // High Flyer, Activity Ace, Mission Complete
+            $contributingbadgeids = [19, 17, 7]; // High Flyer, Activity Ace, Mission Complete
             break;
     }
 
     // Get names of earned contributing badges
-    $badge_names = [
+    $badgenames = [
         4 => 'On a Roll', 5 => 'Halfway Hero', 6 => 'Getting Started', 7 => 'Mission Complete',
         9 => 'Early Bird', 10 => 'Deadline Burner', 11 => 'Sharp Shooter',
         13 => 'Feedback Follower', 14 => 'Tenacious Tiger', 15 => 'Steady Improver',
         17 => 'Activity Ace', 19 => 'High Flyer',
     ];
 
-    foreach ($contributing_badge_ids as $cbid) {
+    foreach ($contributingbadgeids as $cbid) {
         $exists = $DB->record_exists('local_ascend_rewards_coins', [
             'userid' => $USER->id,
             'badgeid' => $cbid,
             'courseid' => $courseid,
         ]);
-        if ($exists && isset($badge_names[$cbid])) {
-            $activities[] = $badge_names[$cbid];
+        if ($exists && isset($badgenames[$cbid])) {
+            $activities[] = $badgenames[$cbid];
         }
     }
 } else {
@@ -193,54 +192,54 @@ if (in_array($badgeid, $meta_badges)) {
     switch ($badgeid) {
         case 4: // On a Roll - 2 consecutive activities per award, show activity pairs grouped by award
             // Read pipe-delimited pair activities from preferences
-            $pref_key = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
-            $pref_json = get_user_preferences($pref_key, '', $USER->id);
+            $prefkey = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
+            $prefjson = get_user_preferences($prefkey, '', $USER->id);
 
-            if ($pref_json) {
-                $all_pairs = json_decode($pref_json, true);
+            if ($prefjson) {
+                $allpairs = json_decode($prefjson, true);
 
-                if (is_array($all_pairs) && count($all_pairs) > 0) {
-                    $total_pairs = count($all_pairs);
-                    $pair_count = 0;
+                if (is_array($allpairs) && count($allpairs) > 0) {
+                    $totalpairs = count($allpairs);
+                    $paircount = 0;
 
                     // Parse each pipe-delimited pair
-                    foreach ($all_pairs as $pair_key) {
-                        $pair_parts = explode('|', $pair_key, 2);
+                    foreach ($allpairs as $pairkey) {
+                        $pairparts = explode('|', $pairkey, 2);
 
-                        if (count($pair_parts) === 2) {
-                            $pair_count++;
-                            $award_number = $pair_count;
+                        if (count($pairparts) === 2) {
+                            $paircount++;
+                            $awardnumber = $paircount;
 
                             // Check if this is cmid-based (numeric) or name-based (text) format
-                            $is_cmid_format = is_numeric($pair_parts[0]) && is_numeric($pair_parts[1]);
+                            $iscmidformat = is_numeric($pairparts[0]) && is_numeric($pairparts[1]);
 
-                            if ($is_cmid_format) {
+                            if ($iscmidformat) {
                                 // Convert cmids to activity names
-                                $cmid1 = intval($pair_parts[0]);
-                                $cmid2 = intval($pair_parts[1]);
+                                $cmid1 = intval($pairparts[0]);
+                                $cmid2 = intval($pairparts[1]);
 
-                                $activity_names = array_filter([
+                                $activitynames = array_filter([
                                     local_ascend_rewards_get_activity_name_by_cmid($cmid1),
                                     local_ascend_rewards_get_activity_name_by_cmid($cmid2),
                                 ]);
 
-                                if (count($activity_names) === 2) {
-                                    foreach ($activity_names as $activity_name) {
-                                        $activities[] = $activity_name;
+                                if (count($activitynames) === 2) {
+                                    foreach ($activitynames as $activityname) {
+                                        $activities[] = $activityname;
                                         $metadata[] = [
-                                            'award_number' => $award_number,
-                                            'award_count' => $total_pairs,
+                                            'award_number' => $awardnumber,
+                                            'award_count' => $totalpairs,
                                             'is_pair_member' => true,
                                         ];
                                     }
                                 }
                             } else {
                                 // Old format: activity names are stored directly
-                                foreach ($pair_parts as $activity_name) {
-                                    $activities[] = $activity_name;
+                                foreach ($pairparts as $activityname) {
+                                    $activities[] = $activityname;
                                     $metadata[] = [
-                                        'award_number' => $award_number,
-                                        'award_count' => $total_pairs,
+                                        'award_number' => $awardnumber,
+                                        'award_count' => $totalpairs,
                                         'is_pair_member' => true,
                                     ];
                                 }
@@ -312,16 +311,16 @@ if (in_array($badgeid, $meta_badges)) {
             break;
 
         case 9: // Early Bird - each activity awards badge once, show with x1, x2, x3
-            $pref_key = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
-            $rawpref = get_user_preferences($pref_key, '', $USER->id);
+            $prefkey = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
+            $rawpref = get_user_preferences($prefkey, '', $USER->id);
             if ($rawpref) {
                 // Determine format: legacy numeric CSV of cmids OR JSON array of activity names
-                $is_numeric_csv = preg_match('/^\d+(,\d+)*$/', $rawpref);
-                if ($is_numeric_csv) {
+                $isnumericcsv = preg_match('/^\d+(,\d+)*$/', $rawpref);
+                if ($isnumericcsv) {
                     // Legacy path (cm ids stored as comma-separated numbers)
-                    $awarded_array = explode(',', $rawpref);
-                    $total_awards = count($awarded_array);
-                    [$insql, $params] = $DB->get_in_or_equal($awarded_array, SQL_PARAMS_NAMED);
+                    $awardedarray = explode(',', $rawpref);
+                    $totalawards = count($awardedarray);
+                    [$insql, $params] = $DB->get_in_or_equal($awardedarray, SQL_PARAMS_NAMED);
                     $params['courseid'] = $courseid;
                     $sql = "SELECT cm.id, cm.instance, m.name as modname
                                   FROM {course_modules} cm
@@ -330,29 +329,29 @@ if (in_array($badgeid, $meta_badges)) {
                                    AND cm.course = :courseid";
                     $cms = $DB->get_records_sql($sql, $params);
                     // Group by module type for batch instance fetch
-                    $by_module = [];
+                    $bymodule = [];
                     foreach ($cms as $cm) {
-                        if (!isset($by_module[$cm->modname])) {
-                            $by_module[$cm->modname] = [];
+                        if (!isset($bymodule[$cm->modname])) {
+                            $bymodule[$cm->modname] = [];
                         }
-                        $by_module[$cm->modname][] = $cm->instance;
+                        $bymodule[$cm->modname][] = $cm->instance;
                     }
-                    $activity_names = [];
-                    foreach ($by_module as $modname => $instances) {
+                    $activitynames = [];
+                    foreach ($bymodule as $modname => $instances) {
                         [$insql2, $params2] = $DB->get_in_or_equal($instances, SQL_PARAMS_NAMED);
-                        $instances_data = $DB->get_records_select($modname, "id $insql2", $params2, '', 'id,name');
-                        foreach ($instances_data as $inst) {
-                            $activity_names[$inst->id] = $inst->name;
+                        $instancesdata = $DB->get_records_select($modname, "id $insql2", $params2, '', 'id,name');
+                        foreach ($instancesdata as $inst) {
+                            $activitynames[$inst->id] = $inst->name;
                         }
                     }
-                    foreach ($awarded_array as $idx => $cmid) {
+                    foreach ($awardedarray as $idx => $cmid) {
                         if (isset($cms[$cmid])) {
                             $cm = $cms[$cmid];
-                            if (isset($activity_names[$cm->instance])) {
-                                $activities[] = $activity_names[$cm->instance];
+                            if (isset($activitynames[$cm->instance])) {
+                                $activities[] = $activitynames[$cm->instance];
                                 $metadata[] = [
                                     'award_number' => $idx + 1,
-                                    'award_count' => $total_awards,
+                                    'award_count' => $totalawards,
                                     'single_activity' => true,
                                 ];
                             }
@@ -362,12 +361,12 @@ if (in_array($badgeid, $meta_badges)) {
                     // New path: JSON array of activity names stored in preference
                     $decoded = json_decode($rawpref, true);
                     if (is_array($decoded)) {
-                        $total_awards = count($decoded);
+                        $totalawards = count($decoded);
                         foreach ($decoded as $idx => $name) {
                             $activities[] = $name;
                             $metadata[] = [
                                 'award_number' => $idx + 1,
-                                'award_count' => $total_awards,
+                                'award_count' => $totalawards,
                                 'single_activity' => true,
                             ];
                         }
@@ -405,18 +404,18 @@ if (in_array($badgeid, $meta_badges)) {
             break;
 
         case 11: // Sharp Shooter - preferences store JSON array of cmid pairs (e.g., ["2|3", "4|5"])
-            $pref_key = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
-            $rawpref = get_user_preferences($pref_key, '', $USER->id);
+            $prefkey = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
+            $rawpref = get_user_preferences($prefkey, '', $USER->id);
             if ($rawpref) {
                 $decoded = json_decode($rawpref, true);
                 if (is_array($decoded) && count($decoded) > 0) {
-                    $award_num = 1;
-                    $total_awards = 0;
+                    $awardnum = 1;
+                    $totalawards = 0;
 
                     // Count valid pairs (pipe-delimited cmid pairs)
                     foreach ($decoded as $entry) {
                         if (strpos($entry, '|') !== false && preg_match('/^\d+\|\d+$/', $entry)) {
-                            $total_awards++;
+                            $totalawards++;
                         }
                     }
 
@@ -430,18 +429,18 @@ if (in_array($badgeid, $meta_badges)) {
                                 if ($name) {
                                     $activities[] = $name;
                                     $metadata[] = [
-                                        'award_number' => $award_num,
-                                        'award_count' => $total_awards,
+                                        'award_number' => $awardnum,
+                                        'award_count' => $totalawards,
                                     ];
                                 }
                             }
-                            $award_num++;
+                            $awardnum++;
                         } else if (!strpos($entry, '|') && !is_numeric($entry)) {
                             // Legacy format: activity name (e.g., "Assign: Test 1")
                             // Keep for backward compatibility with old data
                             $activities[] = $entry;
-                            if (!isset($legacy_total_awards)) {
-                                $legacy_total_awards = count(array_filter(
+                            if (!isset($legacytotalawards)) {
+                                $legacytotalawards = count(array_filter(
                                     $decoded,
                                     function ($e) {
                                         return !strpos($e, '|') && !is_numeric($e);
@@ -449,11 +448,11 @@ if (in_array($badgeid, $meta_badges)) {
                                 ));
                             }
                             $metadata[] = [
-                                'award_number' => isset($legacy_award_num) ? $legacy_award_num : 1,
-                                'award_count' => isset($legacy_total_awards) ? $legacy_total_awards : 1,
+                                'award_number' => isset($legacyawardnum) ? $legacyawardnum : 1,
+                                'award_count' => isset($legacytotalawards) ? $legacytotalawards : 1,
                             ];
-                            if (!isset($legacy_award_num)) {
-                                $legacy_award_num = 1;
+                            if (!isset($legacyawardnum)) {
+                                $legacyawardnum = 1;
                             }
                             if (
                                 $entry === end(array_filter(
@@ -463,7 +462,7 @@ if (in_array($badgeid, $meta_badges)) {
                                     }
                                 ))
                             ) {
-                                $legacy_award_num++;
+                                $legacyawardnum++;
                             }
                         }
                     }
@@ -472,76 +471,76 @@ if (in_array($badgeid, $meta_badges)) {
             break;
 
         case 13: // Feedback Follower - each improved activity awards badge, show with x1, x2, x3
-            $pref_key = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
-            $awarded_ids = get_user_preferences($pref_key, '', $USER->id);
+            $prefkey = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
+            $awardedids = get_user_preferences($prefkey, '', $USER->id);
 
-            if ($awarded_ids) {
-                $decoded = json_decode($awarded_ids, true);
+            if ($awardedids) {
+                $decoded = json_decode($awardedids, true);
                 if (is_array($decoded) && count($decoded) > 0) {
-                    $all_numeric = true;
+                    $allnumeric = true;
                     foreach ($decoded as $entry) {
                         if (!is_numeric($entry)) {
-                            $all_numeric = false;
+                            $allnumeric = false;
                             break;
                         }
                     }
 
-                    if (!$all_numeric) {
-                        $total_awards = count($decoded);
+                    if (!$allnumeric) {
+                        $totalawards = count($decoded);
                         foreach ($decoded as $idx => $name) {
                             $activities[] = $name;
                             $metadata[] = [
                                 'award_number' => $idx + 1,
-                                'award_count' => $total_awards,
+                                'award_count' => $totalawards,
                                 'single_activity' => true,
                             ];
                         }
                         break;
                     }
 
-                    $awarded_array = $decoded;
+                    $awardedarray = $decoded;
                 } else {
-                    $awarded_array = explode(',', $awarded_ids);
+                    $awardedarray = explode(',', $awardedids);
                 }
 
-                $total_awards = count($awarded_array);
+                $totalawards = count($awardedarray);
 
-                foreach ($awarded_array as $idx => $cmid) {
+                foreach ($awardedarray as $idx => $cmid) {
                     if ($cm = $DB->get_record('course_modules', ['id' => $cmid])) {
                         $mod = $DB->get_record('modules', ['id' => $cm->module]);
                         if ($mod && $modinstance = $DB->get_record($mod->name, ['id' => $cm->instance], 'name')) {
                             // Get grade info to show improvement
-                            $grade_item = $DB->get_record('grade_items', [
+                            $gradeitem = $DB->get_record('grade_items', [
                                 'itemtype' => 'mod',
                                 'itemmodule' => $mod->name,
                                 'iteminstance' => $cm->instance,
                                 'courseid' => $courseid,
                             ]);
 
-                            $old_grade = 0;
-                            $new_grade = 0;
-                            if ($grade_item) {
+                            $oldgrade = 0;
+                            $newgrade = 0;
+                            if ($gradeitem) {
                                 $grades = $DB->get_records(
                                     'grade_grades',
-                                    ['itemid' => $grade_item->id, 'userid' => $USER->id],
+                                    ['itemid' => $gradeitem->id, 'userid' => $USER->id],
                                     'timemodified ASC'
                                 );
                                 if (count($grades) >= 2) {
-                                    $grades_array = array_values($grades);
-                                    $first = $grades_array[0];
-                                    $last = end($grades_array);
-                                    $old_grade = $first->finalgrade ? round(($first->finalgrade / $grade_item->grademax) * 100) : 0;
-                                    $new_grade = $last->finalgrade ? round(($last->finalgrade / $grade_item->grademax) * 100) : 0;
+                                    $gradesarray = array_values($grades);
+                                    $first = $gradesarray[0];
+                                    $last = end($gradesarray);
+                                    $oldgrade = $first->finalgrade ? round(($first->finalgrade / $gradeitem->grademax) * 100) : 0;
+                                    $newgrade = $last->finalgrade ? round(($last->finalgrade / $gradeitem->grademax) * 100) : 0;
                                 }
                             }
 
                             $activities[] = $modinstance->name;
                             $metadata[] = [
                                 'award_number' => $idx + 1,
-                                'award_count' => $total_awards,
+                                'award_count' => $totalawards,
                                 'single_activity' => true,
-                                'old_grade' => $old_grade,
-                                'new_grade' => $new_grade,
+                                'old_grade' => $oldgrade,
+                                'new_grade' => $newgrade,
                             ];
                         }
                     }
@@ -550,26 +549,26 @@ if (in_array($badgeid, $meta_badges)) {
             break;
 
         case 14: // Tenacious Tiger - 2+ improved activities (show only activities with improvements)
-            $pref_key = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
-            $awarded_ids = get_user_preferences($pref_key, '', $USER->id);
-            if ($awarded_ids) {
-                $decoded = json_decode($awarded_ids, true);
+            $prefkey = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
+            $awardedids = get_user_preferences($prefkey, '', $USER->id);
+            if ($awardedids) {
+                $decoded = json_decode($awardedids, true);
                 if (is_array($decoded) && count($decoded) > 0) {
-                    $all_numeric = true;
+                    $allnumeric = true;
                     foreach ($decoded as $entry) {
                         if (!is_numeric($entry)) {
-                            $all_numeric = false;
+                            $allnumeric = false;
                             break;
                         }
                     }
 
-                    $total_awards = count($decoded);
-                    if (!$all_numeric) {
+                    $totalawards = count($decoded);
+                    if (!$allnumeric) {
                         foreach ($decoded as $idx => $name) {
                             $activities[] = $name;
                             $metadata[] = [
                                 'award_number' => $idx + 1,
-                                'award_count' => $total_awards,
+                                'award_count' => $totalawards,
                                 'single_activity' => true,
                             ];
                         }
@@ -577,12 +576,12 @@ if (in_array($badgeid, $meta_badges)) {
                     }
 
                     foreach ($decoded as $idx => $cmid) {
-                        $activity_name = local_ascend_rewards_get_activity_name_by_cmid((int)$cmid);
-                        if ($activity_name) {
-                            $activities[] = $activity_name;
+                        $activityname = local_ascend_rewards_get_activity_name_by_cmid((int)$cmid);
+                        if ($activityname) {
+                            $activities[] = $activityname;
                             $metadata[] = [
                                 'award_number' => $idx + 1,
-                                'award_count' => $total_awards,
+                                'award_count' => $totalawards,
                                 'single_activity' => true,
                             ];
                         }
@@ -609,37 +608,37 @@ if (in_array($badgeid, $meta_badges)) {
             // Filter for only activities with grade improvements
             foreach ($completed as $cm) {
                 try {
-                    $grade_item = $DB->get_record('grade_items', [
+                    $gradeitem = $DB->get_record('grade_items', [
                         'itemtype' => 'mod',
                         'itemmodule' => $cm->modname,
                         'iteminstance' => $cm->instance,
                         'courseid' => $courseid,
                     ]);
 
-                    if ($grade_item) {
+                    if ($gradeitem) {
                         $grades = $DB->get_records(
                             'grade_grades',
-                            ['itemid' => $grade_item->id, 'userid' => $USER->id],
+                            ['itemid' => $gradeitem->id, 'userid' => $USER->id],
                             'timemodified ASC'
                         );
 
                         // Only include if there are multiple attempts with improvement
                         if (count($grades) >= 2) {
-                            $grades_array = array_values($grades);
-                            $first = $grades_array[0];
-                            $last = end($grades_array);
+                            $gradesarray = array_values($grades);
+                            $first = $gradesarray[0];
+                            $last = end($gradesarray);
 
                             if ($last->finalgrade > $first->finalgrade) {
                                 if ($modinstance = $DB->get_record($cm->modname, ['id' => $cm->instance], 'name')) {
-                                    $old_pct = $first->finalgrade ? round(($first->finalgrade / $grade_item->grademax) * 100) : 0;
-                                    $new_pct = $last->finalgrade ? round(($last->finalgrade / $grade_item->grademax) * 100) : 0;
+                                    $oldpct = $first->finalgrade ? round(($first->finalgrade / $gradeitem->grademax) * 100) : 0;
+                                    $newpct = $last->finalgrade ? round(($last->finalgrade / $gradeitem->grademax) * 100) : 0;
 
                                     $activities[] = $modinstance->name;
                                     $metadata[] = [
                                     'award_number' => 1,
                                     'award_count' => 1,
-                                    'old_grade' => $old_pct,
-                                    'new_grade' => $new_pct,
+                                    'old_grade' => $oldpct,
+                                    'new_grade' => $newpct,
                                     ];
                                 }
                             }
@@ -652,76 +651,76 @@ if (in_array($badgeid, $meta_badges)) {
             break;
 
         case 15: // Steady Improver - each failed->passed activity awards badge, show with x1, x2, x3
-            $pref_key = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
-            $awarded_ids = get_user_preferences($pref_key, '', $USER->id);
+            $prefkey = "ascend_badge_{$badgeid}_course_{$courseid}_activities";
+            $awardedids = get_user_preferences($prefkey, '', $USER->id);
 
-            if ($awarded_ids) {
-                $decoded = json_decode($awarded_ids, true);
+            if ($awardedids) {
+                $decoded = json_decode($awardedids, true);
                 if (is_array($decoded) && count($decoded) > 0) {
-                    $all_numeric = true;
+                    $allnumeric = true;
                     foreach ($decoded as $entry) {
                         if (!is_numeric($entry)) {
-                            $all_numeric = false;
+                            $allnumeric = false;
                             break;
                         }
                     }
 
-                    if (!$all_numeric) {
-                        $total_awards = count($decoded);
+                    if (!$allnumeric) {
+                        $totalawards = count($decoded);
                         foreach ($decoded as $idx => $name) {
                             $activities[] = $name;
                             $metadata[] = [
                                 'award_number' => $idx + 1,
-                                'award_count' => $total_awards,
+                                'award_count' => $totalawards,
                                 'single_activity' => true,
                             ];
                         }
                         break;
                     }
 
-                    $awarded_array = $decoded;
+                    $awardedarray = $decoded;
                 } else {
-                    $awarded_array = explode(',', $awarded_ids);
+                    $awardedarray = explode(',', $awardedids);
                 }
 
-                $total_awards = count($awarded_array);
+                $totalawards = count($awardedarray);
 
-                foreach ($awarded_array as $idx => $cmid) {
+                foreach ($awardedarray as $idx => $cmid) {
                     if ($cm = $DB->get_record('course_modules', ['id' => $cmid])) {
                         $mod = $DB->get_record('modules', ['id' => $cm->module]);
                         if ($mod && $modinstance = $DB->get_record($mod->name, ['id' => $cm->instance], 'name')) {
                             // Get grade progression
-                            $grade_item = $DB->get_record('grade_items', [
+                            $gradeitem = $DB->get_record('grade_items', [
                                 'itemtype' => 'mod',
                                 'itemmodule' => $mod->name,
                                 'iteminstance' => $cm->instance,
                                 'courseid' => $courseid,
                             ]);
 
-                            $failed_grade = 0;
-                            $passed_grade = 0;
-                            if ($grade_item) {
+                            $failedgrade = 0;
+                            $passedgrade = 0;
+                            if ($gradeitem) {
                                 $grades = $DB->get_records(
                                     'grade_grades',
-                                    ['itemid' => $grade_item->id, 'userid' => $USER->id],
+                                    ['itemid' => $gradeitem->id, 'userid' => $USER->id],
                                     'timemodified ASC'
                                 );
                                 if (count($grades) >= 2) {
-                                    $grades_array = array_values($grades);
-                                    $first = $grades_array[0];
-                                    $last = end($grades_array);
-                                    $failed_grade = $first->finalgrade ? round(($first->finalgrade / $grade_item->grademax) * 100) : 0;
-                                    $passed_grade = $last->finalgrade ? round(($last->finalgrade / $grade_item->grademax) * 100) : 0;
+                                    $gradesarray = array_values($grades);
+                                    $first = $gradesarray[0];
+                                    $last = end($gradesarray);
+                                    $failedgrade = $first->finalgrade ? round(($first->finalgrade / $gradeitem->grademax) * 100) : 0;
+                                    $passedgrade = $last->finalgrade ? round(($last->finalgrade / $gradeitem->grademax) * 100) : 0;
                                 }
                             }
 
                             $activities[] = $modinstance->name;
                             $metadata[] = [
                                 'award_number' => $idx + 1,
-                                'award_count' => $total_awards,
+                                'award_count' => $totalawards,
                                 'single_activity' => true,
-                                'failed_grade' => $failed_grade,
-                                'passed_grade' => $passed_grade,
+                                'failed_grade' => $failedgrade,
+                                'passed_grade' => $passedgrade,
                             ];
                         }
                     }
@@ -759,7 +758,7 @@ if (in_array($badgeid, $meta_badges)) {
 
         case 19: // High Flyer - awards every 2 passed activities, show each pair with x1, x2, x3
             // Count how many times this badge has been awarded
-            $award_count = $DB->count_records('local_ascend_rewards_coins', [
+            $awardcount = $DB->count_records('local_ascend_rewards_coins', [
                 'userid' => $USER->id,
                 'badgeid' => $badgeid,
                 'courseid' => $courseid,
@@ -777,26 +776,26 @@ if (in_array($badgeid, $meta_badges)) {
                            AND cmc.completionstate IN (1, 2)
                            AND m.name IN ('assign', 'quiz')
                       ORDER BY cmc.timemodified ASC";
-            $all_completed = $DB->get_records_sql($sql, ['courseid' => $courseid, 'userid' => $USER->id]);
+            $allcompleted = $DB->get_records_sql($sql, ['courseid' => $courseid, 'userid' => $USER->id]);
 
             // Filter for passed activities (grade >= 60%)
             $passed = [];
-            foreach ($all_completed as $cm) {
-                $grade_item = $DB->get_record('grade_items', [
+            foreach ($allcompleted as $cm) {
+                $gradeitem = $DB->get_record('grade_items', [
                     'itemtype' => 'mod',
                     'itemmodule' => $cm->modname,
                     'iteminstance' => $cm->instance,
                     'courseid' => $courseid,
                 ]);
 
-                if ($grade_item) {
+                if ($gradeitem) {
                     $grade = $DB->get_record('grade_grades', [
-                    'itemid' => $grade_item->id,
+                    'itemid' => $gradeitem->id,
                     'userid' => $USER->id,
                     ]);
 
                     if ($grade && $grade->finalgrade !== null) {
-                        $percentage = ($grade->finalgrade / $grade_item->grademax) * 100;
+                        $percentage = ($grade->finalgrade / $gradeitem->grademax) * 100;
                         if ($percentage >= 60) {
                             $passed[] = $cm;
                         }
@@ -805,19 +804,19 @@ if (in_array($badgeid, $meta_badges)) {
             }
 
             // Show all pairs up to award count
-            $total_pairs = $award_count > 0 ? $award_count : 1;
+            $totalpairs = $awardcount > 0 ? $awardcount : 1;
 
-            for ($pair = 0; $pair < $total_pairs; $pair++) {
-                $start_index = $pair * 2;
-                $pair_activities = array_slice($passed, $start_index, 2);
+            for ($pair = 0; $pair < $totalpairs; $pair++) {
+                $startindex = $pair * 2;
+                $pairactivities = array_slice($passed, $startindex, 2);
 
-                foreach ($pair_activities as $cm) {
+                foreach ($pairactivities as $cm) {
                     try {
                         if ($modinstance = $DB->get_record($cm->modname, ['id' => $cm->instance], 'name')) {
                             $activities[] = $modinstance->name;
                             $metadata[] = [
                                 'award_number' => $pair + 1,
-                                'award_count' => $total_pairs,
+                                'award_count' => $totalpairs,
                             ];
                         }
                     } catch (Exception $e) {
@@ -840,18 +839,18 @@ if (in_array($badgeid, $meta_badges)) {
                       ORDER BY cmc.timemodified DESC
                          LIMIT 10";
             $completed = $DB->get_records_sql($sql, ['courseid' => $courseid, 'userid' => $USER->id]);
-            $award_num = 1;
+            $awardnum = 1;
             foreach ($completed as $cm) {
                 $modtable = $cm->modname;
                 try {
                     if ($modinstance = $DB->get_record($modtable, ['id' => $cm->instance], 'name')) {
                         $activities[] = $modinstance->name;
                         $metadata[] = [
-                            'award_number' => $award_num,
+                            'award_number' => $awardnum,
                             'award_count' => count($completed),
                             'single_activity' => true,
                         ];
-                        $award_num++;
+                        $awardnum++;
                     }
                 } catch (Exception $e) {
                     continue;
@@ -863,18 +862,18 @@ if (in_array($badgeid, $meta_badges)) {
 
 // Cache the results for fast future retrieval
 $now = time();
-$cache_record = $DB->get_record('local_ascend_rewards_badge_cache', [
+$cacherecord = $DB->get_record('local_ascend_rewards_badge_cache', [
     'userid' => $USER->id,
     'courseid' => $courseid,
     'badgeid' => $badgeid,
 ]);
 
-if ($cache_record) {
+if ($cacherecord) {
     // Update existing cache
-    $cache_record->activities = json_encode($activities);
-    $cache_record->metadata = json_encode($metadata);
-    $cache_record->timemodified = $now;
-    $DB->update_record('local_ascend_rewards_badge_cache', $cache_record);
+    $cacherecord->activities = json_encode($activities);
+    $cacherecord->metadata = json_encode($metadata);
+    $cacherecord->timemodified = $now;
+    $DB->update_record('local_ascend_rewards_badge_cache', $cacherecord);
 } else {
     // Insert new cache
     $DB->insert_record('local_ascend_rewards_badge_cache', (object)[
@@ -888,7 +887,7 @@ if ($cache_record) {
     ]);
 }
 
-$perflog['calculation'] = round((microtime(true) - $cache_start) * 1000, 2);
+$perflog['calculation'] = round((microtime(true) - $cachestart) * 1000, 2);
 $perflog['total'] = round((microtime(true) - $perfstart) * 1000, 2);
 
 $response = [
@@ -897,11 +896,11 @@ $response = [
     'cached' => false,
 ];
 
-if ($debug_timing) {
+if ($debugtiming) {
     $response['performance'] = $perflog;
 }
 
-if (!empty($return_data)) {
+if (!empty($returndata)) {
     return $response;
 }
 echo json_encode($response);

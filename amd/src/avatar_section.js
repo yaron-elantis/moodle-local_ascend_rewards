@@ -1,4 +1,4 @@
-import ModalFactory from 'core/modal_factory';
+import Modal from 'core/modal';
 import ModalEvents from 'core/modal_events';
 import {
     init as initAvatarModals,
@@ -128,33 +128,37 @@ const applyDataStyles = () => {
     });
 };
 
-const openStoryModal = async (title, youtubeId) => {
+const openStoryModal = async(title, youtubeId) => {
     if (!youtubeId) {
         return;
     }
 
-    const modal = await ModalFactory.create({
-        type: ModalFactory.types.DEFAULT,
-        title: title,
+    const modal = await Modal.create({
+        title,
+        removeOnClose: true,
         body: `<div class="aa-youtube-modal-body">
             <iframe
-                width="100%"
-                height="600"
+                class="aa-youtube-modal-iframe"
                 src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(youtubeId)}?autoplay=1&rel=0&modestbranding=1&fs=1"
-                title="${title}"
+                title="${title || ''}"
                 frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowfullscreen
-                class="aa-youtube-modal-iframe">
+                referrerpolicy="strict-origin-when-cross-origin"
+                loading="lazy">
             </iframe>
         </div>`
     });
 
-    modal.getRoot().addClass('aa-youtube-modal');
+    const root = modal.getRoot();
+    root.addClass('aa-youtube-modal');
     modal.show();
 
-    modal.getRoot().on(ModalEvents.hidden, () => {
-        modal.destroy();
+    root.on(ModalEvents.hidden, () => {
+        const iframe = root.find('.aa-youtube-modal-iframe');
+        if (iframe.length) {
+            iframe.attr('src', 'about:blank');
+        }
     });
 };
 

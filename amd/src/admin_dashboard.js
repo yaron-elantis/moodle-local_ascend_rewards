@@ -50,20 +50,20 @@ const initBadgePreview = (config) => {
         return;
     }
 
-    const badgeVideos = config?.badgeVideos || {};
-    const badgeCategories = config?.badgeCategories || {};
-    const badgeDescriptions = config?.badgeDescriptions || {};
-    const knownBadgeNames = config?.knownBadgeNames || [];
-    const metaBadgeIds = config?.metaBadgeIds || [];
-    const moreActivitiesTemplate = config?.moreActivitiesTemplate || '';
-    const badgePreviewFallback = config?.badgePreviewFallback || '';
-    const congratsTemplate = config?.congratsTemplate || '';
-    const xpLabel = config?.xpLabel || '';
-    const assetsLabel = config?.assetsLabel || '';
-    const badgeLabel = config?.badgeLabel || '';
-    const badgeCategoryDefault = config?.badgeCategoryDefault || '';
-    const sampleCourseLabel = config?.sampleCourseLabel || '';
-    const selectBadgeAlert = config?.selectBadgeAlert || '';
+    const badgeVideos = config ? .badgeVideos || {};
+    const badgeCategories = config ? .badgeCategories || {};
+    const badgeDescriptions = config ? .badgeDescriptions || {};
+    const knownBadgeNames = config ? .knownBadgeNames || [];
+    const metaBadgeIds = config ? .metaBadgeIds || [];
+    const moreActivitiesTemplate = config ? .moreActivitiesTemplate || '';
+    const badgePreviewFallback = config ? .badgePreviewFallback || '';
+    const congratsTemplate = config ? .congratsTemplate || '';
+    const xpLabel = config ? .xpLabel || '';
+    const assetsLabel = config ? .assetsLabel || '';
+    const badgeLabel = config ? .badgeLabel || '';
+    const badgeCategoryDefault = config ? .badgeCategoryDefault || '';
+    const sampleCourseLabel = config ? .sampleCourseLabel || '';
+    const selectBadgeAlert = config ? .selectBadgeAlert || '';
 
     const q = (selector) => document.querySelector(selector);
 
@@ -96,11 +96,11 @@ const initBadgePreview = (config) => {
         q('#apxBWhen').textContent = d.when || '';
         q('#apxBWhy').textContent = d.why || '';
 
-        const coinsText = d.coins || `+0 ${assetsLabel}`;
+        const coinsText = d.coins || ` + 0 ${assetsLabel}`;
         const coins = parseInt(coinsText.match(/\d+/)) || 0;
         const badgeXp = Math.floor(coins / 2);
 
-        q('#apxBXP').textContent = `+${badgeXp} ${xpLabel}`;
+        q('#apxBXP').textContent = ` + ${badgeXp} ${xpLabel}`;
         q('#apxBCoins').textContent = coinsText;
 
         const courseId = parseInt(d.courseid || '0', 10);
@@ -200,7 +200,7 @@ const initBadgePreview = (config) => {
         }
 
         const videoFile = badgeVideos[badgeId] || 'reward_animation_2.mp4';
-        const videoUrl = `${M.cfg.wwwroot}/local/ascend_rewards/pix/${videoFile}`;
+        const videoUrl = `${M.cfg.wwwroot} / local / ascend_rewards / pix / ${videoFile}`;
 
         if (video && videoSource) {
             videoSource.src = videoUrl;
@@ -251,7 +251,7 @@ const initBadgePreview = (config) => {
             badgeid: badgeId,
             when: new Date().toLocaleDateString(),
             why: badgeDescriptions[badgeId] || badgePreviewFallback,
-            coins: `+100 ${assetsLabel}`
+            coins: ` + 100 ${assetsLabel}`
         };
 
         openModal(badgeData);
@@ -300,8 +300,8 @@ const initSearchTabs = () => {
 };
 
 const initAwardForm = (config) => {
-    const awardCourseError = config?.awardCourseError || '';
-    const awardBadgeError = config?.awardBadgeError || '';
+    const awardCourseError = config ? .awardCourseError || '';
+    const awardBadgeError = config ? .awardBadgeError || '';
     const awardForm = document.querySelector('[data-award-form]');
 
     if (!awardForm) {
@@ -309,8 +309,8 @@ const initAwardForm = (config) => {
     }
 
     awardForm.addEventListener('submit', (event) => {
-        const courseId = document.getElementById('courseid_input')?.value || '';
-        const badgeId = document.getElementById('badgeid_input')?.value || '';
+        const courseId = document.getElementById('courseid_input') ? .value || '';
+        const badgeId = document.getElementById('badgeid_input') ? .value || '';
         const idPattern = /\(\s*[^)]*\d+\s*\)\s*$/;
 
         if (!courseId || !idPattern.test(courseId)) {
@@ -335,9 +335,9 @@ const initBadgeChart = () => {
 };
 
 export const init = (config) => {
-    const fallbackConfig = window.M?.cfg?.local_ascend_rewards_admin_dashboard || {};
+    const fallbackConfig = window.M ? .cfg ? .local_ascend_rewards_admin_dashboard || {};
     const resolvedConfig = config && typeof config === 'object' ? config : fallbackConfig;
-    const alerts = resolvedConfig?.alerts || {};
+    const alerts = resolvedConfig ? .alerts || {};
     alertConfig = {
         alertTitle: alerts.alertTitle || '',
         errorTitle: alerts.errorTitle || alerts.alertTitle || '',
@@ -345,8 +345,8 @@ export const init = (config) => {
     };
     ajaxRequestFailed = alerts.ajaxRequestFailed || '';
 
-    initBadgePreview(resolvedConfig?.badgePreview || {});
+    initBadgePreview(resolvedConfig ? .badgePreview || {});
     initSearchTabs();
-    initAwardForm(resolvedConfig?.awardForm || {});
+    initAwardForm(resolvedConfig ? .awardForm || {});
     initBadgeChart();
 };

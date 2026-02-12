@@ -175,21 +175,21 @@ export const init = () => {
         }
     });
 
-    if (reward.exists) {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                setTimeout(() => reward.show(), 500);
-            });
-        } else {
+if (reward.exists) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => reward.show(), 500);
-        }
-    } else if (levelup.exists) {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                setTimeout(() => levelup.show(), 1000);
             });
-        } else {
-            setTimeout(() => levelup.show(), 1000);
-        }
+    } else {
+        setTimeout(() => reward.show(), 500);
     }
+} else if (levelup.exists) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => levelup.show(), 1000);
+            });
+    } else {
+        setTimeout(() => levelup.show(), 1000);
+    }
+}
 };

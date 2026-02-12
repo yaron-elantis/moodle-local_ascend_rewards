@@ -44,19 +44,19 @@ class ajax_service {
      *
      * @param int $courseid
      * @param int $badgeid
-     * @param bool $force_recalculate
-     * @param bool $debug_timing
+     * @param bool $forcerecalculate
+     * @param bool $debugtiming
      * @return array
      */
-    public static function get_activities(int $courseid, int $badgeid, bool $force_recalculate = false, bool $debug_timing = false): array {
+    public static function get_activities(int $courseid, int $badgeid, bool $forcerecalculate = false, bool $debugtiming = false): array {
         $courseid = (int)$courseid;
         $badgeid = (int)$badgeid;
-        $force_recalculate = (bool)$force_recalculate;
-        $debug_timing = (bool)$debug_timing;
-        $return_data = true;
+        $forcerecalculate = (bool)$forcerecalculate;
+        $debugtiming = (bool)$debugtiming;
+        $returndata = true;
 
-        $result = (function () use ($courseid, $badgeid, $force_recalculate, $debug_timing, $return_data) {
-            return require __DIR__ . '/../get_activities.php';
+        $result = (function () use ($courseid, $badgeid, $forcerecalculate, $debugtiming, $returndata) {
+            return require(__DIR__ . '/../get_activities.php');
         })();
 
         if (!is_array($result)) {
@@ -97,7 +97,7 @@ class ajax_service {
             $neighbors = 3;
         }
 
-        $xp_cid = ($courseid > 0) ? $courseid : 0;
+        $xpcid = ($courseid > 0) ? $courseid : 0;
 
         $sql = "SELECT x.userid, x.xp
                 FROM {local_ascend_rewards_xp} x
@@ -106,7 +106,7 @@ class ajax_service {
                   AND u.suspended = 0 AND u.deleted = 0
                 ORDER BY x.xp DESC, x.userid ASC";
 
-        $rows = $DB->get_records_sql($sql, ['cid' => $xp_cid]);
+        $rows = $DB->get_records_sql($sql, ['cid' => $xpcid]);
         $ranked = [];
         $r = 1;
         foreach ($rows as $row) {
@@ -129,26 +129,26 @@ class ajax_service {
             }
         }
 
-        $users_array = [];
+        $usersarray = [];
         if ($myrank !== null && $total > 1) {
             $start = max(0, $myrank - 1 - $neighbors);
             $end = min($total - 1, $myrank - 1 + $neighbors);
-            $users_array = array_slice($ranked, $start, $end - $start + 1);
-            $start_rank = $start + 1;
-            $end_rank = min($end + 1, $total);
+            $usersarray = array_slice($ranked, $start, $end - $start + 1);
+            $startrank = $start + 1;
+            $endrank = min($end + 1, $total);
         } else if ($myrank !== null) {
-            $users_array = array_filter($ranked, function ($r) use ($myrank) {
+            $usersarray = array_filter($ranked, function ($r) use ($myrank) {
                 return $r['rank'] == $myrank;
             });
-            $start_rank = $myrank;
-            $end_rank = $myrank;
+            $startrank = $myrank;
+            $endrank = $myrank;
         }
 
         return [
             'success' => true,
-            'users' => $users_array,
-            'start_rank' => isset($start_rank) ? $start_rank : 0,
-            'end_rank' => isset($end_rank) ? $end_rank : 0,
+            'users' => $usersarray,
+            'start_rank' => isset($startrank) ? $startrank : 0,
+            'end_rank' => isset($endrank) ? $endrank : 0,
             'total_users' => $total,
             'myrank' => $myrank ?? 0,
         ];
@@ -175,22 +175,22 @@ class ajax_service {
             $result = \local_ascend_rewards_gameboard::make_pick($USER->id, $position);
 
             if ($result['success']) {
-                $coins_to_add = (int)$result['coins'];
-                $current_balance = (int)get_user_preferences('ascend_coins_balance', 0, $USER->id);
-                $new_balance = $current_balance + $coins_to_add;
+                $coinstoadd = (int)$result['coins'];
+                $currentbalance = (int)get_user_preferences('ascend_coins_balance', 0, $USER->id);
+                $newbalance = $currentbalance + $coinstoadd;
 
-                set_user_preference('ascend_coins_balance', $new_balance, $USER->id);
+                set_user_preference('ascend_coins_balance', $newbalance, $USER->id);
 
                 debugging(
-                    "ascend_rewards: user {$USER->id} picked {$position}, +{$coins_to_add} coins, balance={$new_balance}",
+                    "ascend_rewards: user {$USER->id} picked {$position}, +{$coinstoadd} coins, balance={$newbalance}",
                     DEBUG_DEVELOPER,
                 );
 
                 return [
                     'success' => true,
-                    'coins' => $coins_to_add,
+                    'coins' => $coinstoadd,
                     'remaining' => $result['remaining'],
-                    'new_balance' => $new_balance,
+                    'new_balance' => $newbalance,
                 ];
             }
 
@@ -215,33 +215,33 @@ class ajax_service {
     /**
      * Purchase a store item.
      *
-     * @param int $item_id
+     * @param int $itemid
      * @return array
      */
-    public static function store_purchase(int $item_id): array {
+    public static function store_purchase(int $itemid): array {
         global $DB, $USER;
 
-        $item_id = (int)$item_id;
+        $itemid = (int)$itemid;
 
-        $store_items = [
+        $storeitems = [
             4 => ['name' => get_string('xp_item_name', 'local_ascend_rewards'), 'price' => 250],
         ];
 
-        if (!isset($store_items[$item_id])) {
+        if (!isset($storeitems[$itemid])) {
             return [
                 'success' => false,
                 'error' => get_string('store_error_invalid_item', 'local_ascend_rewards'),
             ];
         }
 
-        $item_price = $store_items[$item_id]['price'];
+        $itemprice = $storeitems[$itemid]['price'];
 
-        $current_coins = (int)$DB->get_field_sql(
+        $currentcoins = (int)$DB->get_field_sql(
             "SELECT COALESCE(SUM(coins), 0) FROM {local_ascend_rewards_coins} WHERE userid = :uid",
             ['uid' => $USER->id]
         );
 
-        if ($current_coins < $item_price) {
+        if ($currentcoins < $itemprice) {
             return [
                 'success' => false,
                 'error' => get_string('store_error_not_enough_coins', 'local_ascend_rewards'),
@@ -250,118 +250,118 @@ class ajax_service {
 
         $DB->insert_record('local_ascend_rewards_coins', (object)[
             'userid' => $USER->id,
-            'coins' => -$item_price,
-            'reason' => 'store_purchase_item_' . $item_id,
+            'coins' => -$itemprice,
+            'reason' => 'store_purchase_item_' . $itemid,
             'courseid' => 0,
             'timecreated' => time(),
         ]);
 
-        $new_coins = (int)$DB->get_field_sql(
+        $newcoins = (int)$DB->get_field_sql(
             "SELECT COALESCE(SUM(coins), 0) FROM {local_ascend_rewards_coins} WHERE userid = :uid",
             ['uid' => $USER->id]
         );
 
-        $inventory_str = get_user_preferences('ascend_store_inventory', '', $USER->id);
-        $inventory = $inventory_str ? json_decode($inventory_str, true) : [];
+        $inventorystr = get_user_preferences('ascend_store_inventory', '', $USER->id);
+        $inventory = $inventorystr ? json_decode($inventorystr, true) : [];
 
-        if (!isset($inventory[$item_id])) {
-            $inventory[$item_id] = 0;
+        if (!isset($inventory[$itemid])) {
+            $inventory[$itemid] = 0;
         }
-        $inventory[$item_id]++;
+        $inventory[$itemid]++;
 
         set_user_preference('ascend_store_inventory', json_encode($inventory), $USER->id);
 
-        if ($item_id == 4) {
-            $current_end = get_user_preferences('ascend_xp_multiplier_end', 0, $USER->id);
+        if ($itemid == 4) {
+            $currentend = get_user_preferences('ascend_xp_multiplier_end', 0, $USER->id);
 
-            if ($current_end > time()) {
-                $new_end = $current_end + (24 * 60 * 60);
+            if ($currentend > time()) {
+                $newend = $currentend + (24 * 60 * 60);
             } else {
-                $new_end = time() + (24 * 60 * 60);
+                $newend = time() + (24 * 60 * 60);
             }
 
-            set_user_preference('ascend_xp_multiplier_end', $new_end, $USER->id);
+            set_user_preference('ascend_xp_multiplier_end', $newend, $USER->id);
 
-            $inventory[$item_id]--;
-            if ($inventory[$item_id] <= 0) {
-                unset($inventory[$item_id]);
+            $inventory[$itemid]--;
+            if ($inventory[$itemid] <= 0) {
+                unset($inventory[$itemid]);
             }
             set_user_preference('ascend_store_inventory', json_encode($inventory), $USER->id);
 
-            $activated_items_str = get_user_preferences('ascend_store_activated', '', $USER->id);
-            $activated_items = $activated_items_str ? json_decode($activated_items_str, true) : [];
+            $activateditemsstr = get_user_preferences('ascend_store_activated', '', $USER->id);
+            $activateditems = $activateditemsstr ? json_decode($activateditemsstr, true) : [];
 
-            if (!isset($activated_items[$item_id])) {
-                $activated_items[$item_id] = [];
+            if (!isset($activateditems[$itemid])) {
+                $activateditems[$itemid] = [];
             }
-            $activated_items[$item_id][] = [
+            $activateditems[$itemid][] = [
                 'activated_at' => time(),
-                'expires_at' => $new_end,
+                'expires_at' => $newend,
             ];
-            set_user_preference('ascend_store_activated', json_encode($activated_items), $USER->id);
+            set_user_preference('ascend_store_activated', json_encode($activateditems), $USER->id);
         }
 
         return [
             'success' => true,
-            'remaining_coins' => $new_coins,
+            'remaining_coins' => $newcoins,
         ];
     }
 
     /**
      * Activate a store item.
      *
-     * @param int $item_id
+     * @param int $itemid
      * @return array
      */
-    public static function store_activate(int $item_id): array {
+    public static function store_activate(int $itemid): array {
         global $USER;
 
-        $item_id = (int)$item_id;
+        $itemid = (int)$itemid;
 
-        $inventory_str = get_user_preferences('ascend_store_inventory', '', $USER->id);
-        $inventory = $inventory_str ? json_decode($inventory_str, true) : [];
+        $inventorystr = get_user_preferences('ascend_store_inventory', '', $USER->id);
+        $inventory = $inventorystr ? json_decode($inventorystr, true) : [];
 
-        if (!isset($inventory[$item_id]) || $inventory[$item_id] <= 0) {
+        if (!isset($inventory[$itemid]) || $inventory[$itemid] <= 0) {
             return [
                 'success' => false,
                 'error' => get_string('store_error_item_not_in_inventory', 'local_ascend_rewards'),
             ];
         }
 
-        if ($item_id == 4) {
-            $current_end = get_user_preferences('ascend_xp_multiplier_end', 0, $USER->id);
+        if ($itemid == 4) {
+            $currentend = get_user_preferences('ascend_xp_multiplier_end', 0, $USER->id);
 
-            if ($current_end > time()) {
-                $new_end = $current_end + (24 * 60 * 60);
+            if ($currentend > time()) {
+                $newend = $currentend + (24 * 60 * 60);
             } else {
-                $new_end = time() + (24 * 60 * 60);
+                $newend = time() + (24 * 60 * 60);
             }
 
-            set_user_preference('ascend_xp_multiplier_end', $new_end, $USER->id);
+            set_user_preference('ascend_xp_multiplier_end', $newend, $USER->id);
 
-            $inventory[$item_id]--;
-            if ($inventory[$item_id] <= 0) {
-                unset($inventory[$item_id]);
+            $inventory[$itemid]--;
+            if ($inventory[$itemid] <= 0) {
+                unset($inventory[$itemid]);
             }
             set_user_preference('ascend_store_inventory', json_encode($inventory), $USER->id);
 
-            $activated_items_str = get_user_preferences('ascend_store_activated', '', $USER->id);
-            $activated_items = $activated_items_str ? json_decode($activated_items_str, true) : [];
+            $activateditemsstr = get_user_preferences('ascend_store_activated', '', $USER->id);
+            $activateditems = $activateditemsstr ? json_decode($activateditemsstr, true) : [];
 
-            if (!isset($activated_items[$item_id])) {
-                $activated_items[$item_id] = [];
+            if (!isset($activateditems[$itemid])) {
+                $activateditems[$itemid] = [];
             }
-            $activated_items[$item_id][] = [
+            $activateditems[$itemid][] = [
                 'activated_at' => time(),
-                'expires_at' => $new_end,
+                'expires_at' => $newend,
             ];
-            set_user_preference('ascend_store_activated', json_encode($activated_items), $USER->id);
+            set_user_preference('ascend_store_activated', json_encode($activateditems), $USER->id);
 
             return [
                 'success' => true,
                 'message' => get_string('store_activate_xp_multiplier_message', 'local_ascend_rewards'),
-                'expires_at' => $new_end,
-                'inventory_count' => isset($inventory[$item_id]) ? $inventory[$item_id] : 0,
+                'expires_at' => $newend,
+                'inventory_count' => isset($inventory[$itemid]) ? $inventory[$itemid] : 0,
             ];
         }
 
@@ -388,13 +388,13 @@ class ajax_service {
                 throw new \Exception(get_string('unlock_user_not_logged_in', 'local_ascend_rewards'));
             }
 
-            $user_xp = (int)$DB->get_field('local_ascend_rewards_xp', 'xp', ['userid' => $USER->id, 'courseid' => 0]);
-            $user_level = (int)($user_xp / 1000) + 1;
-            if ($user_level > 8) {
-                $user_level = 8;
+            $userxp = (int)$DB->get_field('local_ascend_rewards_xp', 'xp', ['userid' => $USER->id, 'courseid' => 0]);
+            $userlevel = (int)($userxp / 1000) + 1;
+            if ($userlevel > 8) {
+                $userlevel = 8;
             }
 
-            if ($level > $user_level) {
+            if ($level > $userlevel) {
                 throw new \Exception(get_string('unlock_level_locked', 'local_ascend_rewards', $level));
             }
 
@@ -409,41 +409,41 @@ class ajax_service {
                 throw new \Exception(get_string('unlock_avatar_already_unlocked', 'local_ascend_rewards'));
             }
 
-            $token_record = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
-            if (!$token_record) {
+            $tokenrecord = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
+            if (!$tokenrecord) {
                 throw new \Exception(get_string('unlock_no_token_record', 'local_ascend_rewards'));
             }
 
-            $tokens_available = $token_record->tokens_available - $token_record->tokens_used;
+            $tokensavailable = $tokenrecord->tokens_available - $tokenrecord->tokens_used;
 
-            if ($tokens_available <= 0) {
+            if ($tokensavailable <= 0) {
                 throw new \Exception(get_string('unlock_no_tokens_available', 'local_ascend_rewards'));
             }
 
             $transaction = $DB->start_delegated_transaction();
 
             try {
-                $unlock_record = new \stdClass();
-                $unlock_record->userid = $USER->id;
-                $unlock_record->avatar_name = $avatar;
-                $unlock_record->avatar_level = $level;
-                $unlock_record->pet_id = null;
-                $unlock_record->villain_id = null;
-                $unlock_record->unlock_type = 'token';
-                $unlock_record->timecreated = time();
+                $unlockrecord = new \stdClass();
+                $unlockrecord->userid = $USER->id;
+                $unlockrecord->avatar_name = $avatar;
+                $unlockrecord->avatar_level = $level;
+                $unlockrecord->pet_id = null;
+                $unlockrecord->villain_id = null;
+                $unlockrecord->unlock_type = 'token';
+                $unlockrecord->timecreated = time();
 
-                $DB->insert_record('local_ascend_rewards_avatar_unlocks', $unlock_record);
+                $DB->insert_record('local_ascend_rewards_avatar_unlocks', $unlockrecord);
 
-                $token_record->tokens_used++;
-                $token_record->timemodified = time();
-                $DB->update_record('local_ascend_rewards_level_tokens', $token_record);
+                $tokenrecord->tokens_used++;
+                $tokenrecord->timemodified = time();
+                $DB->update_record('local_ascend_rewards_level_tokens', $tokenrecord);
 
                 $transaction->allow_commit();
 
                 return [
                     'success' => true,
                     'message' => get_string('unlock_avatar_success', 'local_ascend_rewards'),
-                    'tokens_remaining' => $token_record->tokens_available - $token_record->tokens_used,
+                    'tokens_remaining' => $tokenrecord->tokens_available - $tokenrecord->tokens_used,
                 ];
             } catch (\Exception $e) {
                 $transaction->rollback($e);
@@ -460,39 +460,39 @@ class ajax_service {
     /**
      * Unlock a pet using a token or coins.
      *
-     * @param int $pet_id
-     * @param string $unlock_type
+     * @param int $petid
+     * @param string $unlocktype
      * @return array
      */
-    public static function pet_unlock(int $pet_id, string $unlock_type): array {
+    public static function pet_unlock(int $petid, string $unlocktype): array {
         global $DB, $USER;
 
-        $pet_id = (int)$pet_id;
-        $unlock_type = (string)$unlock_type;
+        $petid = (int)$petid;
+        $unlocktype = (string)$unlocktype;
 
         try {
             if (!$USER->id) {
                 throw new \Exception(get_string('unlock_user_not_logged_in', 'local_ascend_rewards'));
             }
 
-            if (!in_array($unlock_type, ['token', 'coin'])) {
+            if (!in_array($unlocktype, ['token', 'coin'])) {
                 throw new \Exception(get_string('unlock_invalid_type', 'local_ascend_rewards'));
             }
 
-            $pet_catalog = [
+            $petcatalog = [
                 100 => ['name' => 'Lynx', 'avatar' => 'elf.png', 'level' => 1, 'price' => 300],
                 102 => ['name' => 'Hamster', 'avatar' => 'imp.png', 'level' => 1, 'price' => 300],
             ];
 
-            if (!isset($pet_catalog[$pet_id])) {
+            if (!isset($petcatalog[$petid])) {
                 throw new \Exception(get_string('unlock_pet_invalid_id', 'local_ascend_rewards'));
             }
 
-            $pet_data = $pet_catalog[$pet_id];
+            $petdata = $petcatalog[$petid];
 
             $existing = $DB->get_record('local_ascend_rewards_avatar_unlocks', [
                 'userid' => $USER->id,
-                'pet_id' => $pet_id,
+                'pet_id' => $petid,
                 'villain_id' => null,
             ]);
 
@@ -500,77 +500,77 @@ class ajax_service {
                 throw new \Exception(get_string('unlock_pet_already_adopted', 'local_ascend_rewards'));
             }
 
-            $avatar_unlocked = $DB->record_exists('local_ascend_rewards_avatar_unlocks', [
+            $avatarunlocked = $DB->record_exists('local_ascend_rewards_avatar_unlocks', [
                 'userid' => $USER->id,
-                'avatar_name' => $pet_data['avatar'],
+                'avatar_name' => $petdata['avatar'],
                 'pet_id' => null,
                 'villain_id' => null,
             ]);
 
-            if (!$avatar_unlocked) {
-                $avatar_name = pathinfo($pet_data['avatar'], PATHINFO_FILENAME);
-                throw new \Exception(get_string('unlock_pet_avatar_required', 'local_ascend_rewards', $avatar_name));
+            if (!$avatarunlocked) {
+                $avatarname = pathinfo($petdata['avatar'], PATHINFO_FILENAME);
+                throw new \Exception(get_string('unlock_pet_avatar_required', 'local_ascend_rewards', $avatarname));
             }
 
-            $new_balance = null;
+            $newbalance = null;
 
             $transaction = $DB->start_delegated_transaction();
 
             try {
-                if ($unlock_type === 'token') {
-                    $token_record = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
-                    if (!$token_record) {
+                if ($unlocktype === 'token') {
+                    $tokenrecord = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
+                    if (!$tokenrecord) {
                         throw new \Exception(get_string('unlock_no_token_record', 'local_ascend_rewards'));
                     }
 
-                    $tokens_available = $token_record->tokens_available - $token_record->tokens_used;
-                    if ($tokens_available <= 0) {
+                    $tokensavailable = $tokenrecord->tokens_available - $tokenrecord->tokens_used;
+                    if ($tokensavailable <= 0) {
                         throw new \Exception(get_string('unlock_no_tokens_available', 'local_ascend_rewards'));
                     }
 
-                    $token_record->tokens_used++;
-                    $token_record->timemodified = time();
-                    $DB->update_record('local_ascend_rewards_level_tokens', $token_record);
+                    $tokenrecord->tokens_used++;
+                    $tokenrecord->timemodified = time();
+                    $DB->update_record('local_ascend_rewards_level_tokens', $tokenrecord);
                 } else {
-                    $price = $pet_data['price'];
+                    $price = $petdata['price'];
 
-                    $coins_records = $DB->get_records('local_ascend_rewards_coins', ['userid' => $USER->id]);
-                    $total_coins = 0;
-                    foreach ($coins_records as $record) {
-                        $total_coins += $record->coins;
+                    $coinsrecords = $DB->get_records('local_ascend_rewards_coins', ['userid' => $USER->id]);
+                    $totalcoins = 0;
+                    foreach ($coinsrecords as $record) {
+                        $totalcoins += $record->coins;
                     }
 
-                    if ($total_coins < $price) {
+                    if ($totalcoins < $price) {
                         throw new \Exception(get_string(
                             'unlock_pet_insufficient_coins',
                             'local_ascend_rewards',
-                            (object) ['need' => $price, 'have' => $total_coins]
+                            (object) ['need' => $price, 'have' => $totalcoins]
                         ));
                     }
 
-                    $deduction_record = new \stdClass();
-                    $deduction_record->userid = $USER->id;
-                    $deduction_record->coins = -$price;
-                    $deduction_record->badgeid = 0;
-                    $deduction_record->timecreated = time();
-                    $DB->insert_record('local_ascend_rewards_coins', $deduction_record);
+                    $deductionrecord = new \stdClass();
+                    $deductionrecord->userid = $USER->id;
+                    $deductionrecord->coins = -$price;
+                    $deductionrecord->badgeid = 0;
+                    $deductionrecord->timecreated = time();
+                    $DB->insert_record('local_ascend_rewards_coins', $deductionrecord);
 
                     performance_cache::clear_user_cache($USER->id);
                     performance_cache::clear_leaderboard_cache();
 
-                    $new_balance = $total_coins - $price;
+                    $newbalance = $totalcoins - $price;
                 }
 
-                $unlock_record = new \stdClass();
-                $unlock_record->userid = $USER->id;
-                $unlock_record->avatar_name = $pet_data['avatar'];
-                $unlock_record->avatar_level = $pet_data['level'];
-                $unlock_record->pet_id = $pet_id;
-                $unlock_record->villain_id = null;
-                $unlock_record->unlock_type = $unlock_type;
-                $unlock_record->timecreated = time();
+                $unlockrecord = new \stdClass();
+                $unlockrecord->userid = $USER->id;
+                $unlockrecord->avatar_name = $petdata['avatar'];
+                $unlockrecord->avatar_level = $petdata['level'];
+                $unlockrecord->pet_id = $petid;
+                $unlockrecord->villain_id = null;
+                $unlockrecord->unlock_type = $unlocktype;
+                $unlockrecord->timecreated = time();
 
-                $DB->insert_record('local_ascend_rewards_avatar_unlocks', $unlock_record);
+                $DB->insert_record('local_ascend_rewards_avatar_unlocks', $unlockrecord);
 
                 $transaction->allow_commit();
 
@@ -579,8 +579,8 @@ class ajax_service {
                     'message' => get_string('unlock_pet_success', 'local_ascend_rewards'),
                 ];
 
-                if ($unlock_type === 'coin') {
-                    $response['new_balance'] = $new_balance;
+                if ($unlocktype === 'coin') {
+                    $response['new_balance'] = $newbalance;
                 }
 
                 return $response;
@@ -598,114 +598,114 @@ class ajax_service {
     /**
      * Unlock a villain using a token or coins.
      *
-     * @param int $villain_id
-     * @param string $unlock_type
+     * @param int $villainid
+     * @param string $unlocktype
      * @return array
      */
-    public static function villain_unlock(int $villain_id, string $unlock_type): array {
+    public static function villain_unlock(int $villainid, string $unlocktype): array {
         global $DB, $USER;
 
-        $villain_id = (int)$villain_id;
-        $unlock_type = (string)$unlock_type;
+        $villainid = (int)$villainid;
+        $unlocktype = (string)$unlocktype;
 
         try {
             if (!$USER->id) {
                 throw new \Exception(get_string('unlock_user_not_logged_in', 'local_ascend_rewards'));
             }
 
-            if (!in_array($unlock_type, ['token', 'coin'])) {
+            if (!in_array($unlocktype, ['token', 'coin'])) {
                 throw new \Exception(get_string('unlock_invalid_type', 'local_ascend_rewards'));
             }
 
-            $villain_catalog = [
+            $villaincatalog = [
                 300 => ['name' => 'Dryad', 'pet_id' => 100, 'avatar' => 'elf.png', 'level' => 1, 'price' => 500],
                 302 => ['name' => 'Mole', 'pet_id' => 102, 'avatar' => 'imp.png', 'level' => 1, 'price' => 500],
             ];
 
-            if (!isset($villain_catalog[$villain_id])) {
+            if (!isset($villaincatalog[$villainid])) {
                 throw new \Exception(get_string('unlock_villain_invalid_id', 'local_ascend_rewards'));
             }
 
-            $villain_data = $villain_catalog[$villain_id];
+            $villaindata = $villaincatalog[$villainid];
 
             $existing = $DB->get_record('local_ascend_rewards_avatar_unlocks', [
                 'userid' => $USER->id,
-                'villain_id' => $villain_id,
+                'villain_id' => $villainid,
             ]);
 
             if ($existing) {
                 throw new \Exception(get_string('unlock_villain_already_unlocked', 'local_ascend_rewards'));
             }
 
-            $pet_unlocked = $DB->get_record_sql(
+            $petunlocked = $DB->get_record_sql(
                 "SELECT * FROM {local_ascend_rewards_avatar_unlocks}
                  WHERE userid = :uid AND pet_id = :petid AND villain_id IS NULL",
-                ['uid' => $USER->id, 'petid' => $villain_data['pet_id']]
+                ['uid' => $USER->id, 'petid' => $villaindata['pet_id']]
             );
 
-            if (!$pet_unlocked) {
+            if (!$petunlocked) {
                 throw new \Exception(get_string('unlock_villain_pet_required', 'local_ascend_rewards'));
             }
 
-            $new_balance = null;
+            $newbalance = null;
 
             $transaction = $DB->start_delegated_transaction();
 
             try {
-                if ($unlock_type === 'token') {
-                    $token_record = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
-                    if (!$token_record) {
+                if ($unlocktype === 'token') {
+                    $tokenrecord = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
+                    if (!$tokenrecord) {
                         throw new \Exception(get_string('unlock_no_token_record', 'local_ascend_rewards'));
                     }
 
-                    $tokens_available = $token_record->tokens_available - $token_record->tokens_used;
-                    if ($tokens_available <= 0) {
+                    $tokensavailable = $tokenrecord->tokens_available - $tokenrecord->tokens_used;
+                    if ($tokensavailable <= 0) {
                         throw new \Exception(get_string('unlock_no_tokens_available', 'local_ascend_rewards'));
                     }
 
-                    $token_record->tokens_used++;
-                    $token_record->timemodified = time();
-                    $DB->update_record('local_ascend_rewards_level_tokens', $token_record);
+                    $tokenrecord->tokens_used++;
+                    $tokenrecord->timemodified = time();
+                    $DB->update_record('local_ascend_rewards_level_tokens', $tokenrecord);
                 } else {
-                    $price = $villain_data['price'];
+                    $price = $villaindata['price'];
 
-                    $coins_records = $DB->get_records('local_ascend_rewards_coins', ['userid' => $USER->id]);
-                    $total_coins = 0;
-                    foreach ($coins_records as $record) {
-                        $total_coins += $record->coins;
+                    $coinsrecords = $DB->get_records('local_ascend_rewards_coins', ['userid' => $USER->id]);
+                    $totalcoins = 0;
+                    foreach ($coinsrecords as $record) {
+                        $totalcoins += $record->coins;
                     }
 
-                    if ($total_coins < $price) {
+                    if ($totalcoins < $price) {
                         throw new \Exception(get_string(
                             'unlock_villain_insufficient_coins',
                             'local_ascend_rewards',
-                            (object) ['need' => $price, 'have' => $total_coins]
+                            (object) ['need' => $price, 'have' => $totalcoins]
                         ));
                     }
 
-                    $deduction_record = new \stdClass();
-                    $deduction_record->userid = $USER->id;
-                    $deduction_record->coins = -$price;
-                    $deduction_record->badgeid = 0;
-                    $deduction_record->timecreated = time();
-                    $DB->insert_record('local_ascend_rewards_coins', $deduction_record);
+                    $deductionrecord = new \stdClass();
+                    $deductionrecord->userid = $USER->id;
+                    $deductionrecord->coins = -$price;
+                    $deductionrecord->badgeid = 0;
+                    $deductionrecord->timecreated = time();
+                    $DB->insert_record('local_ascend_rewards_coins', $deductionrecord);
 
                     performance_cache::clear_user_cache($USER->id);
                     performance_cache::clear_leaderboard_cache();
 
-                    $new_balance = $total_coins - $price;
+                    $newbalance = $totalcoins - $price;
                 }
 
-                $unlock_record = new \stdClass();
-                $unlock_record->userid = $USER->id;
-                $unlock_record->avatar_name = $villain_data['avatar'];
-                $unlock_record->avatar_level = $villain_data['level'];
-                $unlock_record->pet_id = $villain_data['pet_id'];
-                $unlock_record->villain_id = $villain_id;
-                $unlock_record->unlock_type = $unlock_type;
-                $unlock_record->timecreated = time();
+                $unlockrecord = new \stdClass();
+                $unlockrecord->userid = $USER->id;
+                $unlockrecord->avatar_name = $villaindata['avatar'];
+                $unlockrecord->avatar_level = $villaindata['level'];
+                $unlockrecord->pet_id = $villaindata['pet_id'];
+                $unlockrecord->villain_id = $villainid;
+                $unlockrecord->unlock_type = $unlocktype;
+                $unlockrecord->timecreated = time();
 
-                $DB->insert_record('local_ascend_rewards_avatar_unlocks', $unlock_record);
+                $DB->insert_record('local_ascend_rewards_avatar_unlocks', $unlockrecord);
 
                 $transaction->allow_commit();
 
@@ -714,8 +714,8 @@ class ajax_service {
                     'message' => get_string('unlock_villain_success', 'local_ascend_rewards'),
                 ];
 
-                if ($unlock_type === 'coin') {
-                    $response['new_balance'] = $new_balance;
+                if ($unlocktype === 'coin') {
+                    $response['new_balance'] = $newbalance;
                 }
 
                 return $response;
@@ -757,16 +757,17 @@ class ajax_service {
                 $balance = $sum;
             }
 
-            $test_offset = 0;
+            $testoffset = 0;
             try {
                 $pref = get_user_preferences('ascend_test_coins', '', $USER->id);
                 if ($pref !== '') {
-                    $test_offset = (int)$pref;
+                    $testoffset = (int)$pref;
                 }
             } catch (\Exception $e) {
-                // ignore
+                // Intentionally ignore preference read errors.
+                unset($e);
             }
-            $balance += $test_offset;
+            $balance += $testoffset;
 
             if ($balance < $price) {
                 return [
@@ -781,225 +782,225 @@ class ajax_service {
             }
 
             try {
-                $user_xp = (int)$DB->get_field('local_ascend_rewards_xp', 'xp', ['userid' => $USER->id, 'courseid' => 0]);
-                if (!$user_xp) {
-                    $user_xp = 0;
+                $userxp = (int)$DB->get_field('local_ascend_rewards_xp', 'xp', ['userid' => $USER->id, 'courseid' => 0]);
+                if (!$userxp) {
+                    $userxp = 0;
                 }
             } catch (\Exception $e) {
-                $user_xp = 0;
+                $userxp = 0;
             }
 
-            $user_level = (int)($user_xp / 1000) + 1;
-            if ($user_level > 8) {
-                $user_level = 8;
+            $userlevel = (int)($userxp / 1000) + 1;
+            if ($userlevel > 8) {
+                $userlevel = 8;
             }
 
-            $box_number = mt_rand(1, 4);
-            $reward_message = '';
-            $reward_type = '';
-            $reward_data = [];
-            $new_balance = (int)$balance;
+            $boxnumber = mt_rand(1, 4);
+            $rewardmessage = '';
+            $rewardtype = '';
+            $rewarddata = [];
+            $newbalance = (int)$balance;
 
-            $debug_max_level = 1;
-            $debug_pool_size = 0;
+            $debugmaxlevel = 1;
+            $debugpoolsize = 0;
 
             $transaction = $DB->start_delegated_transaction();
 
-            $coin_record = new \stdClass();
-            $coin_record->userid = $USER->id;
-            $coin_record->coins = -$price;
-            $coin_record->reason = get_string('mystery_reason_purchase', 'local_ascend_rewards');
-            $coin_record->timecreated = time();
-            $DB->insert_record('local_ascend_rewards_coins', $coin_record);
+            $coinrecord = new \stdClass();
+            $coinrecord->userid = $USER->id;
+            $coinrecord->coins = -$price;
+            $coinrecord->reason = get_string('mystery_reason_purchase', 'local_ascend_rewards');
+            $coinrecord->timecreated = time();
+            $DB->insert_record('local_ascend_rewards_coins', $coinrecord);
 
             performance_cache::clear_user_cache($USER->id);
             performance_cache::clear_leaderboard_cache();
 
-            $avatar_mapping = [
+            $avatarmapping = [
                 1 => 'elf.png',
                 16 => 'imp.png',
             ];
 
-            switch ($box_number) {
+            switch ($boxnumber) {
                 case 1:
-                    $coin_reward = mt_rand(100, 500);
+                    $coinreward = mt_rand(100, 500);
 
-                    $reward_record = new \stdClass();
-                    $reward_record->userid = $USER->id;
-                    $reward_record->coins = $coin_reward;
-                    $reward_record->reason = get_string('mystery_reason_reward_coins', 'local_ascend_rewards');
-                    $reward_record->timecreated = time();
-                    $DB->insert_record('local_ascend_rewards_coins', $reward_record);
+                    $rewardrecord = new \stdClass();
+                    $rewardrecord->userid = $USER->id;
+                    $rewardrecord->coins = $coinreward;
+                    $rewardrecord->reason = get_string('mystery_reason_reward_coins', 'local_ascend_rewards');
+                    $rewardrecord->timecreated = time();
+                    $DB->insert_record('local_ascend_rewards_coins', $rewardrecord);
 
-                    $new_balance += $coin_reward;
-                    $reward_type = 'coins';
-                    $reward_message = get_string('mystery_reward_coins_message', 'local_ascend_rewards', (object)[
-                        'amount' => number_format($coin_reward),
-                        'coinlabel' => $coin_reward === 1
+                    $newbalance += $coinreward;
+                    $rewardtype = 'coins';
+                    $rewardmessage = get_string('mystery_reward_coins_message', 'local_ascend_rewards', (object)[
+                        'amount' => number_format($coinreward),
+                        'coinlabel' => $coinreward === 1
                             ? get_string('coin_label_singular', 'local_ascend_rewards')
                             : get_string('coin_label_plural', 'local_ascend_rewards'),
                     ]);
                     break;
 
                 case 2:
-                    $token_reward = mt_rand(1, 2);
+                    $tokenreward = mt_rand(1, 2);
 
-                    $token_record = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
-                    if (!$token_record) {
-                        $token_record = new \stdClass();
-                        $token_record->userid = $USER->id;
-                        $token_record->tokens_available = 0;
-                        $token_record->tokens_used = 0;
-                        $token_record->timemodified = time();
-                        $token_record->id = $DB->insert_record('local_ascend_rewards_level_tokens', $token_record);
+                    $tokenrecord = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
+                    if (!$tokenrecord) {
+                        $tokenrecord = new \stdClass();
+                        $tokenrecord->userid = $USER->id;
+                        $tokenrecord->tokens_available = 0;
+                        $tokenrecord->tokens_used = 0;
+                        $tokenrecord->timemodified = time();
+                        $tokenrecord->id = $DB->insert_record('local_ascend_rewards_level_tokens', $tokenrecord);
                     }
 
-                    $token_record->tokens_available += $token_reward;
-                    $token_record->timemodified = time();
-                    $DB->update_record('local_ascend_rewards_level_tokens', $token_record);
+                    $tokenrecord->tokens_available += $tokenreward;
+                    $tokenrecord->timemodified = time();
+                    $DB->update_record('local_ascend_rewards_level_tokens', $tokenrecord);
 
-                    $new_tokens = $token_record->tokens_available - $token_record->tokens_used;
-                    $reward_type = 'tokens';
-                    $reward_message = get_string('mystery_reward_tokens_message', 'local_ascend_rewards', (object)[
-                        'count' => $token_reward,
-                        'tokenlabel' => $token_reward === 1
+                    $newtokens = $tokenrecord->tokens_available - $tokenrecord->tokens_used;
+                    $rewardtype = 'tokens';
+                    $rewardmessage = get_string('mystery_reward_tokens_message', 'local_ascend_rewards', (object)[
+                        'count' => $tokenreward,
+                        'tokenlabel' => $tokenreward === 1
                             ? get_string('token_label_singular', 'local_ascend_rewards')
                             : get_string('token_label_plural', 'local_ascend_rewards'),
                     ]);
                     break;
 
                 case 3:
-                    $max_level_by_xp = min($user_level, 8);
-                    $debug_max_level = $max_level_by_xp;
+                    $maxlevelbyxp = min($userlevel, 8);
+                    $debugmaxlevel = $maxlevelbyxp;
 
-                    $avatar_ids = [1, 16];
+                    $avatarids = [1, 16];
 
-                    shuffle($avatar_ids);
-                    $debug_pool_size = count($avatar_ids);
+                    shuffle($avatarids);
+                    $debugpoolsize = count($avatarids);
 
                     $attempts = 0;
-                    $max_attempts = min(5, count($avatar_ids));
-                    $selected_avatar = null;
-                    $selected_avatar_level = null;
-                    $is_duplicate = false;
-                    $is_locked_level = false;
+                    $maxattempts = min(5, count($avatarids));
+                    $selectedavatar = null;
+                    $selectedavatarlevel = null;
+                    $isduplicate = false;
+                    $islockedlevel = false;
 
-                    while ($attempts < $max_attempts && !$selected_avatar) {
-                        $random_avatar = $avatar_ids[$attempts];
-                        $avatar_filename = $avatar_mapping[$random_avatar] ?? $random_avatar . '.png';
+                    while ($attempts < $maxattempts && !$selectedavatar) {
+                        $randomavatar = $avatarids[$attempts];
+                        $avatarfilename = $avatarmapping[$randomavatar] ?? $randomavatar . '.png';
 
-                        $avatar_level = ($random_avatar == 1) ? 1 : 6;
+                        $avatarlevel = ($randomavatar == 1) ? 1 : 6;
 
-                        $selected_avatar_level = $avatar_level;
+                        $selectedavatarlevel = $avatarlevel;
 
-                        $existing_unlock = $DB->get_record('local_ascend_rewards_avatar_unlocks', [
+                        $existingunlock = $DB->get_record('local_ascend_rewards_avatar_unlocks', [
                             'userid' => $USER->id,
-                            'avatar_name' => $avatar_filename,
+                            'avatar_name' => $avatarfilename,
                         ]);
 
-                        if (!$existing_unlock) {
-                            $selected_avatar = $avatar_filename;
-                            $is_duplicate = false;
+                        if (!$existingunlock) {
+                            $selectedavatar = $avatarfilename;
+                            $isduplicate = false;
                             break;
                         }
 
                         $attempts++;
                     }
 
-                    if (!$selected_avatar && !empty($avatar_ids)) {
-                        $random_avatar = $avatar_ids[array_rand($avatar_ids)];
-                        $selected_avatar = $avatar_mapping[$random_avatar] ?? $random_avatar . '.png';
+                    if (!$selectedavatar && !empty($avatarids)) {
+                        $randomavatar = $avatarids[array_rand($avatarids)];
+                        $selectedavatar = $avatarmapping[$randomavatar] ?? $randomavatar . '.png';
 
-                        $selected_avatar_level = ($random_avatar == 1) ? 1 : 6;
+                        $selectedavatarlevel = ($randomavatar == 1) ? 1 : 6;
 
-                        $is_duplicate = true;
+                        $isduplicate = true;
                     }
 
-                    if ($selected_avatar) {
-                        $is_locked_level = ($selected_avatar_level > $user_level);
+                    if ($selectedavatar) {
+                        $islockedlevel = ($selectedavatarlevel > $userlevel);
 
-                        if ($is_locked_level) {
-                            $coin_reward = mt_rand(150, 500);
-                            $reward_record = new \stdClass();
-                            $reward_record->userid = $USER->id;
-                            $reward_record->coins = $coin_reward;
-                            $reward_record->reason = get_string(
+                        if ($islockedlevel) {
+                            $coinreward = mt_rand(150, 500);
+                            $rewardrecord = new \stdClass();
+                            $rewardrecord->userid = $USER->id;
+                            $rewardrecord->coins = $coinreward;
+                            $rewardrecord->reason = get_string(
                                 'mystery_reason_reward_locked_level',
                                 'local_ascend_rewards'
                             );
-                            $reward_record->timecreated = time();
-                            $DB->insert_record('local_ascend_rewards_coins', $reward_record);
+                            $rewardrecord->timecreated = time();
+                            $DB->insert_record('local_ascend_rewards_coins', $rewardrecord);
 
-                            $new_balance += $coin_reward;
-                            $reward_type = 'avatar_locked_level';
-                            $reward_message = get_string(
+                            $newbalance += $coinreward;
+                            $rewardtype = 'avatar_locked_level';
+                            $rewardmessage = get_string(
                                 'mystery_reward_locked_level_message',
                                 'local_ascend_rewards',
                                 (object)[
-                                    'amount' => number_format($coin_reward),
-                                    'coinlabel' => $coin_reward === 1
+                                    'amount' => number_format($coinreward),
+                                    'coinlabel' => $coinreward === 1
                                         ? get_string('coin_label_singular', 'local_ascend_rewards')
                                         : get_string('coin_label_plural', 'local_ascend_rewards'),
                                 ]
                             );
-                            $reward_data = ['avatar_filename' => $selected_avatar, 'avatar_level' => $selected_avatar_level];
-                        } else if (!$is_duplicate) {
-                            $avatar_unlock_record = new \stdClass();
-                            $avatar_unlock_record->userid = $USER->id;
-                            $avatar_unlock_record->avatar_name = $selected_avatar;
-                            $avatar_unlock_record->avatar_level = $user_level;
-                            $avatar_unlock_record->unlock_type = 'mystery_box';
-                            $avatar_unlock_record->timecreated = time();
-                            $DB->insert_record('local_ascend_rewards_avatar_unlocks', $avatar_unlock_record);
+                            $rewarddata = ['avatar_filename' => $selectedavatar, 'avatar_level' => $selectedavatarlevel];
+                        } else if (!$isduplicate) {
+                            $avatarunlockrecord = new \stdClass();
+                            $avatarunlockrecord->userid = $USER->id;
+                            $avatarunlockrecord->avatar_name = $selectedavatar;
+                            $avatarunlockrecord->avatar_level = $userlevel;
+                            $avatarunlockrecord->unlock_type = 'mystery_box';
+                            $avatarunlockrecord->timecreated = time();
+                            $DB->insert_record('local_ascend_rewards_avatar_unlocks', $avatarunlockrecord);
 
-                            $reward_type = 'avatar_new';
-                            $reward_message = get_string(
+                            $rewardtype = 'avatar_new';
+                            $rewardmessage = get_string(
                                 'mystery_reward_new_avatar_message',
                                 'local_ascend_rewards'
                             );
-                            $reward_data = ['avatar_filename' => $selected_avatar];
+                            $rewarddata = ['avatar_filename' => $selectedavatar];
                         } else {
-                            $coin_reward = mt_rand(150, 500);
+                            $coinreward = mt_rand(150, 500);
 
-                            $reward_record = new \stdClass();
-                            $reward_record->userid = $USER->id;
-                            $reward_record->coins = $coin_reward;
-                            $reward_record->reason = get_string(
+                            $rewardrecord = new \stdClass();
+                            $rewardrecord->userid = $USER->id;
+                            $rewardrecord->coins = $coinreward;
+                            $rewardrecord->reason = get_string(
                                 'mystery_reason_reward_duplicate_avatar',
                                 'local_ascend_rewards'
                             );
-                            $reward_record->timecreated = time();
-                            $DB->insert_record('local_ascend_rewards_coins', $reward_record);
+                            $rewardrecord->timecreated = time();
+                            $DB->insert_record('local_ascend_rewards_coins', $rewardrecord);
 
-                            $new_balance += $coin_reward;
-                            $reward_type = 'avatar_duplicate';
-                            $reward_message = get_string(
+                            $newbalance += $coinreward;
+                            $rewardtype = 'avatar_duplicate';
+                            $rewardmessage = get_string(
                                 'mystery_reward_duplicate_avatar_message',
                                 'local_ascend_rewards',
                                 (object)[
-                                    'amount' => number_format($coin_reward),
-                                    'coinlabel' => $coin_reward === 1
+                                    'amount' => number_format($coinreward),
+                                    'coinlabel' => $coinreward === 1
                                         ? get_string('coin_label_singular', 'local_ascend_rewards')
                                         : get_string('coin_label_plural', 'local_ascend_rewards'),
                                 ]
                             );
-                            $reward_data = ['avatar_filename' => $selected_avatar];
+                            $rewarddata = ['avatar_filename' => $selectedavatar];
                         }
                     } else {
-                        $coin_reward = mt_rand(100, 500);
+                        $coinreward = mt_rand(100, 500);
 
-                        $reward_record = new \stdClass();
-                        $reward_record->userid = $USER->id;
-                        $reward_record->coins = $coin_reward;
-                        $reward_record->reason = get_string('mystery_reason_reward_coins', 'local_ascend_rewards');
-                        $reward_record->timecreated = time();
-                        $DB->insert_record('local_ascend_rewards_coins', $reward_record);
+                        $rewardrecord = new \stdClass();
+                        $rewardrecord->userid = $USER->id;
+                        $rewardrecord->coins = $coinreward;
+                        $rewardrecord->reason = get_string('mystery_reason_reward_coins', 'local_ascend_rewards');
+                        $rewardrecord->timecreated = time();
+                        $DB->insert_record('local_ascend_rewards_coins', $rewardrecord);
 
-                        $new_balance += $coin_reward;
-                        $reward_type = 'coins';
-                        $reward_message = get_string('mystery_reward_coins_message', 'local_ascend_rewards', (object)[
-                            'amount' => number_format($coin_reward),
-                            'coinlabel' => $coin_reward === 1
+                        $newbalance += $coinreward;
+                        $rewardtype = 'coins';
+                        $rewardmessage = get_string('mystery_reward_coins_message', 'local_ascend_rewards', (object)[
+                            'amount' => number_format($coinreward),
+                            'coinlabel' => $coinreward === 1
                                 ? get_string('coin_label_singular', 'local_ascend_rewards')
                                 : get_string('coin_label_plural', 'local_ascend_rewards'),
                         ]);
@@ -1008,37 +1009,37 @@ class ajax_service {
 
                 case 4:
                 default:
-                    $reward_type = 'nothing';
-                    $reward_message = get_string('mystery_reward_nothing_message', 'local_ascend_rewards');
+                    $rewardtype = 'nothing';
+                    $rewardmessage = get_string('mystery_reward_nothing_message', 'local_ascend_rewards');
                     break;
             }
 
             $transaction->allow_commit();
 
-            $total_coins = (int)$DB->get_field_sql(
+            $totalcoins = (int)$DB->get_field_sql(
                 "SELECT COALESCE(SUM(coins), 0) FROM {local_ascend_rewards_coins} WHERE userid = ?",
                 [$USER->id]
             );
 
-            $token_record = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
-            $total_tokens_available = 0;
-            if ($token_record) {
-                $total_tokens_available = $token_record->tokens_available - $token_record->tokens_used;
+            $tokenrecord = $DB->get_record('local_ascend_rewards_level_tokens', ['userid' => $USER->id]);
+            $totaltokensavailable = 0;
+            if ($tokenrecord) {
+                $totaltokensavailable = $tokenrecord->tokens_available - $tokenrecord->tokens_used;
             }
 
             return [
                 'success' => true,
-                'box_number' => $box_number,
-                'reward_type' => $reward_type,
-                'message' => $reward_message,
-                'new_balance' => (int)$total_coins,
-                'total_tokens' => (int)$total_tokens_available,
-                'reward_data' => $reward_data,
+                'box_number' => $boxnumber,
+                'reward_type' => $rewardtype,
+                'message' => $rewardmessage,
+                'new_balance' => (int)$totalcoins,
+                'total_tokens' => (int)$totaltokensavailable,
+                'reward_data' => $rewarddata,
                 'debug' => [
-                    'user_level' => $user_level,
-                    'user_xp' => $user_xp,
-                    'max_level' => $debug_max_level,
-                    'avatar_pool_size' => $debug_pool_size,
+                    'user_level' => $userlevel,
+                    'user_xp' => $userxp,
+                    'max_level' => $debugmaxlevel,
+                    'avatar_pool_size' => $debugpoolsize,
                 ],
             ];
         } catch (\Exception $e) {
@@ -1059,7 +1060,8 @@ class ajax_service {
                     file_put_contents($logfile, $msg, FILE_APPEND | LOCK_EX);
                 }
             } catch (\Exception $inner) {
-                // ignore logging errors
+                // Intentionally ignore logging errors.
+                unset($inner);
             }
 
             return [
@@ -1155,15 +1157,15 @@ class ajax_service {
      * Filter out stale notifications.
      *
      * @param array $items
-     * @param int $max_age_seconds
+     * @param int $maxageseconds
      * @return array
      */
-    private static function filter_recent_notifications(array $items, int $max_age_seconds): array {
+    private static function filter_recent_notifications(array $items, int $maxageseconds): array {
         $now = time();
 
-        $filtered = array_filter($items, function ($item) use ($now, $max_age_seconds) {
+        $filtered = array_filter($items, function ($item) use ($now, $maxageseconds) {
             $timestamp = $item['timestamp'] ?? 0;
-            return ($now - $timestamp) <= $max_age_seconds;
+            return ($now - $timestamp) <= $maxageseconds;
         });
 
         return array_values($filtered);

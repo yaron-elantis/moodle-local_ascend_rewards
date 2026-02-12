@@ -15,9 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_ascend_rewards\hook_callbacks;
-
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Hook callbacks for output.
  *
@@ -34,10 +31,10 @@ class output_callbacks {
     public static function before_standard_head_html(
         \core\hook\output\before_standard_head_html_generation $hook
     ): void {
+
         $cssurl = (new \moodle_url('/local/ascend_rewards/styles.css'))->out(false);
         $hook->add_html('<link rel="stylesheet" href="' . s($cssurl) . '">');
     }
-
     /**
      * Hook callback to inject badge notification on all pages.
      *
@@ -51,8 +48,7 @@ class output_callbacks {
         require_once($CFG->dirroot . '/local/ascend_rewards/lib.php');
         $output = \local_ascend_rewards_build_badge_notification_html();
         $hook->add_html($output);
-        $hook->add_html(\html_writer::script(
-            "(function(){"
+        $hook->add_html(\html_writer::script("(function(){"
             . "var run=function(){"
             . "if (typeof require !== 'undefined') {"
             . "require(['local_ascend_rewards/notifications'], function(mod){ mod.init(); });"
@@ -60,7 +56,6 @@ class output_callbacks {
             . "};"
             . "if (document.readyState === 'complete') { run(); }"
             . "else { window.addEventListener('load', run); }"
-            . "})();"
-        ));
+            . "})();"));
     }
 }

@@ -70,11 +70,19 @@ function local_ascend_rewards_build_badge_notification_html() {
         return $levelup_output;
     }
 
-    // Filter out stale notifications (older than 7 days)
+    // Filter notifications to the current gameboard week so celebration
+    // and gameboard picks follow the same Friday-Thursday window.
     $now = time();
-    $notifications = array_filter($notifications, function ($notif) use ($now) {
+    $weekstart = $now - (7 * DAYSECS);
+    $weekend = $now;
+    try {
+        [$weekstart, $weekend] = local_ascend_rewards_gameboard::get_week_range();
+    } catch (\Throwable $e) {
+        // Fallback to last 7 days when the gameboard helper is unavailable.
+    }
+    $notifications = array_filter($notifications, function ($notif) use ($weekstart, $weekend) {
         $timestamp = $notif['timestamp'] ?? 0;
-        return ($now - $timestamp) <= (7 * DAYSECS);
+        return ($timestamp >= $weekstart && $timestamp <= $weekend);
     });
 
     if (empty($notifications)) {
@@ -303,4 +311,3 @@ function local_ascend_rewards_show_levelup_modal() {
 
     return $OUTPUT->render_from_template('local_ascend_rewards/notification_levelup', $templatecontext);
 }
-

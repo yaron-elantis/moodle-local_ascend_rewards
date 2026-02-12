@@ -1,0 +1,85 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+    @template local_ascend_rewards/instructions
+
+    Instructions page template for Ascend Rewards.
+}}
+<div class="local-ascend-instructions">
+    <div class="d-flex align-items-center mb-3">
+        {{#icon_url}}
+            <img class="local-ascend-instructions__icon mr-3" src="{{icon_url}}" alt="" />
+        {{/icon_url}}
+        <h2 class="mb-0">{{title}}</h2>
+    </div>
+
+    <p class="mb-4">{{intro}}</p>
+
+    <section class="local-ascend-instructions__section mb-5">
+        <h3 class="h5 mb-3">{{badge_groups_heading}}</h3>
+        <div class="local-ascend-instructions__group-grid">
+            {{#badge_groups}}
+                <div class="local-ascend-instructions__group-card">
+                    <div class="local-ascend-instructions__group-header">
+                        <h4 class="h6 mb-1">{{title}}</h4>
+                        <p class="mb-0">{{description}}</p>
+                    </div>
+                    <div class="local-ascend-instructions__badge-grid">
+                        {{#badges}}
+                            <div class="local-ascend-instructions__badge-card">
+                                <img src="{{icon_url}}" alt="{{name}}" />
+                                <div class="local-ascend-instructions__badge-name">{{name}}</div>
+                                <div class="local-ascend-instructions__badge-desc">{{description}}</div>
+                                <div class="local-ascend-instructions__badge-meta">
+                                    <span>{{coins}} {{coins_label}}</span>
+                                    <span>{{xp}} {{xp_label}}</span>
+                                </div>
+                            </div>
+                        {{/badges}}
+                    </div>
+                </div>
+            {{/badge_groups}}
+        </div>
+    </section>
+
+    {{#sections}}
+        <section class="mb-4">
+            <h3 class="h5">{{heading}}</h3>
+            <ul class="mb-0">
+                {{#items}}
+                    <li>{{text}}</li>
+                {{/items}}
+            </ul>
+        </section>
+    {{/sections}}
+
+    <section class="local-ascend-instructions__section mb-5">
+        <h3 class="h5 mb-3">{{features_heading}}</h3>
+        <div class="local-ascend-instructions__grid local-ascend-instructions__grid--features">
+            {{#features}}
+                <div class="local-ascend-instructions__card">
+                    <div class="local-ascend-instructions__card-icon">
+                        <img src="{{icon_url}}" alt="" />
+                    </div>
+                    <h4 class="h6 mb-2">{{title}}</h4>
+                    <p class="mb-0">{{description}}</p>
+                </div>
+            {{/features}}
+        </div>
+    </section>
+
+    <a class="btn btn-secondary" href="{{back_url}}">{{back_label}}</a>
+</div>

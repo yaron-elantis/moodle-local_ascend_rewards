@@ -44,9 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 try {
     require_sesskey();
 
-    $pet_id = required_param('pet_id', PARAM_INT);
-    $unlock_type = required_param('unlock_type', PARAM_TEXT);
-    $result = \local_ascend_rewards\ajax_service::pet_unlock($pet_id, $unlock_type);
+    $petid = required_param('pet_id', PARAM_INT);
+    $unlocktype = required_param('unlock_type', PARAM_TEXT);
+    $result = \local_ascend_rewards\ajax_service::pet_unlock($petid, $unlocktype);
     echo json_encode($result);
 } catch (\Throwable $e) {
     http_response_code(500);

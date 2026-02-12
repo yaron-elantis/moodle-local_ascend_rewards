@@ -96,7 +96,7 @@ final class badges {
     }
 
     /**
-    * Is this badge a meta.
+     * Is this badge a meta.
      */
     public static function is_meta(int $badgeid): bool {
         return in_array($badgeid, [

@@ -54,16 +54,24 @@ global $DB, $USER, $CFG, $OUTPUT, $PAGE;
 
 $context = context_system::instance();
 $PAGE->set_context($context);
+require_capability('local/ascend_rewards:view', $context);
 
 $avatar_circular_dir = '/local/ascend_rewards/pix/Avatars/circular%20avatars';
 
 // AJAX: leaderboard context
 $apex_action = optional_param('apex_action', '', PARAM_ALPHANUMEXT);
 if ($apex_action === 'get_leaderboard_context') {
-    require_sesskey();
+    header('Content-Type: application/json');
+    if (!confirm_sesskey()) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'error' => get_string('invalidsesskey', 'error'),
+        ]);
+        exit;
+    }
     $neighbors = optional_param('neighbors', 3, PARAM_INT);
     $courseid_param = optional_param('courseid', 0, PARAM_INT);
-    header('Content-Type: application/json');
 
     $xp_cid = ($courseid_param > 0) ? $courseid_param : 0;
 
@@ -500,15 +508,16 @@ $badge_categories = [
 /** ------------------------------------------------------------------------
  *  CELEBRATION FLAG
  *  --------------------------------------------------------------------- */
-$celebratesince   = (int)get_user_preferences('ascendassets_lastcoin', 0, $USER->id);
-$showcelebration  = ($celebratesince > 0 && (time() - $celebratesince) <= 7 * DAYSECS);
-
-// Compute whether the current user has earned badges this week (gameboard logic)
+$celebratesince = (int)get_user_preferences('ascendassets_lastcoin', 0, $USER->id);
+$has_earned = false;
 try {
-  $has_earned = local_ascend_rewards_gameboard::has_earned_badges_this_week($USER->id);
+    $has_earned = local_ascend_rewards_gameboard::has_earned_badges_this_week($USER->id);
 } catch (Exception $e) {
-  $has_earned = false;
+    $has_earned = false;
 }
+
+// Keep celebration and gameboard eligibility in the exact same weekly window.
+$showcelebration = $has_earned;
 
 /** ------------------------------------------------------------------------
  *  TEMPLATE CONTEXT
@@ -1104,6 +1113,8 @@ $modal_strings = [
     ]),
     'errorUnlockPet' => get_string('modal_error_unlock_pet', 'local_ascend_rewards'),
     'petAdoptedTitle' => get_string('modal_pet_adopted_title', 'local_ascend_rewards'),
+    'petVillainRevealedTitle' => get_string('modal_pet_villain_revealed_title', 'local_ascend_rewards'),
+    'petVillainRevealedText' => get_string('modal_pet_villain_revealed_text', 'local_ascend_rewards'),
     'downloadPetLabel' => get_string('modal_download_pet_label', 'local_ascend_rewards'),
     'unlockedWithLabel' => get_string('modal_unlocked_with_label', 'local_ascend_rewards', (object) [
         'method' => '{method}',
@@ -1115,6 +1126,8 @@ $modal_strings = [
     'continueLabel' => get_string('continue_label', 'local_ascend_rewards'),
     'villainUnlockTitle' => get_string('modal_villain_unlock_title', 'local_ascend_rewards'),
     'villainUnlockedTitle' => get_string('modal_villain_unlocked_title', 'local_ascend_rewards'),
+    'villainStorybookUnlockedTitle' => get_string('modal_villain_storybook_unlocked_title', 'local_ascend_rewards'),
+    'villainStorybookUnlockedText' => get_string('modal_villain_storybook_unlocked_text', 'local_ascend_rewards'),
     'downloadVillainLabel' => get_string('modal_download_villain_label', 'local_ascend_rewards'),
     'errorUnlockVillain' => get_string('modal_error_unlock_villain', 'local_ascend_rewards'),
     'tokenLabel' => get_string('token_label', 'local_ascend_rewards'),
@@ -1468,7 +1481,7 @@ $index_js_config = json_encode([
 ]);
 
 $templatecontext = [
-    'instructions_url' => (new moodle_url('/local/ascend_rewards/html/index.html'))->out(false),
+    'instructions_url' => (new moodle_url('/local/ascend_rewards/instructions.php'))->out(false),
     'instructions_icon_url' => (new moodle_url('/local/ascend_rewards/pix/instructions.png'))->out(false),
     'instructions_text' => get_string('instructions_text', 'local_ascend_rewards'),
     'show_congrats' => ($has_earned || $show_level_up),
