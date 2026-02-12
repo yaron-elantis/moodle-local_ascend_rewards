@@ -310,7 +310,7 @@ const initMysteryBox = (strings, urls) => {
                         return;
                     }
 
-                    const cacheBust = ` ? v = ${Date.now()}`;
+                    const cacheBust = `?v=${Date.now()}`;
                     const videos = {
                         coins: `${urls.videoCoinsUrl}${cacheBust}`,
                         coins_duplicate: `${urls.videoCoinsUrl}${cacheBust}`,
@@ -323,28 +323,28 @@ const initMysteryBox = (strings, urls) => {
 
                     const videoUrl = videos[result.reward_type] || `${urls.videoNoRewardUrl}${cacheBust}`;
 
-                    let resultHTML = ` < video autoplay playsinline preload = "auto" crossorigin = "anonymous" class = "mystery-result-video" id = "rewardVideo" > < source src = "${videoUrl}" type = "video/mp4" > < / video > `;
+                    let resultHTML = `<video autoplay playsinline preload="auto" crossorigin="anonymous" class="mystery-result-video" id="rewardVideo"><source src="${videoUrl}" type="video/mp4"></video>`;
                     resultIcon.innerHTML = resultHTML;
 
                     let messageHTML = '';
                     let balanceHTML = '';
 
                     if (result.reward_type === 'tokens') {
-                        messageHTML = ` < div class = "mystery-result-media" > < img src = "${urls.imgStarUrl}" class = "mystery-result-icon-image mystery-result-icon-image--star" > < / div > ` +
-                            ` < div > ${result.message} < / div > `;
-                        balanceHTML = ` < div class = "mystery-balance" > ${strings.newBalanceLabel} < img src = "${urls.imgStarUrl}" class = "mystery-balance-icon mystery-balance-icon--star" > ${result.total_tokens} ${strings.tokensLabel} < / div > `;
+                        messageHTML = `<div class="mystery-result-media"><img src="${urls.imgStarUrl}" class="mystery-result-icon-image mystery-result-icon-image--star"></div>` +
+                            `<div>${result.message}</div>`;
+                        balanceHTML = `<div class="mystery-balance">${strings.newBalanceLabel} <img src="${urls.imgStarUrl}" class="mystery-balance-icon mystery-balance-icon--star">${result.total_tokens} ${strings.tokensLabel}</div>`;
                     } else if (result.reward_type === 'coins' || result.reward_type === 'coins_duplicate') {
-                        messageHTML = ` < div class = "mystery-result-media" > < img src = "${urls.imgCoinsUrl}" class = "mystery-result-icon-image mystery-result-icon-image--coins" > < / div > ` +
-                            ` < div > ${result.message} < / div > `;
-                        balanceHTML = ` < div class = "mystery-balance" > ${strings.newBalanceLabel} < img src = "${urls.imgCoinsUrl}" class = "mystery-balance-icon mystery-balance-icon--coins" > ${result.new_balance.toLocaleString()} ${strings.coinsLabel} < / div > `;
+                        messageHTML = `<div class="mystery-result-media"><img src="${urls.imgCoinsUrl}" class="mystery-result-icon-image mystery-result-icon-image--coins"></div>` +
+                            `<div>${result.message}</div>`;
+                        balanceHTML = `<div class="mystery-balance">${strings.newBalanceLabel} <img src="${urls.imgCoinsUrl}" class="mystery-balance-icon mystery-balance-icon--coins">${result.new_balance.toLocaleString()} ${strings.coinsLabel}</div>`;
                     } else if (result.reward_type === 'avatar_duplicate' || result.reward_type === 'avatar_locked_level') {
-                        messageHTML = ` < div > ${result.message} < / div > `;
-                        balanceHTML = ` < div class = "mystery-balance" > ${strings.newBalanceLabel} < img src = "${urls.imgCoinsUrl}" class = "mystery-balance-icon mystery-balance-icon--coins" > ${result.new_balance.toLocaleString()} ${strings.coinsLabel} < / div > `;
+                        messageHTML = `<div>${result.message}</div>`;
+                        balanceHTML = `<div class="mystery-balance">${strings.newBalanceLabel} <img src="${urls.imgCoinsUrl}" class="mystery-balance-icon mystery-balance-icon--coins">${result.new_balance.toLocaleString()} ${strings.coinsLabel}</div>`;
                     } else if (result.reward_type === 'avatar_new') {
-                        messageHTML = ` < div > ${result.message} < / div > `;
+                        messageHTML = `<div>${result.message}</div>`;
                     } else {
                         messageHTML = result.message;
-                        balanceHTML = ` < div class = "mystery-balance" > ${strings.balanceLabel} < img src = "${urls.imgCoinsUrl}" class = "mystery-balance-icon mystery-balance-icon--coins" > ${result.new_balance.toLocaleString()} ${strings.coinsLabel} < / div > `;
+                        balanceHTML = `<div class="mystery-balance">${strings.balanceLabel} <img src="${urls.imgCoinsUrl}" class="mystery-balance-icon mystery-balance-icon--coins">${result.new_balance.toLocaleString()} ${strings.coinsLabel}</div>`;
                     }
 
                     resultMessage.innerHTML = messageHTML + balanceHTML;
@@ -353,7 +353,7 @@ const initMysteryBox = (strings, urls) => {
                         result.reward_data &&
                         result.reward_data.avatar_filename) {
                         const avatarUrl = `${urls.avatarCircularBaseUrl}${result.reward_data.avatar_filename}`;
-                        resultHTML += ` < div class = "mystery-avatar-reward" id = "avatarReward" > < img src = "${avatarUrl}" alt = "${strings.avatarAltLabel || ""}" class = "mystery-avatar-image" > < / div > `;
+                        resultHTML += `<div class="mystery-avatar-reward" id="avatarReward"><img src="${avatarUrl}" alt="${strings.avatarAltLabel || ""}" class="mystery-avatar-image"></div>`;
                         resultIcon.innerHTML = resultHTML;
                     }
 
@@ -383,13 +383,13 @@ const initMysteryBox = (strings, urls) => {
                             }, 300);
 
                             const avatarReward = document.getElementById('avatarReward');
-                        if (avatarReward) {
-                            const avatarImg = avatarReward.querySelector('img');
-                            if (avatarImg) {
-                                avatarImg.classList.add('animate-bounce-in');
-                                avatarImg.style.opacity = '1';
+                            if (avatarReward) {
+                                const avatarImg = avatarReward.querySelector('img');
+                                if (avatarImg) {
+                                    avatarImg.classList.add('animate-bounce-in');
+                                    avatarImg.style.opacity = '1';
+                                }
                             }
-                        }
                         });
 
                         setTimeout(() => {
@@ -422,7 +422,7 @@ const initMysteryBox = (strings, urls) => {
                     if (resultDisplay) {
                         resultDisplay.style.display = 'block';
                     }
-                    resultIcon.innerHTML = ` < video autoplay loop playsinline class = "mystery-result-video mystery-result-video--fallback" > < source src = "${urls.videoNoRewardUrl}" type = "video/mp4" > < / video > `;
+                    resultIcon.innerHTML = `<video autoplay loop playsinline class="mystery-result-video mystery-result-video--fallback"><source src="${urls.videoNoRewardUrl}" type="video/mp4"></video>`;
                     resultMessage.textContent = strings.mysteryErrorProcessing;
                     resultMessage.classList.add('animate-slide-in');
                     resultMessage.style.opacity = '1';
@@ -435,14 +435,14 @@ const initMysteryBox = (strings, urls) => {
         });
     });
 
-if (closeModalBtn) {
-    closeModalBtn.addEventListener('click', () => {
-        if (mysteryModal) {
-            mysteryModal.style.display = 'none';
-            window.location.reload();
-        }
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', () => {
+            if (mysteryModal) {
+                mysteryModal.style.display = 'none';
+                window.location.reload();
+            }
         });
-}
+    }
 };
 
 export const init = (config) => {
@@ -450,11 +450,11 @@ export const init = (config) => {
         return;
     }
 
-    const tokensAvailable = Number(config ? .tokensAvailable ? ? 0);
-    const coinBalance = Number(config ? .coinBalance ? ? 0);
-    const strings = config ? .strings || {};
-    const urls = config ? .urls || {};
-    const modalStrings = config ? .modalStrings || {};
+    const tokensAvailable = Number((config && config.tokensAvailable) || 0);
+    const coinBalance = Number((config && config.coinBalance) || 0);
+    const strings = (config && config.strings) || {};
+    const urls = (config && config.urls) || {};
+    const modalStrings = (config && config.modalStrings) || {};
 
     initAvatarModals({strings: modalStrings});
 

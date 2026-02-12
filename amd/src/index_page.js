@@ -51,8 +51,8 @@ const initPanelToggles = () => {
 };
 
 const initInstructions = (config) => {
-    const windowName = config ? .windowName || 'ascend_instructions';
-    const windowFeatures = config ? .windowFeatures || '';
+    const windowName = (config && config.windowName) || 'ascend_instructions';
+    const windowFeatures = (config && config.windowFeatures) || '';
 
     document.querySelectorAll('.js-instructions-link').forEach((link) => {
         link.addEventListener('click', (event) => {
@@ -73,12 +73,12 @@ const initGameboard = (config) => {
         return;
     }
 
-    const successText = config ? .successText || '';
-    const errorPrefix = config ? .errorPrefix || '';
-    const genericError = config ? .genericError || '';
-    const processingErrorPrefix = config ? .processingErrorPrefix || '';
-    const coinAltLabel = config ? .coinAltLabel || '';
-    const coinIconUrl = config ? .coinIconUrl || '';
+    const successText = (config && config.successText) || '';
+    const errorPrefix = (config && config.errorPrefix) || '';
+    const genericError = (config && config.genericError) || '';
+    const processingErrorPrefix = (config && config.processingErrorPrefix) || '';
+    const coinAltLabel = (config && config.coinAltLabel) || '';
+    const coinIconUrl = (config && config.coinIconUrl) || '';
 
     cards.forEach((card) => {
         card.addEventListener('click', () => {
@@ -138,7 +138,7 @@ const initGameboard = (config) => {
                     }
                 })
                 .catch((error) => {
-                    showAlert(processingErrorPrefix + (error ? .message || ''), true);
+                    showAlert(processingErrorPrefix + ((error && error.message) || ''), true);
                     cards.forEach((item) => {
                         item.style.pointerEvents = 'auto';
                     });
@@ -159,17 +159,17 @@ const initBadgeModal = (config) => {
         return;
     }
 
-    const badgeVideos = config ? .badgeVideos || {};
-    const metaBadgeIds = config ? .metaBadgeIds || [];
-    const knownBadgeNames = config ? .knownBadgeNames || [];
-    const awardLabelPrefix = config ? .awardLabelPrefix || '';
-    const awardLabelSuffix = config ? .awardLabelSuffix || '';
-    const xpLabel = config ? .xpLabel || '';
-    const coinsLabel = config ? .coinsLabel || '';
-    const assetsLabel = config ? .assetsLabel || '';
-    const badgeCategoryDefault = config ? .badgeCategoryDefault || '';
-    const failedLabel = config ? .failedLabel || '';
-    const passedLabel = config ? .passedLabel || '';
+    const badgeVideos = (config && config.badgeVideos) || {};
+    const metaBadgeIds = (config && config.metaBadgeIds) || [];
+    const knownBadgeNames = (config && config.knownBadgeNames) || [];
+    const awardLabelPrefix = (config && config.awardLabelPrefix) || '';
+    const awardLabelSuffix = (config && config.awardLabelSuffix) || '';
+    const xpLabel = (config && config.xpLabel) || '';
+    const coinsLabel = (config && config.coinsLabel) || '';
+    const assetsLabel = (config && config.assetsLabel) || '';
+    const badgeCategoryDefault = (config && config.badgeCategoryDefault) || '';
+    const failedLabel = (config && config.failedLabel) || '';
+    const passedLabel = (config && config.passedLabel) || '';
 
     const q = (selector) => document.querySelector(selector);
 
@@ -194,12 +194,12 @@ const initBadgeModal = (config) => {
         q('#apxBWhen').textContent = d.when || '';
         q('#apxBWhy').textContent = d.why || '';
 
-        const coinsText = d.coins || ` + 0 ${assetsLabel}`;
+        const coinsText = d.coins || `+0 ${assetsLabel}`;
         const coins = parseInt(coinsText.match(/\d+/)) || 0;
         const xpValue = d.xp ? parseInt(d.xp, 10) : Math.floor(coins / 2);
 
-        q('#apxBXP').textContent = ` + ${xpValue} ${xpLabel}`;
-        q('#apxBCoins').textContent = coinsText || ` + 0 ${coinsLabel}`;
+        q('#apxBXP').textContent = `+${xpValue} ${xpLabel}`;
+        q('#apxBCoins').textContent = coinsText || `+0 ${coinsLabel}`;
 
         const courseId = parseInt(d.courseid || '0', 10);
         const badgeId = parseInt(d.badgeid || '0', 10);
@@ -275,26 +275,26 @@ const initBadgeModal = (config) => {
                                     li.className = 'apx-activity-item';
 
                                     if (meta && meta.failed_grade !== undefined && meta.passed_grade !== undefined) {
-                                        li.innerHTML = ` < span class = \"apx - activity - failed\" > ${failedLabel} (${meta.failed_grade} % ) < / span > - > ` +
-                                            ` < span class = \"apx - activity - passed\" > ${passedLabel} (${meta.passed_grade} % ) < / span > < br / > ` +
-                                            ` < span class = \"apx - activity - indent\" > ${activity} < / span > `;
+                                        li.innerHTML = `<span class=\"apx-activity-failed\">${failedLabel} (${meta.failed_grade}%)</span> -> ` +
+                                            `<span class=\"apx-activity-passed\">${passedLabel} (${meta.passed_grade}%)</span><br/>` +
+                                            `<span class=\"apx-activity-indent\">${activity}</span>`;
                                     } else if (meta && meta.old_grade !== undefined && meta.new_grade !== undefined) {
-                                        li.innerHTML = `${activity} < span class = \"apx - activity - improved\" > (${meta.old_grade} % - > ${meta.new_grade} % ) < / span > `;
-                                        } else {
-                                            li.textContent = activity;
-                                        }
+                                        li.innerHTML = `${activity} <span class=\"apx-activity-improved\">(${meta.old_grade}% -> ${meta.new_grade}%)</span>`;
+                                    } else {
+                                        li.textContent = activity;
+                                    }
 
-                                        activitiesList.appendChild(li);
+                                    activitiesList.appendChild(li);
                                 });
-                        }
+                            }
 
-                        if (activitiesDiv) {
-                            activitiesDiv.classList.remove('aa-hidden');
+                            if (activitiesDiv) {
+                                activitiesDiv.classList.remove('aa-hidden');
+                            }
+                            if (badgesDiv) {
+                                badgesDiv.classList.add('aa-hidden');
+                            }
                         }
-                        if (badgesDiv) {
-                            badgesDiv.classList.add('aa-hidden');
-                        }
-                    }
                     } else {
                         if (activitiesDiv) {
                             activitiesDiv.classList.add('aa-hidden');
@@ -315,18 +315,18 @@ const initBadgeModal = (config) => {
         }
 
         const videoFile = badgeVideos[badgeId] || 'reward_animation_2.mp4';
-        const videoUrl = `${M.cfg.wwwroot} / local / ascend_rewards / pix / ${videoFile}`;
+        const videoUrl = `${M.cfg.wwwroot}/local/ascend_rewards/pix/${videoFile}`;
 
-    if (video && videoSource) {
-        videoSource.src = videoUrl;
-        video.load();
-        video.style.display = 'block';
-        video.currentTime = 0;
-        video.play().catch(() => {});
-        if (fullscreenBtn) {
-            fullscreenBtn.style.display = 'block';
+        if (video && videoSource) {
+            videoSource.src = videoUrl;
+            video.load();
+            video.style.display = 'block';
+            video.currentTime = 0;
+            video.play().catch(() => {});
+            if (fullscreenBtn) {
+                fullscreenBtn.style.display = 'block';
+            }
         }
-    }
 
         modal.style.display = 'block';
         backdrop.style.display = 'block';
@@ -337,9 +337,9 @@ const initBadgeModal = (config) => {
         el.addEventListener('click', () => openModal(el));
     });
 
-if (closeBtn) {
-    closeBtn.addEventListener('click', closeModal);
-}
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+    }
     backdrop.addEventListener('click', closeModal);
 
     document.addEventListener('keydown', (event) => {
@@ -348,19 +348,19 @@ if (closeBtn) {
         }
     });
 
-if (fullscreenBtn && video) {
-    fullscreenBtn.addEventListener('click', () => {
-        if (video.requestFullscreen) {
-            video.requestFullscreen();
-        } else if (video.webkitRequestFullscreen) {
-            video.webkitRequestFullscreen();
-        } else if (video.webkitEnterFullscreen) {
-            video.webkitEnterFullscreen();
-        } else if (video.msRequestFullscreen) {
-            video.msRequestFullscreen();
-        }
+    if (fullscreenBtn && video) {
+        fullscreenBtn.addEventListener('click', () => {
+            if (video.requestFullscreen) {
+                video.requestFullscreen();
+            } else if (video.webkitRequestFullscreen) {
+                video.webkitRequestFullscreen();
+            } else if (video.webkitEnterFullscreen) {
+                video.webkitEnterFullscreen();
+            } else if (video.msRequestFullscreen) {
+                video.msRequestFullscreen();
+            }
         });
-}
+    }
 };
 
 const initLeaderboard = (config) => {
@@ -373,26 +373,26 @@ const initLeaderboard = (config) => {
         return;
     }
 
-    const courseId = Number(config ? .courseId ? ? 0);
-    const userId = Number(config ? .userId ? ? 0);
-    const leaderboardRangeLabel = config ? .leaderboardRangeLabel || '';
-    const leaderboardModeLabel = config ? .leaderboardModeLabel || '';
-    const leaderboardLoadingLabel = config ? .leaderboardLoadingLabel || '';
-    const leaderboardContextErrorLabel = config ? .leaderboardContextErrorLabel || '';
-    const leaderboardContextViewErrorLabel = config ? .leaderboardContextViewErrorLabel || '';
-    const youLabel = config ? .youLabel || '';
-    const userNumberPrefix = config ? .userNumberPrefix || '';
-    const userIdBadgeLabel = config ? .userIdBadgeLabel || '';
+    const courseId = Number((config && config.courseId) || 0);
+    const userId = Number((config && config.userId) || 0);
+    const leaderboardRangeLabel = (config && config.leaderboardRangeLabel) || '';
+    const leaderboardModeLabel = (config && config.leaderboardModeLabel) || '';
+    const leaderboardLoadingLabel = (config && config.leaderboardLoadingLabel) || '';
+    const leaderboardContextErrorLabel = (config && config.leaderboardContextErrorLabel) || '';
+    const leaderboardContextViewErrorLabel = (config && config.leaderboardContextViewErrorLabel) || '';
+    const youLabel = (config && config.youLabel) || '';
+    const userNumberPrefix = (config && config.userNumberPrefix) || '';
+    const userIdBadgeLabel = (config && config.userIdBadgeLabel) || '';
 
     const originalHTML = leaderboardList.innerHTML;
 
     const switchToContextView = () => {
-        leaderboardList.innerHTML = ` < li class = "aa-muted aa-leaderboard-loading" > < i class = "fa-solid fa-spinner fa-spin" > < / i > ${leaderboardLoadingLabel} < / li > `;
+        leaderboardList.innerHTML = `<li class="aa-muted aa-leaderboard-loading"><i class="fa-solid fa-spinner fa-spin"></i> ${leaderboardLoadingLabel}</li>`;
 
         callAjax('local_ascend_rewards_get_leaderboard_context', {courseid: courseId})
             .then((data) => {
                 if (!data.success || !data.users) {
-                    leaderboardList.innerHTML = ` < li class = "aa-muted" > ${leaderboardContextErrorLabel} < / li > `;
+                    leaderboardList.innerHTML = `<li class="aa-muted">${leaderboardContextErrorLabel}</li>`;
                     return;
                 }
 
@@ -401,27 +401,27 @@ const initLeaderboard = (config) => {
                     const isCurrentUser = user.is_current_user;
                     const displayName = isCurrentUser ? youLabel : `${userNumberPrefix}${user.userid}`;
                     const userIdBadge = isCurrentUser
-                        ? ` < span class = "user-id-badge" > ${userIdBadgeLabel} ${userId} < / span > `
+                        ? `<span class="user-id-badge">${userIdBadgeLabel} ${userId}</span>`
                         : '';
                     const medal = user.medal;
                     const xp = user.xp.toLocaleString();
                     const currentClass = isCurrentUser ? ' class="current-user"' : '';
                     const gradId = `xpIconGradLBCtx${idx}`;
 
-                    html += ` < li${currentClass} > `;
-                    html += ` < span class = "pos" > ${medal} < / span > `;
-                    html += ` < strong > ${displayName} < / strong > `;
+                    html += `<li${currentClass}>`;
+                    html += `<span class="pos">${medal}</span>`;
+                    html += `<strong>${displayName}</strong>`;
                     html += userIdBadge;
                     html += '<div class="xp-display xp-display-right">';
                     html += '<svg width="24" height="24" viewBox="0 0 80 80" class="xp-icon">';
-                    html += ` < defs > < linearGradient id = "${gradId}" x1 = "0%" y1 = "0%" x2 = "100%" y2 = "100%" > `;
+                    html += `<defs><linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="100%">`;
                     html += '<stop offset="0%" stop-color="#00D4FF" />';
                     html += '<stop offset="50%" stop-color="#FF00AA" />';
                     html += '<stop offset="100%" stop-color="#FF9500" /></linearGradient></defs>';
-                    html += ` < circle cx = "40" cy = "40" r = "36" fill = "url(#${gradId})" / > `;
+                    html += `<circle cx="40" cy="40" r="36" fill="url(#${gradId})" />`;
                     html += '<text x="40" y="52" text-anchor="middle" fill="#01142E" font-size="32" font-weight="800">X</text>';
                     html += '</svg>';
-                    html += ` < span class = "aa-muted aa-xp-value" > ${xp} < / span > `;
+                    html += `<span class="aa-muted aa-xp-value">${xp}</span>`;
                     html += '</div>';
                     html += '</li>';
                 });
@@ -440,15 +440,15 @@ const initLeaderboard = (config) => {
                     }
                 }, 100);
 
-        if (btnTopView) {
-            btnTopView.classList.remove('is-active');
-        }
-        if (btnContextView) {
-            btnContextView.classList.add('is-active');
-        }
+                if (btnTopView) {
+                    btnTopView.classList.remove('is-active');
+                }
+                if (btnContextView) {
+                    btnContextView.classList.add('is-active');
+                }
             })
             .catch(() => {
-                leaderboardList.innerHTML = ` < li class = "aa-muted" > ${leaderboardContextViewErrorLabel} < / li > `;
+                leaderboardList.innerHTML = `<li class="aa-muted">${leaderboardContextViewErrorLabel}</li>`;
             });
     };
 
@@ -473,7 +473,7 @@ const initLeaderboard = (config) => {
 };
 
 export const init = (config) => {
-    const alerts = config ? .alerts || {};
+    const alerts = (config && config.alerts) || {};
     alertConfig = {
         alertTitle: alerts.alertTitle || '',
         errorTitle: alerts.errorTitle || alerts.alertTitle || '',
@@ -482,8 +482,8 @@ export const init = (config) => {
     ajaxRequestFailed = alerts.ajaxRequestFailed || '';
 
     initPanelToggles();
-    initInstructions(config ? .instructions || {});
-    initGameboard(config ? .gameboard || {});
-    initBadgeModal(config ? .badgeModal || {});
-    initLeaderboard(config ? .leaderboard || {});
+    initInstructions((config && config.instructions) || {});
+    initGameboard((config && config.gameboard) || {});
+    initBadgeModal((config && config.badgeModal) || {});
+    initLeaderboard((config && config.leaderboard) || {});
 };

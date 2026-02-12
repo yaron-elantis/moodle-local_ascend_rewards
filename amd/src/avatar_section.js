@@ -133,21 +133,20 @@ const openStoryModal = async(title, youtubeId) => {
         return;
     }
 
+    const safeTitle = title || '';
+    const body = '<div class="aa-youtube-modal-body">' +
+        '<iframe class="aa-youtube-modal-iframe" ' +
+        'src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(youtubeId) +
+        '?autoplay=1&rel=0&modestbranding=1&fs=1" ' +
+        'title="' + safeTitle + '" frameborder="0" ' +
+        'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
+        'allowfullscreen referrerpolicy="strict-origin-when-cross-origin" loading="lazy">' +
+        '</iframe></div>';
+
     const modal = await Modal.create({
         title,
         removeOnClose: true,
-        body: `<div class="aa-youtube-modal-body">
-            <iframe
-                class="aa-youtube-modal-iframe"
-                src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(youtubeId)}?autoplay=1&rel=0&modestbranding=1&fs=1"
-                title="${title || ''}"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen
-                referrerpolicy="strict-origin-when-cross-origin"
-                loading="lazy">
-            </iframe>
-        </div>`
+        body
     });
 
     const root = modal.getRoot();
@@ -167,10 +166,14 @@ export const init = (config) => {
         return;
     }
 
-    const tokensAvailable = Number(config?.tokensAvailable ?? 0);
-    const coinBalance = Number(config?.coinBalance ?? 0);
-    const storyFallbackTitle = config?.storyFallbackTitle || '';
-    const modalStrings = config?.modalStrings || {};
+    const tokensAvailable = Number(
+        config && typeof config.tokensAvailable !== 'undefined' ? config.tokensAvailable : 0
+    );
+    const coinBalance = Number(
+        config && typeof config.coinBalance !== 'undefined' ? config.coinBalance : 0
+    );
+    const storyFallbackTitle = config && config.storyFallbackTitle ? config.storyFallbackTitle : '';
+    const modalStrings = config && config.modalStrings ? config.modalStrings : {};
 
     initAvatarModals({strings: modalStrings});
 
