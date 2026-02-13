@@ -30,6 +30,26 @@ defined('MOODLE_INTERNAL') || die();
  */
 class rebuild_badge_cache extends \core\task\scheduled_task {
     /**
+     * Return a cross-DB SQL expression for random ordering.
+     *
+     * @param \moodle_database $db
+     * @return string
+     */
+    protected function get_random_order_sql(\moodle_database $db): string {
+        switch ($db->get_dbfamily()) {
+            case 'postgres':
+                return 'RANDOM()';
+            case 'mssql':
+                return 'NEWID()';
+            case 'oracle':
+                return 'DBMS_RANDOM.VALUE';
+            case 'mysql':
+            default:
+                return 'RAND()';
+        }
+    }
+
+    /**
      * Get the task name shown in scheduled tasks UI.
      *
      * @return string
@@ -55,11 +75,14 @@ class rebuild_badge_cache extends \core\task\scheduled_task {
         mtrace("Rebuilt {$rebuilt} cache entries");
 
         // Verify existing cache entries (sample 500 random entries).
-        // Note: Using RAND() for randomization instead of sql_random().
-        $cachedentries = $DB->get_records_sql(
-            "SELECT * FROM {local_ascend_rewards_badge_cache}
-          ORDER BY RAND()
-             LIMIT 500"
+        $randomorder = $this->get_random_order_sql($DB);
+        $cachedentries = $DB->get_recordset_sql(
+            "SELECT *
+               FROM {local_ascend_rewards_badge_cache}
+           ORDER BY {$randomorder}",
+            [],
+            0,
+            500
         );
 
         $verified = 0;
@@ -88,6 +111,7 @@ class rebuild_badge_cache extends \core\task\scheduled_task {
 
             $verified++;
         }
+        $cachedentries->close();
 
         mtrace("Verified {$verified} cache entries, corrected {$corrected}");
 
