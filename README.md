@@ -4,11 +4,11 @@ A Moodle local plugin that gamifies learning through a comprehensive badge, coin
 
 ## Latest Evaluation Release
 
-- **Version:** `1.2.10`
-- **Tag:** `v1.2.10`
+- **Version:** `1.2.11`
+- **Tag:** `v1.2.11`
 - **Branch for evaluation work:** `master`
-- **Release date:** `2026-02-12`
-- **Notes:** Use `v1.2.10` as the current baseline for Moodle evaluation and any follow-up fixes.
+- **Release date:** `2026-02-13`
+- **Notes:** Use `v1.2.11` as the current baseline for Moodle evaluation and any follow-up fixes.
 
 ## Description
 
