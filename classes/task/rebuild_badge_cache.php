@@ -76,37 +76,53 @@ class rebuild_badge_cache extends \core\task\scheduled_task {
 
         // Verify existing cache entries (sample 500 random entries).
         $randomorder = $this->get_random_order_sql($DB);
-        $cachedentries = $DB->get_recordset_sql(
-            "SELECT *
-               FROM {local_ascend_rewards_badge_cache}
-           ORDER BY {$randomorder}",
-            [],
-            0,
-            500
-        );
+        try {
+            $cachedentries = $DB->get_recordset_sql(
+                "SELECT *
+                   FROM {local_ascend_rewards_badge_cache}
+               ORDER BY {$randomorder}",
+                [],
+                0,
+                500
+            );
+        } catch (\dml_exception $e) {
+            mtrace('Random ordering unavailable, using fallback ordering for cache verification');
+            $cachedentries = $DB->get_recordset_sql(
+                "SELECT *
+                   FROM {local_ascend_rewards_badge_cache}
+               ORDER BY timemodified DESC",
+                [],
+                0,
+                500
+            );
+        }
 
         $verified = 0;
         $corrected = 0;
 
         foreach ($cachedentries as $entry) {
-            // Recalculate and compare.
-            $fresh = $helper->calculate_activities($entry->userid, $entry->courseid, $entry->badgeid);
+            try {
+                // Recalculate and compare.
+                $fresh = $helper->calculate_activities($entry->userid, $entry->courseid, $entry->badgeid);
 
-            $cachedactivities = json_decode($entry->activities, true);
-            $cachedmetadata = json_decode($entry->metadata, true);
+                $cachedactivities = json_decode($entry->activities, true);
+                $cachedmetadata = json_decode($entry->metadata, true);
 
-            // Simple comparison - if different, update.
-            if (
-                json_encode($cachedactivities) !== json_encode($fresh['activities']) ||
-                json_encode($cachedmetadata) !== json_encode($fresh['metadata'])
-            ) {
-                // Update cache with corrected data.
-                $entry->activities = json_encode($fresh['activities']);
-                $entry->metadata = json_encode($fresh['metadata']);
-                $entry->timemodified = time();
-                $DB->update_record('local_ascend_rewards_badge_cache', $entry);
+                // Simple comparison - if different, update.
+                if (
+                    json_encode($cachedactivities) !== json_encode($fresh['activities']) ||
+                    json_encode($cachedmetadata) !== json_encode($fresh['metadata'])
+                ) {
+                    // Update cache with corrected data.
+                    $entry->activities = json_encode($fresh['activities']);
+                    $entry->metadata = json_encode($fresh['metadata']);
+                    $entry->timemodified = time();
+                    $DB->update_record('local_ascend_rewards_badge_cache', $entry);
 
-                $corrected++;
+                    $corrected++;
+                }
+            } catch (\Throwable $e) {
+                mtrace('Skipped cache verification for one entry due to: ' . $e->getMessage());
             }
 
             $verified++;
