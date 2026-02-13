@@ -23,13 +23,14 @@
  */
 
 require_once(__DIR__ . '/../../config.php');
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir . '/tablelib.php');
 
 admin_externalpage_setup('local_ascend_rewards_audit');
 
 $context = context_system::instance();
-require_capability('moodle/site:config', $context);
+require_capability('local/ascend_rewards:manage', $context);
 // This page renders large inline HTML; suppress layout-sensitive sniffs.
 // phpcs:disable moodle.Files.LineLength.MaxExceeded,moodle.Files.LineLength.TooLong
 // phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
@@ -50,45 +51,51 @@ $courseid = optional_param('courseid', 0, PARAM_INT);
 $datefrom = optional_param('datefrom', '', PARAM_RAW);
 $dateto = optional_param('dateto', '', PARAM_RAW);
 
+$badge_names = [
+    6  => get_string('badge_name_getting_started', 'local_ascend_rewards'),
+    4  => get_string('badge_name_on_a_roll', 'local_ascend_rewards'),
+    5  => get_string('badge_name_halfway_hero', 'local_ascend_rewards'),
+    8  => get_string('badge_name_master_navigator', 'local_ascend_rewards'),
+    9  => get_string('badge_name_early_bird', 'local_ascend_rewards'),
+    11 => get_string('badge_name_sharp_shooter', 'local_ascend_rewards'),
+    10 => get_string('badge_name_deadline_burner', 'local_ascend_rewards'),
+    12 => get_string('badge_name_time_tamer', 'local_ascend_rewards'),
+    13 => get_string('badge_name_feedback_follower', 'local_ascend_rewards'),
+    15 => get_string('badge_name_steady_improver', 'local_ascend_rewards'),
+    14 => get_string('badge_name_tenacious_tiger', 'local_ascend_rewards'),
+    16 => get_string('badge_name_glory_guide', 'local_ascend_rewards'),
+    19 => get_string('badge_name_high_flyer', 'local_ascend_rewards'),
+    17 => get_string('badge_name_activity_ace', 'local_ascend_rewards'),
+    7  => get_string('badge_name_mission_complete', 'local_ascend_rewards'),
+    20 => get_string('badge_name_learning_legend', 'local_ascend_rewards'),
+];
+
+$status_labels = [
+    'success' => get_string('status_success', 'local_ascend_rewards'),
+    'revoked' => get_string('status_revoked', 'local_ascend_rewards'),
+    'debug' => get_string('status_debug', 'local_ascend_rewards'),
+    'error' => get_string('status_error', 'local_ascend_rewards'),
+];
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('audit_trail', 'local_ascend_rewards'));
 
 // Filter form
-echo '<form method="get" action="' . $PAGE->url->out(false) . '" class="apex-audit-filters">';
-echo '<div style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 5px;">';
-echo '<h3>Filters</h3>';
-echo '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">';
+echo '<form method="get" action="' . $PAGE->url->out(false) . '" class="ascend-audit-filters">';
+echo '<div class="aa-audit-filter-panel">';
+echo '<h3>' . get_string('filters_heading', 'local_ascend_rewards') . '</h3>';
+echo '<div class="aa-audit-grid">';
 
 // User filter
 echo '<div>';
-echo '<label for="userid">User ID:</label><br>';
-echo '<input type="number" name="userid" id="userid" value="' . s($userid) . '" style="width: 100%;">';
+echo '<label for="userid">' . get_string('user_id_label', 'local_ascend_rewards') . ':</label><br>';
+echo '<input type="number" name="userid" id="userid" value="' . s($userid) . '" class="aa-admin-input-full">';
 echo '</div>';
 
-// Badge filter
-$badge_names = [
-    6  => 'Getting Started',
-    4  => 'On a Roll',
-    5  => 'Halfway Hero',
-    8  => 'Master Navigator',
-    9  => 'Early Bird',
-    11 => 'Sharp Shooter',
-    10 => 'Deadline Burner',
-    12 => 'Time Tamer',
-    13 => 'Feedback Follower',
-    15 => 'Steady Improver',
-    14 => 'Tenacious Tiger',
-    16 => 'Glory Guide',
-    19 => 'High Flyer',
-    17 => 'Activity Ace',
-    7  => 'Mission Complete',
-    20 => 'Learning Legend',
-];
-
 echo '<div>';
-echo '<label for="badgeid">Badge:</label><br>';
-echo '<select name="badgeid" id="badgeid" style="width: 100%;">';
-echo '<option value="0">All Badges</option>';
+echo '<label for="badgeid">' . get_string('badge_label', 'local_ascend_rewards') . ':</label><br>';
+echo '<select name="badgeid" id="badgeid" class="aa-admin-input-full">';
+echo '<option value="0">' . get_string('all_badges_label', 'local_ascend_rewards') . '</option>';
 foreach ($badge_names as $bid => $bname) {
     $selected = ($badgeid == $bid) ? ' selected' : '';
     echo '<option value="' . $bid . '"' . $selected . '>' . s($bname) . '</option>';
@@ -98,13 +105,13 @@ echo '</div>';
 
 // Status filter
 echo '<div>';
-echo '<label for="status">Status:</label><br>';
-echo '<select name="status" id="status" style="width: 100%;">';
-echo '<option value="">All</option>';
-echo '<option value="success"' . ($status === 'success' ? ' selected' : '') . '>Success</option>';
-echo '<option value="revoked"' . ($status === 'revoked' ? ' selected' : '') . '>Revoked</option>';
-echo '<option value="debug"' . ($status === 'debug' ? ' selected' : '') . '>Debug</option>';
-echo '<option value="error"' . ($status === 'error' ? ' selected' : '') . '>Error</option>';
+echo '<label for="status">' . get_string('status_label', 'local_ascend_rewards') . ':</label><br>';
+echo '<select name="status" id="status" class="aa-admin-input-full">';
+echo '<option value="">' . get_string('all_label', 'local_ascend_rewards') . '</option>';
+echo '<option value="success"' . ($status === 'success' ? ' selected' : '') . '>' . $status_labels['success'] . '</option>';
+echo '<option value="revoked"' . ($status === 'revoked' ? ' selected' : '') . '>' . $status_labels['revoked'] . '</option>';
+echo '<option value="debug"' . ($status === 'debug' ? ' selected' : '') . '>' . $status_labels['debug'] . '</option>';
+echo '<option value="error"' . ($status === 'error' ? ' selected' : '') . '>' . $status_labels['error'] . '</option>';
 echo '</select>';
 echo '</div>';
 
@@ -118,9 +125,9 @@ $courses = $DB->get_records_sql("
 ");
 
 echo '<div>';
-echo '<label for="courseid">Course:</label><br>';
-echo '<select name="courseid" id="courseid" style="width: 100%;">';
-echo '<option value="0">All Courses</option>';
+echo '<label for="courseid">' . get_string('course_label', 'local_ascend_rewards') . ':</label><br>';
+echo '<select name="courseid" id="courseid" class="aa-admin-input-full">';
+echo '<option value="0">' . get_string('all_courses_label', 'local_ascend_rewards') . '</option>';
 foreach ($courses as $course) {
     $selected = ($courseid == $course->id) ? ' selected' : '';
     echo '<option value="' . $course->id . '"' . $selected . '>' . s($course->fullname) . '</option>';
@@ -130,20 +137,20 @@ echo '</div>';
 
 // Date from
 echo '<div>';
-echo '<label for="datefrom">Date From:</label><br>';
-echo '<input type="date" name="datefrom" id="datefrom" value="' . s($datefrom) . '" style="width: 100%;">';
+echo '<label for="datefrom">' . get_string('date_from_label', 'local_ascend_rewards') . '</label><br>';
+echo '<input type="date" name="datefrom" id="datefrom" value="' . s($datefrom) . '" class="aa-admin-input-full">';
 echo '</div>';
 
 // Date to
 echo '<div>';
-echo '<label for="dateto">Date To:</label><br>';
-echo '<input type="date" name="dateto" id="dateto" value="' . s($dateto) . '" style="width: 100%;">';
+echo '<label for="dateto">' . get_string('date_to_label', 'local_ascend_rewards') . '</label><br>';
+echo '<input type="date" name="dateto" id="dateto" value="' . s($dateto) . '" class="aa-admin-input-full">';
 echo '</div>';
 
 echo '</div>';
-echo '<div style="margin-top: 15px;">';
-echo '<button type="submit" class="btn btn-primary">Apply Filters</button> ';
-echo '<a href="' . $PAGE->url->out(false) . '" class="btn btn-secondary">Clear Filters</a>';
+echo '<div class="aa-audit-actions">';
+echo '<button type="submit" class="btn btn-primary">' . get_string('apply_filters_label', 'local_ascend_rewards') . '</button> ';
+echo '<a href="' . $PAGE->url->out(false) . '" class="btn btn-secondary">' . get_string('clear_filters_label', 'local_ascend_rewards') . '</a>';
 echo '</div>';
 echo '</div>';
 echo '</form>';
@@ -158,24 +165,24 @@ $sql = "SELECT l.id, l.userid, l.badgeid, l.status, l.message, l.timecreated,
 $params = [];
 
 if ($userid > 0) {
-    $sql .= " AND l.userid = :userid";
+    $sql .= ' AND l.userid = :userid';
     $params['userid'] = $userid;
 }
 
 if ($badgeid > 0) {
-    $sql .= " AND l.badgeid = :badgeid";
+    $sql .= ' AND l.badgeid = :badgeid';
     $params['badgeid'] = $badgeid;
 }
 
 if (!empty($status)) {
-    $sql .= " AND l.status = :status";
+    $sql .= ' AND l.status = :status';
     $params['status'] = $status;
 }
 
 if (!empty($datefrom)) {
     $timestamp = strtotime($datefrom);
     if ($timestamp !== false) {
-        $sql .= " AND l.timecreated >= :datefrom";
+        $sql .= ' AND l.timecreated >= :datefrom';
         $params['datefrom'] = $timestamp;
     }
 }
@@ -183,31 +190,31 @@ if (!empty($datefrom)) {
 if (!empty($dateto)) {
     $timestamp = strtotime($dateto . ' 23:59:59');
     if ($timestamp !== false) {
-        $sql .= " AND l.timecreated <= :dateto";
+        $sql .= ' AND l.timecreated <= :dateto';
         $params['dateto'] = $timestamp;
     }
 }
 
-$sql .= " ORDER BY l.timecreated DESC";
+$sql .= ' ORDER BY l.timecreated DESC';
 
 // Get records
 $records = $DB->get_records_sql($sql, $params, 0, 1000); // Limit to 1000 records
 
 // Display table
-echo '<div style="margin-top: 20px;">';
-echo '<p><strong>Total Records:</strong> ' . count($records) . ' (showing up to 1000 most recent)</p>';
+echo '<div class="aa-audit-table-wrap">';
+echo '<p><strong>' . get_string('total_records_label', 'local_ascend_rewards') . '</strong> ' . count($records) . ' ' . get_string('audit_showing_limit', 'local_ascend_rewards', 1000) . '</p>';
 
 if (!empty($records)) {
-    echo '<div style="overflow-x: auto;">';
-    echo '<table class="generaltable" style="width: 100%;">';
+    echo '<div class="aa-table-scroll">';
+    echo '<table class="generaltable aa-admin-table">';
     echo '<thead>';
     echo '<tr>';
-    echo '<th>ID</th>';
-    echo '<th>Date/Time</th>';
-    echo '<th>User</th>';
-    echo '<th>Badge</th>';
-    echo '<th>Status</th>';
-    echo '<th>Message</th>';
+    echo '<th>' . get_string('id_label', 'local_ascend_rewards') . '</th>';
+    echo '<th>' . get_string('date_time_label', 'local_ascend_rewards') . '</th>';
+    echo '<th>' . get_string('user_label', 'local_ascend_rewards') . '</th>';
+    echo '<th>' . get_string('badge_label', 'local_ascend_rewards') . '</th>';
+    echo '<th>' . get_string('status_label', 'local_ascend_rewards') . '</th>';
+    echo '<th>' . get_string('message_label', 'local_ascend_rewards') . '</th>';
     echo '</tr>';
     echo '</thead>';
     echo '<tbody>';
@@ -218,23 +225,23 @@ if (!empty($records)) {
 
         switch ($record->status) {
             case 'success':
-                $status_badge = '<span style="background: #28a745; color: white; padding: 3px 8px; border-radius: 3px; font-size: 0.85em;">SUCCESS</span>';
+                $status_badge = '<span class="aa-status-badge aa-status-success">' . core_text::strtoupper($status_labels['success']) . '</span>';
                 break;
             case 'revoked':
-                $status_badge = '<span style="background: #dc3545; color: white; padding: 3px 8px; border-radius: 3px; font-size: 0.85em;">REVOKED</span>';
+                $status_badge = '<span class="aa-status-badge aa-status-revoked">' . core_text::strtoupper($status_labels['revoked']) . '</span>';
                 break;
             case 'debug':
-                $status_badge = '<span style="background: #6c757d; color: white; padding: 3px 8px; border-radius: 3px; font-size: 0.85em;">DEBUG</span>';
+                $status_badge = '<span class="aa-status-badge aa-status-debug">' . core_text::strtoupper($status_labels['debug']) . '</span>';
                 break;
             case 'error':
-                $status_badge = '<span style="background: #ffc107; color: black; padding: 3px 8px; border-radius: 3px; font-size: 0.85em;">ERROR</span>';
+                $status_badge = '<span class="aa-status-badge aa-status-error">' . core_text::strtoupper($status_labels['error']) . '</span>';
                 break;
             default:
-                $status_badge = '<span style="background: #17a2b8; color: white; padding: 3px 8px; border-radius: 3px; font-size: 0.85em;">' . strtoupper(s($record->status)) . '</span>';
+                $status_badge = '<span class="aa-status-badge aa-status-other">' . strtoupper(s($record->status)) . '</span>';
         }
 
-        $badge_name = $badge_names[$record->badgeid] ?? 'Badge #' . $record->badgeid;
-        $user_name = $record->firstname ? fullname($record) . ' (' . $record->email . ')' : 'User #' . $record->userid;
+        $badge_name = $badge_names[$record->badgeid] ?? get_string('badge_number_label', 'local_ascend_rewards', $record->badgeid);
+        $user_name = $record->firstname ? fullname($record) . ' (' . $record->email . ')' : get_string('user_number_label', 'local_ascend_rewards', $record->userid);
         $date = userdate($record->timecreated, '%d %b %Y, %H:%M:%S');
 
         echo '<tr>';
@@ -243,7 +250,7 @@ if (!empty($records)) {
         echo '<td><a href="' . new moodle_url('/user/profile.php', ['id' => $record->userid]) . '">' . s($user_name) . '</a></td>';
         echo '<td>' . s($badge_name) . '</td>';
         echo '<td>' . $status_badge . '</td>';
-        echo '<td style="max-width: 400px; word-wrap: break-word;">' . s($record->message) . '</td>';
+        echo '<td class="aa-audit-message">' . s($record->message) . '</td>';
         echo '</tr>';
     }
 
@@ -251,14 +258,14 @@ if (!empty($records)) {
     echo '</table>';
     echo '</div>';
 } else {
-    echo '<p>No audit records found.</p>';
+    echo '<p>' . get_string('no_audit_records_label', 'local_ascend_rewards') . '</p>';
 }
 
 echo '</div>';
 
 // Summary statistics
-echo '<div style="margin-top: 30px; padding: 15px; background: #f9f9f9; border-radius: 5px;">';
-echo '<h3>Statistics</h3>';
+echo '<div class="aa-audit-summary">';
+echo '<h3>' . get_string('statistics_heading', 'local_ascend_rewards') . '</h3>';
 
 $stats_sql = "SELECT status, COUNT(*) as count
               FROM {local_ascend_rewards_badgerlog}
@@ -266,19 +273,19 @@ $stats_sql = "SELECT status, COUNT(*) as count
 $stats_params = [];
 
 if ($userid > 0) {
-    $stats_sql .= " AND userid = :userid";
+    $stats_sql .= ' AND userid = :userid';
     $stats_params['userid'] = $userid;
 }
 
 if ($badgeid > 0) {
-    $stats_sql .= " AND badgeid = :badgeid";
+    $stats_sql .= ' AND badgeid = :badgeid';
     $stats_params['badgeid'] = $badgeid;
 }
 
 if (!empty($datefrom)) {
     $timestamp = strtotime($datefrom);
     if ($timestamp !== false) {
-        $stats_sql .= " AND timecreated >= :datefrom";
+        $stats_sql .= ' AND timecreated >= :datefrom';
         $stats_params['datefrom'] = $timestamp;
     }
 }
@@ -286,21 +293,22 @@ if (!empty($datefrom)) {
 if (!empty($dateto)) {
     $timestamp = strtotime($dateto . ' 23:59:59');
     if ($timestamp !== false) {
-        $stats_sql .= " AND timecreated <= :dateto";
+        $stats_sql .= ' AND timecreated <= :dateto';
         $stats_params['dateto'] = $timestamp;
     }
 }
 
-$stats_sql .= " GROUP BY status ORDER BY count DESC";
+$stats_sql .= ' GROUP BY status ORDER BY count DESC';
 
 $stats = $DB->get_records_sql($stats_sql, $stats_params);
 
 if (!empty($stats)) {
-    echo '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">';
+    echo '<div class="aa-audit-summary-grid">';
     foreach ($stats as $stat) {
-        echo '<div style="padding: 10px; background: white; border-radius: 5px; text-align: center;">';
-        echo '<div style="font-size: 2em; font-weight: bold;">' . $stat->count . '</div>';
-        echo '<div style="color: #666;">' . ucfirst(s($stat->status)) . '</div>';
+        echo '<div class="aa-audit-summary-card">';
+        echo '<div class="aa-audit-summary-value">' . $stat->count . '</div>';
+        $status_label = $status_labels[$stat->status] ?? s($stat->status);
+        echo '<div class="aa-audit-summary-label">' . $status_label . '</div>';
         echo '</div>';
     }
     echo '</div>';

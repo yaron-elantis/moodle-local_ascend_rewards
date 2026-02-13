@@ -60,7 +60,7 @@ class local_ascend_rewards_navigation {
             $url,
             navigation_node::TYPE_CUSTOM,
             null,
-            'apexrewards',
+            'ascendrewards',
             $icon
         );
         $node->showinflatnavigation = true;

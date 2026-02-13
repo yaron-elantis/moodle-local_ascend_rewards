@@ -25,6 +25,7 @@
  */
 
 require_once(__DIR__ . '/../../config.php');
+defined('MOODLE_INTERNAL') || die();
 require_login();
 
 // This script renders large inline HTML/CSS blocks. Avoid auto-reflow that could
@@ -49,21 +50,28 @@ require_login();
 // phpcs:disable moodle.WhiteSpace.WhiteSpaceInStrings.EndLine,moodle.Commenting.MissingDocblock.Function
 // phpcs:disable moodle.PHP.IncludingFile.UseRequire,Squiz.PHP.CommentedOutCode.Found
 
-// Include performance cache helper
-require_once(__DIR__ . '/classes/performance_cache.php');
-
-// Include gameboard class
-require_once(__DIR__ . '/classes/gameboard.php');
-
 global $DB, $USER, $CFG, $OUTPUT, $PAGE;
+
+$context = context_system::instance();
+$PAGE->set_context($context);
+require_capability('local/ascend_rewards:view', $context);
+
+$avatar_circular_dir = '/local/ascend_rewards/pix/Avatars/circular%20avatars';
 
 // AJAX: leaderboard context
 $apex_action = optional_param('apex_action', '', PARAM_ALPHANUMEXT);
 if ($apex_action === 'get_leaderboard_context') {
-    require_sesskey();
+    header('Content-Type: application/json');
+    if (!confirm_sesskey()) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'error' => get_string('invalidsesskey', 'error'),
+        ]);
+        exit;
+    }
     $neighbors = optional_param('neighbors', 3, PARAM_INT);
     $courseid_param = optional_param('courseid', 0, PARAM_INT);
-    header('Content-Type: application/json');
 
     $xp_cid = ($courseid_param > 0) ? $courseid_param : 0;
 
@@ -82,7 +90,7 @@ if ($apex_action === 'get_leaderboard_context') {
             'userid' => (int)$row->userid,
             'xp' => (int)$row->xp,
             'rank' => $r,
-            'medal' => apex_medal_for_place($r),
+            'medal' => local_ascend_rewards_medal_for_place($r),
             'is_current_user' => ($row->userid == $USER->id),
         ];
         $r++;
@@ -106,7 +114,9 @@ if ($apex_action === 'get_leaderboard_context') {
         $start_rank = $start + 1;
         $end_rank = min($end + 1, $total);
     } else if ($myrank !== null) {
-        $users_array = array_filter($ranked, function($r) use ($myrank) { return $r['rank'] == $myrank; });
+        $users_array = array_filter($ranked, function ($r) use ($myrank) {
+            return $r['rank'] == $myrank;
+        });
         $start_rank = $myrank;
         $end_rank = $myrank;
     }
@@ -135,7 +145,7 @@ if ($apex_action === 'get_leaderboard_context') {
  * @param string $alt Alt text for the image (unused, for semantic clarity)
  * @return string The URL as a string
  */
-function apex_img(moodle_url $url, string $alt = ''): string {
+function local_ascend_rewards_img(moodle_url $url, string $alt = ''): string {
     return $url->out(false);
 }
 
@@ -145,7 +155,7 @@ function apex_img(moodle_url $url, string $alt = ''): string {
  * @param int $place The rank position (1-indexed)
  * @return string Medal emoji or position number
  */
-function apex_medal_for_place(int $place): string {
+function local_ascend_rewards_medal_for_place(int $place): string {
     if ($place === 1) {
         return '🥇';
     } elseif ($place === 2) {
@@ -162,7 +172,7 @@ function apex_medal_for_place(int $place): string {
  * @param int $timestamp Unix timestamp
  * @return string Formatted date (e.g., "Jan 15, 2026")
  */
-function apex_fmt_date(int $timestamp): string {
+function local_ascend_rewards_fmt_date(int $timestamp): string {
     return date('M d, Y', $timestamp);
 }
 
@@ -172,20 +182,20 @@ function apex_fmt_date(int $timestamp): string {
 $coin_fallback  = new moodle_url('/local/ascend_rewards/pix/ascend_coin_main.png');
 $stack_fallback = new moodle_url('/local/ascend_rewards/pix/ascend_assets_stack.png');
 
-$coinimgurl  = apex_img($coin_fallback, 'ascend_coin_main');
-$stackimgurl = apex_img($stack_fallback, 'ascend_assets_stack');
+$coinimgurl  = local_ascend_rewards_img($coin_fallback, 'ascend_coin_main');
+$stackimgurl = local_ascend_rewards_img($stack_fallback, 'ascend_assets_stack');
 
-$medal_gold_url   = apex_img(new moodle_url('/local/ascend_rewards/pix/medal_gold.png'), 'medal_gold');
-$medal_silver_url = apex_img(new moodle_url('/local/ascend_rewards/pix/medal_silver.png'), 'medal_silver');
-$medal_bronze_url = apex_img(new moodle_url('/local/ascend_rewards/pix/medal_bronze.png'), 'medal_bronze');
+$medal_gold_url   = local_ascend_rewards_img(new moodle_url('/local/ascend_rewards/pix/medal_gold.png'), 'medal_gold');
+$medal_silver_url = local_ascend_rewards_img(new moodle_url('/local/ascend_rewards/pix/medal_silver.png'), 'medal_silver');
+$medal_bronze_url = local_ascend_rewards_img(new moodle_url('/local/ascend_rewards/pix/medal_bronze.png'), 'medal_bronze');
 
 $pixbase = new moodle_url('/local/ascend_rewards/pix');
 
 // Section header icons
-$icon_leaderboard_url      = apex_img(new moodle_url('/local/ascend_rewards/pix/leaderboard.png'), 'leaderboard');
-$icon_badges_course_url   = apex_img(new moodle_url('/local/ascend_rewards/pix/badges_course.png'), 'badges_course');
-$icon_challenges_url      = apex_img(new moodle_url('/local/ascend_rewards/pix/mystery_box.png'), 'challenge');
-$icon_journey_url         = apex_img(new moodle_url('/local/ascend_rewards/pix/journey.png'), 'journey');
+$icon_leaderboard_url      = local_ascend_rewards_img(new moodle_url('/local/ascend_rewards/pix/leaderboard.png'), 'leaderboard');
+$icon_badges_course_url   = local_ascend_rewards_img(new moodle_url('/local/ascend_rewards/pix/badges_course.png'), 'badges_course');
+$icon_challenges_url      = local_ascend_rewards_img(new moodle_url('/local/ascend_rewards/pix/mystery_box.png'), 'challenge');
+$icon_journey_url         = local_ascend_rewards_img(new moodle_url('/local/ascend_rewards/pix/journey.png'), 'journey');
 
 /**
  * Badge -> icon filename mapping.
@@ -236,7 +246,7 @@ $badge_descriptions = [
  * @param string $badgename The badge name to normalize
  * @return string The normalized badge name
  */
-function apex_normalize_badge_name(string $badgename): string {
+function local_ascend_rewards_normalize_badge_name(string $badgename): string {
     // Return the name as-is; badge names from $badge_definitions are already properly formatted
     // This function exists as a safety layer and for future extensibility
     return trim($badgename);
@@ -245,8 +255,8 @@ function apex_normalize_badge_name(string $badgename): string {
 /**
  * Resolve a badge icon URL.
  */
-function apex_badge_icon_url(string $badgename, array $map, moodle_url $pixbase, moodle_url $fallback): moodle_url {
-    $name = apex_normalize_badge_name($badgename);
+function local_ascend_rewards_badge_icon_url(string $badgename, array $map, moodle_url $pixbase, moodle_url $fallback): moodle_url {
+    $name = local_ascend_rewards_normalize_badge_name($badgename);
     $filename = $map[$name] ?? null;
     if ($filename) {
         return new moodle_url('/local/ascend_rewards/pix/' . $filename);
@@ -257,6 +267,12 @@ function apex_badge_icon_url(string $badgename, array $map, moodle_url $pixbase,
 /** Get the course filter parameter from the URL */
 $courseid_param = optional_param('courseid', '', PARAM_INT);
 $courseid = (!empty($courseid_param) && $courseid_param > 0) ? (int)$courseid_param : null;
+
+$urlparams = [];
+if (!is_null($courseid)) {
+    $urlparams['courseid'] = $courseid;
+}
+$PAGE->set_url(new moodle_url('/local/ascend_rewards/index.php', $urlparams));
 
 /** --------
  *  USER PARAMS / WHERE FRAGMENTS
@@ -419,7 +435,10 @@ $sql_course = "SELECT cns.id,
                       crs.fullname AS coursename
                  FROM {local_ascend_rewards_coins} cns
                  LEFT JOIN {course} crs ON crs.id = cns.courseid
-                WHERE cns.userid = :uid {$where_course_cns} AND cns.courseid > 0
+                WHERE cns.userid = :uid {$where_course_cns}
+                  AND cns.courseid > 0
+                  AND cns.badgeid > 0
+                  AND cns.coins > 0
              ORDER BY crs.fullname ASC, cns.timecreated DESC";
 
 $rows_course = $DB->get_records_sql($sql_course, $paramscourse);
@@ -427,15 +446,15 @@ $rows_course = $DB->get_records_sql($sql_course, $paramscourse);
 $bycourse = [];
 foreach ($rows_course as $r) {
     $name  = $badgenames_map_full[(int)$r->badgeid] ?? 'Coin Transaction';
-    $name  = apex_normalize_badge_name($name);
+    $name  = local_ascend_rewards_normalize_badge_name($name);
     $bucket = $r->coursename;
     if (!$bucket) continue;  // Skip if no course name
     if (!isset($bycourse[$bucket])) {
         $bycourse[$bucket] = [];
     }
     $r->badgename_display = $name;
-    $r->icon_url          = apex_badge_icon_url($name, $badge_images, $pixbase, $coin_fallback)->out(false);
-    $r->formatted_date    = apex_fmt_date((int)$r->timecreated);
+    $r->icon_url          = local_ascend_rewards_badge_icon_url($name, $badge_images, $pixbase, $coin_fallback)->out(false);
+    $r->formatted_date    = local_ascend_rewards_fmt_date((int)$r->timecreated);
     $r->coins_text        = (((int)$r->coins) > 0 ? '+' : '') . (int)$r->coins;
     $bycourse[$bucket][]  = $r;
 }
@@ -489,15 +508,16 @@ $badge_categories = [
 /** ------------------------------------------------------------------------
  *  CELEBRATION FLAG
  *  --------------------------------------------------------------------- */
-$celebratesince   = (int)get_user_preferences('ascendassets_lastcoin', 0, $USER->id);
-$showcelebration  = ($celebratesince > 0 && (time() - $celebratesince) <= 7 * DAYSECS);
-
-// Compute whether the current user has earned badges this week (gameboard logic)
+$celebratesince = (int)get_user_preferences('ascendassets_lastcoin', 0, $USER->id);
+$has_earned = false;
 try {
-  $has_earned = local_ascend_rewards_gameboard::has_earned_badges_this_week($USER->id);
+    $has_earned = local_ascend_rewards_gameboard::has_earned_badges_this_week($USER->id);
 } catch (Exception $e) {
-  $has_earned = false;
+    $has_earned = false;
 }
+
+// Keep celebration and gameboard eligibility in the exact same weekly window.
+$showcelebration = $has_earned;
 
 /** ------------------------------------------------------------------------
  *  TEMPLATE CONTEXT
@@ -518,7 +538,6 @@ $leaderboard_mode_label = get_string('leaderboard_top10_label', 'local_ascend_re
 if (!is_null($courseid) && !empty($selectedcoursename)) {
     $leaderboard_mode_label = get_string('leaderboard_top10_course_label', 'local_ascend_rewards', $selectedcoursename);
 }
-$leaderboard_mode_label_js = json_encode('(' . $leaderboard_mode_label . ')');
 
 // Leaderboard context label
 $leaderboard_context_label = !is_null($courseid) && !empty($selectedcoursename)
@@ -536,8 +555,7 @@ foreach ($top10 as $row) {
     $display_xp = isset($row->xp) ? (int)$row->xp : 0;
     $top10_list[] = [
         'is_current_user' => $is_current_user,
-        'row_style' => $is_current_user ? 'background:linear-gradient(135deg,rgba(255,0,170,0.12) 0%,rgba(0,212,255,0.12) 100%);border:2px solid #FF00AA;box-shadow:0 0 24px rgba(255,0,170,0.4), inset 0 1px 0 rgba(255,255,255,0.1);' : '',
-        'pos_label' => apex_medal_for_place($rank),
+        'pos_label' => local_ascend_rewards_medal_for_place($rank),
         'display_name' => $is_current_user ? $you_label : ($user_number_prefix . (int)$row->userid),
         'user_id' => (int)$USER->id,
         'grad_id' => 'xpIconGradLB' . $rank,
@@ -549,7 +567,7 @@ foreach ($top10 as $row) {
 $current_user_entry = null;
 if ($current_user_data !== null) {
     $current_user_entry = [
-        'pos_label' => apex_medal_for_place((int)$current_user_data->rank),
+        'pos_label' => local_ascend_rewards_medal_for_place((int)$current_user_data->rank),
         'you_label' => $you_label,
         'user_id' => (int)$USER->id,
         'xp_display' => number_format((int)$current_user_data->xp),
@@ -618,7 +636,7 @@ foreach ($bycourse as $coursename => $list) {
         }
         $categories[] = [
             'name' => format_string($category_label),
-            'color' => $category_colors[$category_key] ?? '#A5B4D6',
+            'color_class' => 'aa-category-' . $category_key,
             'badges' => $badges_list,
         ];
     }
@@ -699,8 +717,24 @@ $avatar_levels = [
 ];
 
 $avatar_pets_catalog = [
-    100 => ['name' => 'Lynx', 'avatar' => 'elf.png', 'level' => 1, 'icon' => 'pets/lynx.png', 'video' => 'pets/videos/lynx.mp4', 'download_image' => 'pets/pets_circular/lynx.png', 'price' => 300],
-    102 => ['name' => 'Hamster', 'avatar' => 'imp.png', 'level' => 1, 'icon' => 'pets/hamster.png', 'video' => 'pets/videos/hamster.mp4', 'download_image' => 'pets/pets_circular/hamster.png', 'price' => 300],
+    100 => [
+        'name' => 'Lynx',
+        'avatar' => 'elf.png',
+        'level' => 1,
+        'icon' => 'pets/lynx.png',
+        'video' => 'pets/videos/lynx.mp4',
+        'download_image' => 'pets/pets_circular/lynx.png',
+        'price' => 300,
+    ],
+    102 => [
+        'name' => 'Hamster',
+        'avatar' => 'imp.png',
+        'level' => 1,
+        'icon' => 'pets/hamster.png',
+        'video' => 'pets/videos/hamster.mp4',
+        'download_image' => 'pets/pets_circular/hamster.png',
+        'price' => 300,
+    ],
 ];
 
 $villain_catalog = [
@@ -840,7 +874,7 @@ for ($lv = 1; $lv <= 6; $lv++) {
             $pet_icon_path = str_replace('pets/', '', $pet_data['icon']);
             $pet_url = (new moodle_url("/local/ascend_rewards/pix/pets/{$pet_icon_path}"))->out(false);
             $avatar_filename = str_replace(['.png', '.jpeg'], '', $pet_data['avatar']);
-            $avatar_circular_url = (new moodle_url("/local/ascend_rewards/pix/Avatars/circular avatars/{$avatar_filename}.png"))->out(false);
+            $avatar_circular_url = (new moodle_url("{$avatar_circular_dir}/{$avatar_filename}.png"))->out(false);
 
             $pet_context = [
                 'id' => $pet_id,
@@ -867,11 +901,12 @@ for ($lv = 1; $lv <= 6; $lv++) {
         if ($villain_data) {
             $villain_name = $villain_data['name'];
             $villain_icon_path = str_replace('villains/', '', $villain_data['icon']);
+            $villain_icon_name = pathinfo($villain_icon_path, PATHINFO_FILENAME);
             $villain_url = (new moodle_url("/local/ascend_rewards/pix/villains/{$villain_icon_path}"))->out(false);
             $villain_pet_icon = $pet_data ? str_replace('pets/', '', $pet_data['icon']) : '';
             $villain_pet_url = $pet_data ? (new moodle_url("/local/ascend_rewards/pix/pets/{$villain_pet_icon}"))->out(false) : '';
             $villain_avatar_filename = $villain_data['avatar'] ? str_replace(['.png', '.jpeg'], '', $villain_data['avatar']) : '';
-            $villain_avatar_circular_url = $villain_avatar_filename ? (new moodle_url("/local/ascend_rewards/pix/Avatars/circular avatars/{$villain_avatar_filename}.png"))->out(false) : '';
+            $villain_avatar_circular_url = $villain_avatar_filename ? (new moodle_url("{$avatar_circular_dir}/{$villain_avatar_filename}.png"))->out(false) : '';
 
             $story = null;
             $set_complete = $is_unlocked && $has_pet_unlocked && $has_villain_unlocked;
@@ -889,7 +924,7 @@ for ($lv = 1; $lv <= 6; $lv++) {
                 'name' => $villain_name,
                 'price' => (int)$villain_data['price'],
                 'pet_id' => (int)$villain_data['pet_id'],
-                'icon_name' => $villain_icon_path,
+                'icon_name' => $villain_icon_name,
                 'card_class' => $has_villain_unlocked ? 'owned' : 'locked',
                 'cursor' => ($can_unlock_villain && !$has_villain_unlocked) ? 'pointer' : 'default',
                 'can_unlock_flag' => $can_unlock_villain ? '1' : '0',
@@ -967,7 +1002,7 @@ foreach ([7, 8, 9] as $epic_lv) {
         $pet_icon_path = str_replace('pets/', '', $pet_data['icon']);
         $pet_url = (new moodle_url("/local/ascend_rewards/pix/pets/{$pet_icon_path}"))->out(false);
         $avatar_filename = str_replace(['.png', '.jpeg'], '', $pet_data['avatar']);
-        $avatar_circular_url = (new moodle_url("/local/ascend_rewards/pix/Avatars/circular avatars/{$avatar_filename}.png"))->out(false);
+        $avatar_circular_url = (new moodle_url("{$avatar_circular_dir}/{$avatar_filename}.png"))->out(false);
         $pet_avatar_unlocked = in_array($pet_data['avatar'], $unlocked_avatars);
 
         $pet_list[] = [
@@ -992,12 +1027,13 @@ foreach ([7, 8, 9] as $epic_lv) {
         $villain_name = $villain_data['name'];
         $is_owned = in_array($villain_id, $owned_villains);
         $villain_icon_path = str_replace('villains/', '', $villain_data['icon']);
+        $villain_icon_name = pathinfo($villain_icon_path, PATHINFO_FILENAME);
         $villain_url = (new moodle_url("/local/ascend_rewards/pix/villains/{$villain_icon_path}"))->out(false);
         $pet_data = $villain_data['pet_id'] ? ($avatar_pets_catalog[$villain_data['pet_id']] ?? null) : null;
         $pet_icon = $pet_data ? str_replace('pets/', '', $pet_data['icon']) : '';
         $pet_url = $pet_data ? (new moodle_url("/local/ascend_rewards/pix/pets/{$pet_icon}"))->out(false) : '';
         $avatar_filename = $villain_data['avatar'] ? str_replace(['.png', '.jpeg'], '', $villain_data['avatar']) : '';
-        $avatar_circular_url = $avatar_filename ? (new moodle_url("/local/ascend_rewards/pix/Avatars/circular avatars/{$avatar_filename}.png"))->out(false) : '';
+        $avatar_circular_url = $avatar_filename ? (new moodle_url("{$avatar_circular_dir}/{$avatar_filename}.png"))->out(false) : '';
         $villain_pet_owned = $villain_data['pet_id'] && in_array($villain_data['pet_id'], $owned_pets);
 
         $villain_list[] = [
@@ -1005,7 +1041,7 @@ foreach ([7, 8, 9] as $epic_lv) {
             'name' => $villain_name,
             'price' => (int)$villain_data['price'],
             'pet_id' => (int)$villain_data['pet_id'],
-            'icon_name' => $villain_icon_path,
+            'icon_name' => $villain_icon_name,
             'card_class' => $is_owned ? 'owned' : 'locked',
             'cursor' => ($villain_pet_owned && !$is_owned) ? 'pointer' : 'default',
             'can_unlock_flag' => $villain_pet_owned ? '1' : '0',
@@ -1031,6 +1067,83 @@ foreach ([7, 8, 9] as $epic_lv) {
         'villains' => $villain_list,
     ];
 }
+
+$modal_strings = [
+    'alertTitle' => get_string('alert_title', 'local_ascend_rewards'),
+    'errorTitle' => get_string('error_title', 'local_ascend_rewards'),
+    'noTokensAvailable' => get_string('modal_no_tokens_available', 'local_ascend_rewards'),
+    'unlockAvatarTitle' => get_string('modal_unlock_avatar_title', 'local_ascend_rewards', (object) [
+        'name' => '{name}',
+    ]),
+    'unlockAvatarLevelNote' => get_string('modal_unlock_avatar_level_note', 'local_ascend_rewards', (object) [
+        'level' => '{level}',
+    ]),
+    'unlockAvatarButton' => get_string('modal_unlock_avatar_button', 'local_ascend_rewards'),
+    'unlockAvatarNote' => get_string('modal_unlock_avatar_note', 'local_ascend_rewards'),
+    'unlockingLabel' => get_string('unlocking_label', 'local_ascend_rewards'),
+    'processingLabel' => get_string('processing_label', 'local_ascend_rewards'),
+    'errorPrefix' => get_string('error_prefix', 'local_ascend_rewards'),
+    'errorUnlockAvatar' => get_string('modal_error_unlock_avatar', 'local_ascend_rewards'),
+    'avatarUnlockedTitle' => get_string('modal_avatar_unlocked_title', 'local_ascend_rewards', (object) [
+        'name' => '{name}',
+    ]),
+    'avatarPetRevealedTitle' => get_string('modal_avatar_pet_revealed_title', 'local_ascend_rewards', (object) [
+        'name' => '{name}',
+    ]),
+    'avatarPetRevealedText' => get_string('modal_avatar_pet_revealed_text', 'local_ascend_rewards'),
+    'downloadAvatarLabel' => get_string('modal_download_avatar_label', 'local_ascend_rewards'),
+    'avatarUseProfileNote' => get_string('modal_avatar_use_profile_note', 'local_ascend_rewards'),
+    'closeLabel' => get_string('close_label', 'local_ascend_rewards'),
+    'cancelLabel' => get_string('cancel_label', 'local_ascend_rewards'),
+    'petUnlockTitle' => get_string('modal_pet_unlock_title', 'local_ascend_rewards'),
+    'unlockMethodLabel' => get_string('modal_unlock_method_label', 'local_ascend_rewards'),
+    'tokenAvailableLabel' => get_string('modal_token_available_label', 'local_ascend_rewards', (object) [
+        'count' => '{count}',
+    ]),
+    'payCoinsLabel' => get_string('modal_pay_coins_label', 'local_ascend_rewards', (object) [
+        'price' => '{price}',
+        'balance' => '{balance}',
+    ]),
+    'insufficientCoinsLabel' => get_string('modal_insufficient_coins_label', 'local_ascend_rewards', (object) [
+        'price' => '{price}',
+    ]),
+    'useTokenButton' => get_string('modal_use_token_button', 'local_ascend_rewards'),
+    'payButtonLabel' => get_string('modal_pay_button_label', 'local_ascend_rewards', (object) [
+        'price' => '{price}',
+    ]),
+    'errorUnlockPet' => get_string('modal_error_unlock_pet', 'local_ascend_rewards'),
+    'petAdoptedTitle' => get_string('modal_pet_adopted_title', 'local_ascend_rewards'),
+    'petVillainRevealedTitle' => get_string('modal_pet_villain_revealed_title', 'local_ascend_rewards'),
+    'petVillainRevealedText' => get_string('modal_pet_villain_revealed_text', 'local_ascend_rewards'),
+    'downloadPetLabel' => get_string('modal_download_pet_label', 'local_ascend_rewards'),
+    'unlockedWithLabel' => get_string('modal_unlocked_with_label', 'local_ascend_rewards', (object) [
+        'method' => '{method}',
+    ]),
+    'newBalanceLabel' => get_string('modal_new_balance_label', 'local_ascend_rewards', (object) [
+        'balance' => '{balance}',
+        'coinsLabel' => '{coinsLabel}',
+    ]),
+    'continueLabel' => get_string('continue_label', 'local_ascend_rewards'),
+    'villainUnlockTitle' => get_string('modal_villain_unlock_title', 'local_ascend_rewards'),
+    'villainUnlockedTitle' => get_string('modal_villain_unlocked_title', 'local_ascend_rewards'),
+    'villainStorybookUnlockedTitle' => get_string('modal_villain_storybook_unlocked_title', 'local_ascend_rewards'),
+    'villainStorybookUnlockedText' => get_string('modal_villain_storybook_unlocked_text', 'local_ascend_rewards'),
+    'downloadVillainLabel' => get_string('modal_download_villain_label', 'local_ascend_rewards'),
+    'errorUnlockVillain' => get_string('modal_error_unlock_villain', 'local_ascend_rewards'),
+    'tokenLabel' => get_string('token_label', 'local_ascend_rewards'),
+    'coinsLabel' => get_string('coins_label', 'local_ascend_rewards'),
+    'ajaxRequestFailed' => get_string('ajax_request_failed', 'local_ascend_rewards'),
+    'ajaxConfigMissing' => get_string('ajax_config_missing', 'local_ascend_rewards'),
+    'ajaxInvalidJson' => get_string('ajax_invalid_json', 'local_ascend_rewards'),
+    'ajaxNetworkError' => get_string('ajax_network_error', 'local_ascend_rewards'),
+];
+
+$avatar_js_config = json_encode([
+    'tokensAvailable' => $tokens_available,
+    'coinBalance' => (int)$coin_balance,
+    'storyFallbackTitle' => get_string('watch_story_label', 'local_ascend_rewards'),
+    'modalStrings' => $modal_strings,
+]);
 
 $avatar_context = [
     'avatar_icon_url' => $avatar_icon_url,
@@ -1070,14 +1183,11 @@ $avatar_context = [
     'coin_stack_size' => '92px',
     'coins_label' => get_string('coins_label', 'local_ascend_rewards'),
     'watch_story_label' => get_string('watch_story_label', 'local_ascend_rewards'),
-    'tokens_available' => $tokens_available,
-    'coin_balance' => (int)$coin_balance,
-    'modal_not_loaded_label' => get_string('modal_not_loaded_label', 'local_ascend_rewards'),
+    'avatar_js_config' => $avatar_js_config,
     'level_label' => get_string('level_label', 'local_ascend_rewards'),
     'locked_until_label' => get_string('locked_until_label', 'local_ascend_rewards'),
     'epic_level_label' => get_string('epic_level_label', 'local_ascend_rewards'),
     'collection_label' => get_string('collection_label', 'local_ascend_rewards'),
-    'avatar_modals_js_url' => (new moodle_url('/local/ascend_rewards/avatar_modals.js'))->out(false),
 ];
 
 // Store context
@@ -1137,7 +1247,7 @@ foreach ($avatar_pets_catalog as $pet_id => $pet_data) {
     $pet_avatar_circular_url = '';
     if (!empty($pet_data['avatar']) && in_array($pet_data['avatar'], $unlocked_avatars)) {
         $pet_avatar_filename = str_replace(['.png', '.jpeg'], '', $pet_data['avatar']);
-        $pet_avatar_circular_url = (new moodle_url("/local/ascend_rewards/pix/Avatars/circular avatars/{$pet_avatar_filename}.png"))->out(false);
+        $pet_avatar_circular_url = (new moodle_url("{$avatar_circular_dir}/{$pet_avatar_filename}.png"))->out(false);
     }
     $available_pets[] = [
         'id' => $pet_id,
@@ -1174,6 +1284,7 @@ foreach ($villain_catalog as $villain_id => $villain_data) {
     $villain_name = $villain_data['name'];
     $villain_price = (int)$villain_data['price'];
     $villain_icon_path = str_replace('villains/', '', $villain_data['icon']);
+    $villain_icon_name = pathinfo($villain_icon_path, PATHINFO_FILENAME);
     $villain_url = (new moodle_url("/local/ascend_rewards/pix/villains/{$villain_icon_path}"))->out(false);
 
     $villain_avatar_name = '';
@@ -1188,7 +1299,7 @@ foreach ($villain_catalog as $villain_id => $villain_data) {
     $villain_avatar_circular_url = '';
     if ($villain_avatar_name && in_array($villain_avatar_name, $unlocked_avatars)) {
         $villain_avatar_filename = str_replace(['.png', '.jpeg'], '', $villain_avatar_name);
-        $villain_avatar_circular_url = (new moodle_url("/local/ascend_rewards/pix/Avatars/circular avatars/{$villain_avatar_filename}.png"))->out(false);
+        $villain_avatar_circular_url = (new moodle_url("{$avatar_circular_dir}/{$villain_avatar_filename}.png"))->out(false);
     }
 
     $villain_pet_badge_url = '';
@@ -1207,7 +1318,7 @@ foreach ($villain_catalog as $villain_id => $villain_data) {
         'price_display' => number_format($villain_price),
         'level' => $villain_data['level'] ?? 1,
         'image_url' => $villain_url,
-        'icon_name' => $villain_icon_path,
+        'icon_name' => $villain_icon_name,
         'can_afford' => ($coin_balance >= $villain_price),
         'border_color' => '#06b6d4',
         'avatar_badge_url' => $villain_avatar_circular_url ?: null,
@@ -1219,6 +1330,51 @@ foreach ($villain_catalog as $villain_id => $villain_data) {
         'buy_label' => get_string('villain_buy_label', 'local_ascend_rewards', number_format($villain_price)),
     ];
 }
+
+$store_js_config = json_encode([
+    'tokensAvailable' => $tokens_available,
+    'coinBalance' => (int)$coin_balance,
+    'modalStrings' => $modal_strings,
+    'strings' => [
+        'alertTitle' => get_string('alert_title', 'local_ascend_rewards'),
+        'errorTitle' => get_string('error_title', 'local_ascend_rewards'),
+        'closeLabel' => get_string('close_label', 'local_ascend_rewards'),
+        'confirmTitle' => get_string('confirm_title', 'local_ascend_rewards'),
+        'purchaseConfirmActionLabel' => get_string('purchase_confirm_action_label', 'local_ascend_rewards'),
+        'expiredLabel' => get_string('expired_label', 'local_ascend_rewards'),
+        'purchaseConfirmPrefix' => get_string('purchase_confirm_prefix', 'local_ascend_rewards'),
+        'purchaseConfirmMid' => get_string('purchase_confirm_mid', 'local_ascend_rewards'),
+        'purchaseConfirmSuffix' => get_string('purchase_confirm_suffix', 'local_ascend_rewards'),
+        'processingLabel' => get_string('processing_label', 'local_ascend_rewards'),
+        'purchaseSuccessLabel' => get_string('purchase_success_label', 'local_ascend_rewards'),
+        'remainingBalanceLabel' => get_string('remaining_balance_label', 'local_ascend_rewards'),
+        'errorPrefix' => get_string('error_prefix', 'local_ascend_rewards'),
+        'purchaseErrorLabel' => get_string('purchase_error_label', 'local_ascend_rewards'),
+        'purchaseProcessingErrorLabel' => get_string('purchase_processing_error_label', 'local_ascend_rewards'),
+        'purchaseButtonPrefix' => get_string('purchase_button_prefix', 'local_ascend_rewards'),
+        'activationErrorLabel' => get_string('activation_error_label', 'local_ascend_rewards'),
+        'activationProcessingErrorLabel' => get_string('activation_processing_error_label', 'local_ascend_rewards'),
+        'activateLabel' => get_string('activate_label', 'local_ascend_rewards'),
+        'mysteryOpeningLabel' => get_string('mystery_opening_label', 'local_ascend_rewards'),
+        'mysteryErrorCouldNotOpen' => get_string('mystery_error_could_not_open', 'local_ascend_rewards'),
+        'mysteryErrorProcessing' => get_string('mystery_error_processing', 'local_ascend_rewards'),
+        'balanceLabel' => get_string('balance_label', 'local_ascend_rewards'),
+        'newBalanceLabel' => get_string('new_balance_label', 'local_ascend_rewards'),
+        'tokensLabel' => get_string('tokens_label', 'local_ascend_rewards'),
+        'coinsLabel' => get_string('coins_label', 'local_ascend_rewards'),
+        'avatarAltLabel' => get_string('avatar_alt_label', 'local_ascend_rewards'),
+        'ajaxRequestFailed' => get_string('ajax_request_failed', 'local_ascend_rewards'),
+    ],
+    'urls' => [
+        'videoCoinsUrl' => (new moodle_url('/local/ascend_rewards/pix/coins.mp4'))->out(false),
+        'videoTokensUrl' => (new moodle_url('/local/ascend_rewards/pix/token.mp4'))->out(false),
+        'videoHeroUrl' => (new moodle_url('/local/ascend_rewards/pix/hero.mp4'))->out(false),
+        'videoNoRewardUrl' => (new moodle_url('/local/ascend_rewards/pix/no_reward.mp4'))->out(false),
+        'imgStarUrl' => (new moodle_url('/local/ascend_rewards/pix/start.png'))->out(false),
+        'imgCoinsUrl' => (new moodle_url('/local/ascend_rewards/pix/ascend_assets_stack.png'))->out(false),
+        'avatarCircularBaseUrl' => (new moodle_url($avatar_circular_dir . '/'))->out(false),
+    ],
+]);
 
 $store_context = [
     'store_icon_url' => (new moodle_url('/local/ascend_rewards/pix/store.png'))->out(false),
@@ -1258,54 +1414,74 @@ $store_context = [
     'linked_hero_label' => get_string('linked_hero_label', 'local_ascend_rewards'),
     'linked_pet_label' => get_string('linked_pet_label', 'local_ascend_rewards'),
     'coin_stack_url' => $coin_stack_url,
-    'avatar_modals_js_url' => (new moodle_url('/local/ascend_rewards/avatar_modals.js'))->out(false),
-    'tokens_available' => $tokens_available,
-    'coin_balance' => (int)$coin_balance,
-    'modal_not_loaded_label' => get_string('modal_not_loaded_label', 'local_ascend_rewards'),
     'box_label_1' => get_string('box_label_1', 'local_ascend_rewards'),
     'box_label_2' => get_string('box_label_2', 'local_ascend_rewards'),
     'box_label_3' => get_string('box_label_3', 'local_ascend_rewards'),
     'box_label_4' => get_string('box_label_4', 'local_ascend_rewards'),
     'continue_label' => get_string('continue_label', 'local_ascend_rewards'),
-    'expired_label' => get_string('expired_label', 'local_ascend_rewards'),
-    'purchase_confirm_prefix' => get_string('purchase_confirm_prefix', 'local_ascend_rewards'),
-    'purchase_confirm_mid' => get_string('purchase_confirm_mid', 'local_ascend_rewards'),
-    'purchase_confirm_suffix' => get_string('purchase_confirm_suffix', 'local_ascend_rewards'),
-    'processing_label' => get_string('processing_label', 'local_ascend_rewards'),
-    'purchase_success_label' => get_string('purchase_success_label', 'local_ascend_rewards'),
-    'remaining_balance_label' => get_string('remaining_balance_label', 'local_ascend_rewards'),
-    'error_prefix' => get_string('error_prefix', 'local_ascend_rewards'),
-    'purchase_error_label' => get_string('purchase_error_label', 'local_ascend_rewards'),
-    'purchase_processing_error_label' => get_string('purchase_processing_error_label', 'local_ascend_rewards'),
-    'purchase_button_prefix' => get_string('purchase_button_prefix', 'local_ascend_rewards'),
-    'video_coins_url' => (new moodle_url('/local/ascend_rewards/pix/coins.mp4'))->out(false),
-    'video_tokens_url' => (new moodle_url('/local/ascend_rewards/pix/token.mp4'))->out(false),
-    'video_hero_url' => (new moodle_url('/local/ascend_rewards/pix/hero.mp4'))->out(false),
-    'video_no_reward_url' => (new moodle_url('/local/ascend_rewards/pix/no_reward.mp4'))->out(false),
-    'img_star_url' => (new moodle_url('/local/ascend_rewards/pix/start.png'))->out(false),
-    'img_coins_url' => (new moodle_url('/local/ascend_rewards/pix/ascend_assets_stack.png'))->out(false),
-    'img_avatar_url' => (new moodle_url('/local/ascend_rewards/pix/avatar.png'))->out(false),
-    'avatar_circular_base_url' => (new moodle_url('/local/ascend_rewards/pix/Avatars/circular avatars/'))->out(false),
-    'coins_reward_prefix' => get_string('coins_reward_prefix', 'local_ascend_rewards'),
-    'balance_label' => get_string('balance_label', 'local_ascend_rewards'),
-    'tokens_reward_prefix' => get_string('tokens_reward_prefix', 'local_ascend_rewards'),
-    'tokens_balance_label' => get_string('tokens_balance_label', 'local_ascend_rewards'),
-    'tokens_label' => get_string('tokens_label', 'local_ascend_rewards'),
-    'hero_reward_prefix' => get_string('hero_reward_prefix', 'local_ascend_rewards'),
-    'hero_reward_suffix' => get_string('hero_reward_suffix', 'local_ascend_rewards'),
-    'no_reward_label' => get_string('no_reward_label', 'local_ascend_rewards'),
-    'mystery_error_label' => get_string('mystery_error_label', 'local_ascend_rewards'),
-    'mystery_processing_error_label' => get_string('mystery_processing_error_label', 'local_ascend_rewards'),
-    'mystery_generic_error_label' => get_string('mystery_generic_error_label', 'local_ascend_rewards'),
-    'empty_state_icon' => get_string('empty_state_icon', 'local_ascend_rewards'),
-    'mystery_opening_label' => get_string('mystery_opening_label', 'local_ascend_rewards'),
-    'mystery_error_could_not_open' => get_string('mystery_error_could_not_open', 'local_ascend_rewards'),
-    'mystery_error_processing' => get_string('mystery_error_processing', 'local_ascend_rewards'),
-    'mystery_error_network' => get_string('mystery_error_network', 'local_ascend_rewards'),
+    'store_js_config' => $store_js_config,
 ];
 
+$badge_videos = [
+    6 => 'Getting Started/getting_started_2.mp4',
+    5 => 'Halfway Hero/halfway_hero_1.mp4',
+    8 => 'Master Navigator/master_navigator_3.mp4',
+    13 => 'Feedback Follower/feedback_follower_1.mp4',
+    15 => 'Steady Improver/steady_improver_1.mp4',
+    14 => 'Tenacious Tiger/tenacious_tiger_1.mp4',
+    16 => 'Glory Guide/glory_guide_3.mp4',
+];
+
+$index_js_config = json_encode([
+    'alerts' => [
+        'alertTitle' => get_string('alert_title', 'local_ascend_rewards'),
+        'errorTitle' => get_string('error_title', 'local_ascend_rewards'),
+        'closeLabel' => get_string('close_label', 'local_ascend_rewards'),
+        'ajaxRequestFailed' => get_string('ajax_request_failed', 'local_ascend_rewards'),
+    ],
+    'gameboard' => [
+        'successText' => get_string('gameboard_success_text', 'local_ascend_rewards'),
+        'errorPrefix' => get_string('gameboard_error_prefix', 'local_ascend_rewards'),
+        'genericError' => get_string('gameboard_generic_error', 'local_ascend_rewards'),
+        'processingErrorPrefix' => get_string('gameboard_processing_error_prefix', 'local_ascend_rewards'),
+        'coinAltLabel' => get_string('coin_label_singular', 'local_ascend_rewards'),
+        'coinIconUrl' => (new moodle_url('/local/ascend_rewards/pix/ascend_coin_main.png'))->out(false),
+    ],
+    'badgeModal' => [
+        'badgeVideos' => $badge_videos,
+        'metaBadgeIds' => [8, 16],
+        'knownBadgeNames' => array_keys($badge_definitions),
+        'moreActivitiesTemplate' => str_replace('{$a}', '{count}', get_string('more_activities_label', 'local_ascend_rewards')),
+        'awardLabelPrefix' => get_string('award_number_label_prefix', 'local_ascend_rewards'),
+        'awardLabelSuffix' => get_string('award_number_label_suffix', 'local_ascend_rewards'),
+        'xpLabel' => get_string('xp_label', 'local_ascend_rewards'),
+        'coinsLabel' => get_string('coins_label', 'local_ascend_rewards'),
+        'assetsLabel' => get_string('assets_label', 'local_ascend_rewards'),
+        'badgeLabel' => get_string('badge_label', 'local_ascend_rewards'),
+        'badgeCategoryDefault' => get_string('badge_category_default', 'local_ascend_rewards'),
+        'failedLabel' => get_string('failed_label', 'local_ascend_rewards'),
+        'passedLabel' => get_string('passed_label', 'local_ascend_rewards'),
+    ],
+    'leaderboard' => [
+        'courseId' => (int)($courseid ?? 0),
+        'userId' => (int)$USER->id,
+        'leaderboardRangeLabel' => get_string('leaderboard_range_label', 'local_ascend_rewards'),
+        'leaderboardModeLabel' => '(' . $leaderboard_mode_label . ')',
+        'leaderboardLoadingLabel' => get_string('leaderboard_loading_label', 'local_ascend_rewards'),
+        'leaderboardContextErrorLabel' => get_string('leaderboard_context_error_label', 'local_ascend_rewards'),
+        'leaderboardContextViewErrorLabel' => get_string('leaderboard_context_view_error_label', 'local_ascend_rewards'),
+        'youLabel' => $you_label,
+        'userNumberPrefix' => $user_number_prefix,
+        'userIdBadgeLabel' => get_string('user_id_badge_label', 'local_ascend_rewards'),
+    ],
+    'instructions' => [
+        'windowName' => 'ascend_instructions',
+        'windowFeatures' => 'width=1600,height=900,scrollbars=yes,resizable=yes',
+    ],
+]);
+
 $templatecontext = [
-    'instructions_url' => (new moodle_url('/local/ascend_rewards/html/index.html'))->out(false),
+    'instructions_url' => (new moodle_url('/local/ascend_rewards/instructions.php'))->out(false),
     'instructions_icon_url' => (new moodle_url('/local/ascend_rewards/pix/instructions.png'))->out(false),
     'instructions_text' => get_string('instructions_text', 'local_ascend_rewards'),
     'show_congrats' => ($has_earned || $show_level_up),
@@ -1388,22 +1564,11 @@ $templatecontext = [
     'meta_picks_label' => get_string('meta_picks_label', 'local_ascend_rewards'),
     'gameboard' => $gameboard,
     'gameboard_locked_label' => get_string('gameboard_locked_label', 'local_ascend_rewards'),
-    'gameboard_success_text' => json_encode(get_string('gameboard_success_text', 'local_ascend_rewards')),
-    'gameboard_error_prefix' => json_encode(get_string('gameboard_error_prefix', 'local_ascend_rewards')),
-    'gameboard_generic_error' => json_encode(get_string('gameboard_generic_error', 'local_ascend_rewards')),
-    'gameboard_processing_error_prefix' => json_encode(get_string('gameboard_processing_error_prefix', 'local_ascend_rewards')),
-    'avatar_modals_js_url' => (new moodle_url('/local/ascend_rewards/avatar_modals.js'))->out(false),
     'level_up_audio_url' => (new moodle_url('/local/ascend_rewards/pix/level_up.mp3'))->out(false),
     'stack_fallback_url' => $stack_fallback->out(false),
     'avatar' => $avatar_context,
     'store' => $store_context,
-    'js' => [
-        'courseid' => (int)($courseid ?? 0),
-        'leaderboard_url' => json_encode((new moodle_url('/local/ascend_rewards/index.php'))->out(false)),
-        'user_id' => (int)$USER->id,
-        'leaderboard_mode_label' => $leaderboard_mode_label_js,
-        'leaderboard_range_label' => json_encode(get_string('leaderboard_range_label', 'local_ascend_rewards')),
-    ],
+    'index_js_config' => $index_js_config,
 ];
 
 /** ------------------------------------------------------------------------

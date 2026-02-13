@@ -47,6 +47,6 @@ Each pet should:
 
 ## File Locations
 
-- Pet images go here: `/local/apex_rewards/pix/pets/`
-- Avatar images: `/local/apex_rewards/pix/Avatars/`
-- Other store icons: `/local/apex_rewards/pix/`
+- Pet images go here: `/local/ascend_rewards/pix/pets/`
+- Avatar images: `/local/ascend_rewards/pix/Avatars/`
+- Other store icons: `/local/ascend_rewards/pix/`

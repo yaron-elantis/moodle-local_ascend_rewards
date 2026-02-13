@@ -70,7 +70,7 @@ function xmldb_local_ascend_rewards_upgrade($oldversion) {
 
         // Seed issuer defaults.
         if (!get_config('local_ascend_rewards', 'issuername')) {
-            set_config('issuername', 'Apex Rewards', 'local_ascend_rewards');
+            set_config('issuername', 'Ascend Rewards', 'local_ascend_rewards');
         }
         if (!get_config('local_ascend_rewards', 'issuercontact')) {
             set_config('issuercontact', 'noreply@example.com', 'local_ascend_rewards');
@@ -378,6 +378,26 @@ function xmldb_local_ascend_rewards_upgrade($oldversion) {
         }
 
         upgrade_plugin_savepoint(true, 2025121001, 'local', 'ascend_rewards');
+    }
+
+    if ($oldversion < 2026021000) {
+        // Ensure view capability is granted to authenticated users by default.
+        global $CFG;
+        require_once($CFG->libdir . '/accesslib.php');
+        $context = context_system::instance();
+        $roleids = [];
+        foreach (['user', 'student', 'teacher', 'editingteacher', 'manager', 'guest'] as $archetype) {
+            $roles = get_archetype_roles($archetype);
+            foreach ($roles as $role) {
+                $roleids[$role->id] = true;
+            }
+        }
+
+        foreach (array_keys($roleids) as $roleid) {
+            assign_capability('local/ascend_rewards:view', CAP_ALLOW, $roleid, $context->id, true);
+        }
+
+        upgrade_plugin_savepoint(true, 2026021000, 'local', 'ascend_rewards');
     }
 
     return true;

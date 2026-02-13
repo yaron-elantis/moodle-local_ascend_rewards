@@ -15,9 +15,11 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Store Item Purchase Handler
+ * Legacy AJAX endpoint for purchasing store items.
  *
- * Handles purchasing of store items with coins.
+ * This wrapper is kept for backward compatibility and delegates to
+ * local_ascend_rewards\ajax_service. New code should use the external
+ * service: local_ascend_rewards_store_purchase.
  *
  * @package    local_ascend_rewards
  * @copyright 2026 Elantis (Pty) LTD
@@ -26,113 +28,32 @@
 
 define('AJAX_SCRIPT', true);
 require_once(__DIR__ . '/../../config.php');
+defined('MOODLE_INTERNAL') || die();
 require_login();
-// Preserve naming and comment separators without altering behavior.
-// phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
-// phpcs:disable moodle.Commenting.InlineComment.InvalidEndChar,moodle.Commenting.InlineComment.NotCapital
-// phpcs:disable moodle.Files.LineLength.MaxExceeded,moodle.Files.LineLength.TooLong
-
-global $DB, $USER;
+$context = context_system::instance();
+require_capability('local/ascend_rewards:view', $context);
 
 header('Content-Type: application/json');
 
-// Get item ID from POST
-$item_id = required_param('item_id', PARAM_INT);
-
-// Store items with their prices
-$store_items = [
-    4 => ['name' => 'XP Multiplier (24h)', 'price' => 250],
-];
-
-// Check if item exists
-if (!isset($store_items[$item_id])) {
-    echo json_encode(['success' => false, 'error' => 'Invalid item']);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode([
+        'success' => false,
+        'error' => get_string('ajax_method_not_allowed', 'local_ascend_rewards'),
+    ]);
     exit;
 }
 
-$item_price = $store_items[$item_id]['price'];
+try {
+    require_sesskey();
 
-// Get current coins from database
-$current_coins = (int)$DB->get_field_sql(
-    "SELECT COALESCE(SUM(coins), 0)
-       FROM {local_ascend_rewards_coins}
-      WHERE userid = :uid",
-    ['uid' => $USER->id]
-);
-
-// Check if user has enough coins
-if ($current_coins < $item_price) {
-    echo json_encode(['success' => false, 'error' => 'Not enough coins']);
-    exit;
+    $itemid = required_param('item_id', PARAM_INT);
+    $result = \local_ascend_rewards\ajax_service::store_purchase($itemid);
+    echo json_encode($result);
+} catch (\Throwable $t) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => get_string('ajax_server_error', 'local_ascend_rewards'),
+    ]);
 }
-
-// Deduct coins by inserting a negative transaction
-$DB->insert_record('local_ascend_rewards_coins', (object)[
-    'userid' => $USER->id,
-    'coins' => -$item_price,
-    'reason' => 'store_purchase_item_' . $item_id,
-    'courseid' => 0,
-    'timecreated' => time(),
-]);
-
-// Calculate new balance after purchase
-$new_coins = (int)$DB->get_field_sql(
-    "SELECT COALESCE(SUM(coins), 0)
-       FROM {local_ascend_rewards_coins}
-      WHERE userid = :uid",
-    ['uid' => $USER->id]
-);
-
-// Add to inventory
-$inventory_str = get_user_preferences('ascend_store_inventory', '', $USER->id);
-$inventory = $inventory_str ? json_decode($inventory_str, true) : [];
-
-if (!isset($inventory[$item_id])) {
-    $inventory[$item_id] = 0;
-}
-$inventory[$item_id]++;
-
-set_user_preference('ascend_store_inventory', json_encode($inventory), $USER->id);
-
-// Auto-activate if it's the XP multiplier (item 4)
-if ($item_id == 4) {
-    // Check if already active
-    $current_end = get_user_preferences('ascend_xp_multiplier_end', 0, $USER->id);
-
-    if ($current_end > time()) {
-        // Already active - extend it by 24 hours
-        $new_end = $current_end + (24 * 60 * 60);
-    } else {
-        // Not active - activate for 24 hours from now
-        $new_end = time() + (24 * 60 * 60);
-    }
-
-    // Set the new expiration time
-    set_user_preference('ascend_xp_multiplier_end', $new_end, $USER->id);
-
-    // Remove one from inventory and track activation
-    $inventory[$item_id]--;
-    if ($inventory[$item_id] <= 0) {
-        unset($inventory[$item_id]);
-    }
-    set_user_preference('ascend_store_inventory', json_encode($inventory), $USER->id);
-
-    // Track activation
-    $activated_items_str = get_user_preferences('ascend_store_activated', '', $USER->id);
-    $activated_items = $activated_items_str ? json_decode($activated_items_str, true) : [];
-
-    if (!isset($activated_items[$item_id])) {
-        $activated_items[$item_id] = [];
-    }
-    $activated_items[$item_id][] = [
-        'activated_at' => time(),
-        'expires_at' => $new_end,
-    ];
-    set_user_preference('ascend_store_activated', json_encode($activated_items), $USER->id);
-}
-
-// Return success with remaining coins
-echo json_encode([
-    'success' => true,
-    'remaining_coins' => $new_coins,
-]);

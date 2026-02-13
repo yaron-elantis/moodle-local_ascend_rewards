@@ -211,24 +211,25 @@ class badge_cache_helper {
 
         $count = 0;
 
-        // Get all badge awards that need cache
-        // Use badgeid as first column in SELECT DISTINCT for uniqueness
-        $sql = "SELECT DISTINCT bc.id, c.userid, c.courseid, c.badgeid
+        // Get all badge awards that need cache.
+        // Use grouping to stay compatible with PostgreSQL ordering rules.
+        $sql = "SELECT c.userid, c.courseid, c.badgeid, MAX(c.timecreated) AS timecreated
                   FROM {local_ascend_rewards_coins} c
                   LEFT JOIN {local_ascend_rewards_badge_cache} bc
                     ON bc.userid = c.userid
                    AND bc.courseid = c.courseid
                    AND bc.badgeid = c.badgeid
                  WHERE bc.id IS NULL
-              ORDER BY c.timecreated DESC";
+              GROUP BY c.userid, c.courseid, c.badgeid
+              ORDER BY timecreated DESC";
 
-        $awards = $DB->get_records_sql($sql, [], 0, $limit);
-
+        $awards = $DB->get_recordset_sql($sql, [], 0, $limit);
         foreach ($awards as $award) {
             if (self::populate_cache($award->userid, $award->courseid, $award->badgeid)) {
                 $count++;
             }
         }
+        $awards->close();
 
         return $count;
     }

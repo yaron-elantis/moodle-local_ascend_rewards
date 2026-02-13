@@ -15,9 +15,11 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * AJAX handler for gameboard card picks.
+ * Legacy AJAX endpoint for gameboard card picks.
  *
- * Receives position from JavaScript and processes the pick.
+ * This wrapper is kept for backward compatibility and delegates to
+ * local_ascend_rewards\ajax_service. New code should use the external
+ * service: local_ascend_rewards_gameboard_pick.
  *
  * @package   local_ascend_rewards
  * @copyright 2026 Elantis (Pty) LTD
@@ -26,68 +28,26 @@
 
 define('AJAX_SCRIPT', true);
 require_once(__DIR__ . '/../../config.php');
+defined('MOODLE_INTERNAL') || die();
 require_login();
-// Preserve legacy naming and inline comment separators.
-// phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
-// phpcs:disable moodle.Commenting.InlineComment.InvalidEndChar,moodle.Commenting.InlineComment.NotCapital
-// phpcs:disable moodle.Files.LineLength.MaxExceeded,moodle.Files.LineLength.TooLong
-
-global $USER, $DB;
+$context = context_system::instance();
+require_capability('local/ascend_rewards:view', $context);
 
 header('Content-Type: application/json');
 
-// Get position from POST
-$position = optional_param('position', -1, PARAM_INT);
-
-if ($position < 0 || $position >= 16) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Invalid position']);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'error' => 'Method not allowed']);
     exit;
 }
 
 try {
-    // Import gameboard class
-    require_once(__DIR__ . '/classes/gameboard.php');
+    require_sesskey();
 
-    // Make the pick
-    $result = local_ascend_rewards_gameboard::make_pick($USER->id, $position);
-
-    if ($result['success']) {
-        // Add coins to user's balance (update coins spendable balance)
-        $coins_to_add = (int)$result['coins'];
-
-        // Get current balance
-        $current_balance = (int)get_user_preferences('ascend_coins_balance', 0, $USER->id);
-        $new_balance = $current_balance + $coins_to_add;
-
-        // Update balance preference
-        set_user_preference('ascend_coins_balance', $new_balance, $USER->id);
-
-        debugging(
-            "ascend_rewards: user {$USER->id} picked {$position}, +{$coins_to_add} coins, balance={$new_balance}",
-            DEBUG_DEVELOPER,
-        );
-
-        http_response_code(200);
-        echo json_encode([
-            'success' => true,
-            'coins' => $coins_to_add,
-            'remaining' => $result['remaining'],
-            'new_balance' => $new_balance,
-        ]);
-    } else {
-        http_response_code(200);
-        echo json_encode([
-            'success' => false,
-            'error' => $result['error'] ?? 'Could not make pick',
-        ]);
-    }
-} catch (Exception $e) {
-    debugging('ascend_rewards gameboard_pick error: ' . $e->getMessage(), DEBUG_DEVELOPER);
-    http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Server error: ' . $e->getMessage()]);
-} catch (Throwable $t) {
-    debugging('ascend_rewards gameboard_pick fatal: ' . $t->getMessage(), DEBUG_DEVELOPER);
+    $position = optional_param('position', -1, PARAM_INT);
+    $result = \local_ascend_rewards\ajax_service::gameboard_pick($position);
+    echo json_encode($result);
+} catch (\Throwable $t) {
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Server error']);
 }

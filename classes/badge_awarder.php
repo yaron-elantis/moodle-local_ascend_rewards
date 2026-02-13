@@ -41,8 +41,6 @@ defined('MOODLE_INTERNAL') || die();
 // phpcs:disable moodle.Commenting.InlineComment.NotCapital,moodle.Commenting.DocblockDescription.Missing
 // phpcs:disable moodle.ControlStructures.ControlSignature.Found,Squiz.ControlStructures.ControlSignature.SpaceAfterCloseBrace
 
-require_once(__DIR__ . '/performance_cache.php');
-
 require_once($CFG->dirroot . '/grade/lib.php');
 require_once($CFG->dirroot . '/mod/assign/locallib.php');
 require_once($CFG->dirroot . '/lib/accesslib.php');
@@ -487,7 +485,7 @@ class badge_awarder {
         $params = [$userid];
 
         if ($courseid !== null) {
-            $sql .= " AND courseid = ?";
+            $sql .= ' AND courseid = ?';
             $params[] = $courseid;
         }
 
@@ -648,7 +646,6 @@ class badge_awarder {
 
                 // Cache all awarded activities with proper metadata
                 try {
-                    require_once($CFG->dirroot . '/local/ascend_rewards/classes/badge_cache_helper.php');
                     \local_ascend_rewards\badge_cache_helper::store_cache($userid, $cid, $badgeid, $all_awarded_array, $cache_metadata);
                 } catch (\Exception $e) {
                     self::log($userid, $badgeid, 'warning', 'Cache storage failed: ' . $e->getMessage());
@@ -664,7 +661,6 @@ class badge_awarder {
                     ];
                 }
                 try {
-                    require_once($CFG->dirroot . '/local/ascend_rewards/classes/badge_cache_helper.php');
                     \local_ascend_rewards\badge_cache_helper::store_cache($userid, $cid, $badgeid, $contributing_activities, $cache_metadata);
                 } catch (\Exception $e) {
                     self::log($userid, $badgeid, 'warning', 'Cache storage failed: ' . $e->getMessage());
@@ -992,10 +988,18 @@ class badge_awarder {
              WHERE cm.course = :c AND cmc.userid = :u AND cmc.completionstate >= 1
         ", ['c' => $courseid, 'u' => $userid]));
         $pct = round(100.0 * $completed / max(1, $tot), 2);
-        return ['result' => ($pct >= 50.0), 'debug' => "Halfway Hero: completed={$completed}/{$tot} = {$pct}% (need >=50%)."];
+        $debug = "Halfway Hero: completed={$completed}/{$tot} = {$pct}% (need >=50%).";
+        return ['result' => ($pct >= 50.0), 'debug' => $debug];
     }
 
-    private static function check_feedback_follower(int $userid, int $courseid, array $course_activities = [], array $course_completions = [], array $course_grades = [], bool $skip_awarded_filter = false) {
+    private static function check_feedback_follower(
+        int $userid,
+        int $courseid,
+        array $course_activities = [],
+        array $course_completions = [],
+        array $course_grades = [],
+        bool $skip_awarded_filter = false
+    ) {
         global $DB;
 
         // Get already awarded activities for this badge (unless we're checking for revocation)
@@ -1254,14 +1258,22 @@ class badge_awarder {
             }
         }
 
+        $debug = "Tenacious Tiger: improved_activities={$improved} (need >=2 activities with improvement).";
         return [
             'result' => ($improved >= 2),
-            'debug' => "Tenacious Tiger: improved_activities={$improved} (need >=2 activities with improvement).",
+            'debug' => $debug,
             'activities' => $improved_activities,
         ];
     }
 
-    private static function check_steady_improver(int $userid, int $courseid, array $course_activities = [], array $course_completions = [], array $course_grades = [], bool $skip_awarded_filter = false) {
+    private static function check_steady_improver(
+        int $userid,
+        int $courseid,
+        array $course_activities = [],
+        array $course_completions = [],
+        array $course_grades = [],
+        bool $skip_awarded_filter = false
+    ) {
         global $DB;
 
         // Get already awarded activities for this badge (unless we're checking for revocation)

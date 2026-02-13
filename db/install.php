@@ -23,7 +23,6 @@
  * @copyright 2026 Elantis (Pty) LTD
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 // phpcs:disable moodle.Files.LineLength.MaxExceeded,moodle.Files.LineLength.TooLong
 // phpcs:disable moodle.Commenting.InlineComment.InvalidEndChar,moodle.Commenting.InlineComment.NotCapital
 
@@ -32,14 +31,26 @@
  *
  * @return bool True on success
  */
-defined('MOODLE_INTERNAL') || die();
-
 function xmldb_local_ascend_rewards_install() {
     global $DB;
 
+    $dbman = $DB->get_manager();
+
+    if (
+        !$dbman->table_exists('user_preferences') ||
+        !$dbman->table_exists('local_ascend_rewards_level_tokens')
+    ) {
+        return true;
+    }
+
     // Backfill level tokens from stored user level preference on fresh install.
     $now = time();
-    $levelprefs = $DB->get_records('user_preferences', ['name' => 'ascend_current_level']);
+    try {
+        $levelprefs = $DB->get_records('user_preferences', ['name' => 'ascend_current_level'], '', 'id, userid, value');
+    } catch (dml_exception $e) {
+        // If a replica/read failure occurs during install, skip backfill to avoid blocking install.
+        return true;
+    }
 
     foreach ($levelprefs as $pref) {
         // Skip if value is not numeric or is zero.

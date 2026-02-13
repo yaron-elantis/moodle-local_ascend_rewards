@@ -69,7 +69,7 @@ if ($hassiteconfig) {
         'local_ascend_rewards_dashboard',
         get_string('admin_dashboard', 'local_ascend_rewards'),
         new moodle_url('/local/ascend_rewards/admin_dashboard.php'),
-        'moodle/site:config'
+        'local/ascend_rewards:manage'
     ));
 
     // === ADD AUDIT TRAIL PAGE ===
@@ -77,6 +77,6 @@ if ($hassiteconfig) {
         'local_ascend_rewards_audit',
         get_string('audit_trail', 'local_ascend_rewards'),
         new moodle_url('/local/ascend_rewards/admin_audit.php'),
-        'moodle/site:config'
+        'local/ascend_rewards:manage'
     ));
 }

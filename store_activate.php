@@ -15,9 +15,11 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Store Item Activation Handler
+ * Legacy AJAX endpoint for activating store items.
  *
- * Handles activation of purchased store items (like XP multipliers).
+ * This wrapper is kept for backward compatibility and delegates to
+ * local_ascend_rewards\ajax_service. New code should use the external
+ * service: local_ascend_rewards_store_activate.
  *
  * @package    local_ascend_rewards
  * @copyright 2026 Elantis (Pty) LTD
@@ -26,73 +28,32 @@
 
 define('AJAX_SCRIPT', true);
 require_once(__DIR__ . '/../../config.php');
+defined('MOODLE_INTERNAL') || die();
 require_login();
-// Preserve naming and comment separators without altering behavior.
-// phpcs:disable moodle.NamingConventions.ValidVariableName.VariableNameUnderscore
-// phpcs:disable moodle.Commenting.InlineComment.InvalidEndChar,moodle.Commenting.InlineComment.NotCapital
-// phpcs:disable moodle.Files.LineLength.MaxExceeded,moodle.Files.LineLength.TooLong
-
-global $DB, $USER;
+$context = context_system::instance();
+require_capability('local/ascend_rewards:view', $context);
 
 header('Content-Type: application/json');
 
-// Get item ID from POST
-$item_id = required_param('item_id', PARAM_INT);
-
-// Get current inventory
-$inventory_str = get_user_preferences('ascend_store_inventory', '', $USER->id);
-$inventory = $inventory_str ? json_decode($inventory_str, true) : [];
-
-// Check if user has the item
-if (!isset($inventory[$item_id]) || $inventory[$item_id] <= 0) {
-    echo json_encode(['success' => false, 'error' => 'Item not in inventory']);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode([
+        'success' => false,
+        'error' => get_string('ajax_method_not_allowed', 'local_ascend_rewards'),
+    ]);
     exit;
 }
 
-// Handle activation based on item ID
-if ($item_id == 4) {
-    // XP Multiplier (24h)
+try {
+    require_sesskey();
 
-    // Check if already active
-    $current_end = get_user_preferences('ascend_xp_multiplier_end', 0, $USER->id);
-
-    if ($current_end > time()) {
-        // Already active - extend it by 24 hours
-        $new_end = $current_end + (24 * 60 * 60);
-    } else {
-        // Not active - activate for 24 hours from now
-        $new_end = time() + (24 * 60 * 60);
-    }
-
-    // Set the new expiration time
-    set_user_preference('ascend_xp_multiplier_end', $new_end, $USER->id);
-
-    // Remove one from inventory
-    $inventory[$item_id]--;
-    if ($inventory[$item_id] <= 0) {
-        unset($inventory[$item_id]);
-    }
-    set_user_preference('ascend_store_inventory', json_encode($inventory), $USER->id);
-
-    // Track activation
-    $activated_items_str = get_user_preferences('ascend_store_activated', '', $USER->id);
-    $activated_items = $activated_items_str ? json_decode($activated_items_str, true) : [];
-
-    if (!isset($activated_items[$item_id])) {
-        $activated_items[$item_id] = [];
-    }
-    $activated_items[$item_id][] = [
-        'activated_at' => time(),
-        'expires_at' => $new_end,
-    ];
-    set_user_preference('ascend_store_activated', json_encode($activated_items), $USER->id);
-
+    $itemid = required_param('item_id', PARAM_INT);
+    $result = \local_ascend_rewards\ajax_service::store_activate($itemid);
+    echo json_encode($result);
+} catch (\Throwable $t) {
+    http_response_code(500);
     echo json_encode([
-        'success' => true,
-        'message' => 'XP Multiplier activated! You\'re now earning 2x XP.',
-        'expires_at' => $new_end,
-        'inventory_count' => isset($inventory[$item_id]) ? $inventory[$item_id] : 0,
+        'success' => false,
+        'error' => get_string('ajax_server_error', 'local_ascend_rewards'),
     ]);
-} else {
-    echo json_encode(['success' => false, 'error' => 'Unknown item type']);
 }

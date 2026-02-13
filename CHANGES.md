@@ -5,6 +5,30 @@ All notable changes to the Ascend Rewards plugin will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.9] - 2026-02-12
+
+### Fixed
+- Rewards instructions link now opens `instructions.php` instead of removed legacy `html/index.html`
+- Unlock journey modal copy finalized for hero -> pet -> villain -> storybook progression
+
+### Changed
+- Release metadata updated for Moodle/GitHub submission (`$plugin->release = 1.2.9`)
+
+## [1.2.8] - 2026-02-10
+
+### Fixed
+- Rebuild badge cache task: PostgreSQL-compatible query ordering
+- Rebuild badge cache task: use recordset to avoid duplicate-key debug warnings
+- Admin dashboard rendering and navigation regressions
+- Repeatable badge awards allowed for selected badge types
+- Badge notification modal wiring and AMD usage
+
+### Changed
+- Migrated legacy HTML to Mustache templates / Output API
+- Migrated legacy JS to AMD modules
+- Added required GPL headers to all templates
+- Standardized user-facing strings to `get_string()`
+
 ## [1.2.3] - 2026-02-02
 
 ### Fixed

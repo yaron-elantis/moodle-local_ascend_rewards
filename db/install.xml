@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/ascend_rewards/db" VERSION="20251210" COMMENT="Apex Rewards plugin"
+<XMLDB PATH="local/ascend_rewards/db" VERSION="20251210" COMMENT="Ascend Rewards plugin"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -20,7 +20,7 @@ You should have received a copy of the GNU General Public License
 along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 -->
   <TABLES>
-    <TABLE NAME="local_ascend_rewards_coins" COMMENT="Coin ledger for Apex Rewards">
+    <TABLE NAME="local_ascend_rewards_coins" COMMENT="Coin ledger for Ascend Rewards">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" />
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />

@@ -38,7 +38,7 @@ require_login();
 // phpcs:disable moodle.WhiteSpace.WhiteSpaceInStrings.EndLine,moodle.Commenting.MissingDocblock.Function
 // phpcs:disable moodle.Commenting.MissingDocblock.Constant,moodle.Files.MoodleInternal.MoodleInternalGlobalState
 $context = context_system::instance();
-require_capability('moodle/site:config', $context);
+require_capability('local/ascend_rewards:manage', $context);
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/ascend_rewards/badges.php'));
 $PAGE->set_pagelayout('admin');
@@ -55,7 +55,16 @@ if ($action === 'seed' && confirm_sesskey()) {
 }
 echo $OUTPUT->header();
 echo html_writer::tag('h3', get_string('managebadges', 'local_ascend_rewards'));
-echo $OUTPUT->single_button(new moodle_url('/local/ascend_rewards/badges.php', ['action' => 'seed', 'courseid' => $courseid, 'sesskey' => sesskey()]), get_string('createbadges', 'local_ascend_rewards'), 'post');
+$seed_url = new moodle_url('/local/ascend_rewards/badges.php', [
+    'action' => 'seed',
+    'courseid' => $courseid,
+    'sesskey' => sesskey(),
+]);
+echo $OUTPUT->single_button(
+    $seed_url,
+    get_string('createbadges', 'local_ascend_rewards'),
+    'post'
+);
 $defs = \local_ascend_rewards\badges::definitions();
 $table = new html_table();
 $table->head = [
@@ -73,7 +82,7 @@ foreach ($defs as $code => $def) {
         'map_' . $code,
         ($currentid ?: 0),
         ['0' => get_string('badge_not_mapped_label', 'local_ascend_rewards')],
-        ['form' => 'apex-map-form']
+        ['form' => 'ascend-map-form']
     );
     $table->data[] = new html_table_row([
         html_writer::tag('code', s($code)),
@@ -84,7 +93,7 @@ foreach ($defs as $code => $def) {
     ]);
 }
 echo html_writer::table($table);
-echo html_writer::start_tag('form', ['method' => 'post', 'id' => 'apex-map-form', 'action' => new moodle_url('/local/ascend_rewards/badges.php')]);
+echo html_writer::start_tag('form', ['method' => 'post', 'id' => 'ascend-map-form', 'action' => new moodle_url('/local/ascend_rewards/badges.php')]);
 echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
 echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'courseid', 'value' => $courseid]);
 echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'action', 'value' => 'save']);

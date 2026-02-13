@@ -1,3 +1,23 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+@template local_ascend_rewards/avatar_section_new
+@copyright 2026 Elantis (Pty) LTD
+@license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
 <!-- ============================================================================
      CUSTOM FONTS
      ============================================================================ -->
@@ -13,10 +33,10 @@
         <h3>
             <img src="{{avatar_icon_url}}" 
                  alt="{{ascend_universe_label}}" 
-                 style="width:60px;height:60px;vertical-align:middle;margin-right:8px;">
+                 class="aa-section-icon">
             {{ascend_universe_label}}
             {{#show_tokens_available}}
-                <span style="color:#ec4899;font-size:14px;font-weight:600;margin-left:8px;">
+                <span class="aa-token-badge">
                     {{tokens_available_badge_text}}
                 </span>
             {{/show_tokens_available}}
@@ -26,66 +46,68 @@
     
     <div class="aa-panel-content">
         <!-- User Stats -->
-        <p class="aa-muted" style="margin-bottom:24px;">
+        <p class="aa-muted aa-avatar-stats">
             {{you_are_level_label}} {{level}}. {{you_have_label}} 
             <strong>{{unlocked_avatars_count}}</strong> {{hero_label}}{{#heroes_plural}}es{{/heroes_plural}} {{unlocked_label}}, 
             <strong>{{owned_pets_count}}</strong> {{pet_label}}{{#pets_plural}}s{{/pets_plural}} {{adopted_label}}, {{and_label}} 
             <strong>{{owned_villains_count}}</strong> {{villain_label}}{{#villains_plural}}s{{/villains_plural}} {{unlocked_label}}.
             {{#show_tokens_available}}
-                <span style="color:#ec4899;">
+                <span class="aa-token-text">
                     {{{tokens_available_text}}}
                 </span>
             {{/show_tokens_available}}
         </p>
         
         {{#levels}}
-        <div style="margin-bottom:40px;padding-bottom:24px;border-bottom:2px solid rgba(255,255,255,0.1);">
-            <h4 class="avatar-level-header" data-level="{{level_number}}" style="color:{{header_color}};font-size:18px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;transition:all 0.3s;">
-                <i class="fa-solid fa-chevron-down level-chevron" style="font-size:14px;transition:transform 0.3s;"></i>
+        <div class="avatar-level-block">
+            <h4 class="avatar-level-header" data-level="{{level_number}}" data-header-color="{{header_color}}">
+                <i class="fa-solid fa-chevron-down level-chevron"></i>
                 {{level_label}} {{level_number}}: {{world_name}}
                 {{^can_access}}
-                    <i class="fa-solid fa-lock" style="color:#64748b;"></i> {{locked_until_label}} {{level_number}}
+                    <i class="fa-solid fa-lock avatar-lock-icon"></i> {{locked_until_label}} {{level_number}}
                 {{/can_access}}
             </h4>
             
-            <div class="avatar-level-content" data-level="{{level_number}}" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;opacity:{{content_opacity}};pointer-events:{{content_pointer}};overflow:hidden;transition:max-height 0.3s ease, opacity 0.3s ease;max-height:5000px;">
+            <div class="avatar-level-content" data-level="{{level_number}}" data-content-opacity="{{content_opacity}}" data-content-pointer="{{content_pointer}}">
                 {{#sets}}
-                <div style="display:flex;flex-direction:column;gap:16px;">
+                <div class="avatar-set">
                     <!-- HERO -->
-                    <div style="text-align:center;">
+                    <div class="avatar-group">
                         {{#is_first_column}}
-                        <h5 style="color:#FFD700;font-size:14px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;height:20px;"><img src="{{hero_icon_url}}" alt="{{heroes_label}}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:4px;">{{heroes_label}}</h5>
+                        <h5 class="avatar-group-title avatar-group-title-hero"><img src="{{hero_icon_url}}" alt="{{heroes_label}}" class="avatar-group-icon">{{heroes_label}}</h5>
                         {{/is_first_column}}
                         {{^is_first_column}}
-                        <div style="height:28px;"></div>
+                        <div class="avatar-group-spacer"></div>
                         {{/is_first_column}}
-                        <div class="avatar-card {{hero.card_class}}" 
+                        <div class="avatar-card avatar-card-hero {{hero.card_class}}" 
                              data-avatar="{{hero.filename}}"
                              data-name="{{hero.display_name}}"
-                             data-level="{{level_number}}"
-                             style="position:relative;aspect-ratio:1;border-radius:50%;overflow:hidden;cursor:pointer;border:3px solid #FFD700;transition:all 0.3s ease;">
-                            <img src="{{hero.image_url}}" 
-                                 alt="{{hero.display_name}}" 
-                                 style="width:100%;height:100%;object-fit:cover;filter:{{hero.filter}};">
-                            {{^hero.unlocked}}
-                                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);">
-                                    <i class="fa-solid fa-lock" style="font-size:48px;color:#94a3b8;"></i>
-                                </div>
-                            {{/hero.unlocked}}
+                             data-level="{{level_number}}">
+                            <div class="avatar-card-frame avatar-card-frame-hero">
+                                <img src="{{hero.image_url}}" 
+                                     alt="{{hero.display_name}}" 
+                                     class="avatar-card-image"
+                                     data-filter="{{hero.filter}}">
+                                {{^hero.unlocked}}
+                                    <div class="avatar-lock-overlay">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-lg"></i>
+                                    </div>
+                                {{/hero.unlocked}}
+                            </div>
                         </div>
-                        <div style="margin-top:8px;color:#FFD700;font-size:13px;font-family:{{font_family}};">
+                        <div class="avatar-card-name avatar-card-name-hero" data-font-family="{{font_family}}">
                             {{hero.display_name}}
                         </div>
                     </div>
                     
                     <!-- PET -->
                     {{#pet}}
-                    <div style="text-align:center;">
+                    <div class="avatar-group">
                         {{#is_first_column}}
-                        <h5 style="color:#ec4899;font-size:14px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;height:20px;"><img src="{{pet_icon_url}}" alt="{{pets_label}}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:4px;">{{pets_label}}</h5>
+                        <h5 class="avatar-group-title avatar-group-title-pet"><img src="{{pet_icon_url}}" alt="{{pets_label}}" class="avatar-group-icon">{{pets_label}}</h5>
                         {{/is_first_column}}
                         {{^is_first_column}}
-                        <div style="height:28px;"></div>
+                        <div class="avatar-group-spacer"></div>
                         {{/is_first_column}}
                         <div class="pet-card {{card_class}}" 
                              data-pet-id="{{id}}"
@@ -93,34 +115,35 @@
                              data-pet-price="{{price}}"
                              data-pet-avatar="{{avatar}}"
                              data-can-unlock="{{can_unlock_flag}}"
-                             style="position:relative;aspect-ratio:1;cursor:{{cursor}};transition:all 0.3s ease;">
-                            <div style="position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;border:3px solid #ec4899;">
+                             data-cursor="{{cursor}}">
+                            <div class="avatar-card-frame avatar-card-frame-pet">
                                 <img src="{{image_url}}" 
                                      alt="{{name}}"
-                                     style="width:100%;height:100%;object-fit:cover;filter:{{filter}};">
+                                     class="avatar-card-image"
+                                     data-filter="{{filter}}">
                                 
                                 {{#show_lock_overlay}}
-                                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);">
-                                        <i class="fa-solid fa-lock" style="font-size:36px;color:#94a3b8;"></i>
+                                    <div class="avatar-lock-overlay">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-md"></i>
                                     </div>
                                 {{/show_lock_overlay}}
                                 {{#show_price_overlay}}
-                                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);flex-direction:column;gap:6px;">
-                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" style="width:{{coin_stack_size}};height:32px;object-fit:contain;">
-                                        <div style="font-size:11px;color:#FFD700;font-weight:700;">{{price}}</div>
+                                    <div class="avatar-price-overlay">
+                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" class="avatar-price-icon" data-coin-size="{{coin_stack_size}}">
+                                        <div class="avatar-price-text avatar-price-text-gold">{{price}}</div>
                                     </div>
                                 {{/show_price_overlay}}
                             </div>
                             
                             {{#show_avatar_badge}}
-                            <div style="position:absolute;top:-4px;right:-4px;width:28%;aspect-ratio:1;border-radius:50%;overflow:hidden;border:2px solid #FFD700;background:#1a1f2e;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:10;display:flex;align-items:center;justify-content:center;">
+                            <div class="avatar-badge avatar-badge-hero">
                                 <img src="{{avatar_badge_url}}" 
                                      alt="{{avatar}}"
-                                     style="width:90%;height:90%;object-fit:contain;">
+                                     class="avatar-badge-image">
                             </div>
                             {{/show_avatar_badge}}
                         </div>
-                        <div style="margin-top:8px;color:#ec4899;font-size:13px;font-family:{{font_family}};">
+                        <div class="avatar-card-name avatar-card-name-pet" data-font-family="{{font_family}}">
                             {{name}}
                         </div>
                     </div>
@@ -128,12 +151,12 @@
                     
                     <!-- VILLAIN -->
                     {{#villain}}
-                    <div style="text-align:center;">
+                    <div class="avatar-group">
                         {{#is_first_column}}
-                        <h5 style="color:#06b6d4;font-size:14px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;height:20px;"><img src="{{villain_icon_url}}" alt="{{villains_label}}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-right:4px;">{{villains_label}}</h5>
+                        <h5 class="avatar-group-title avatar-group-title-villain"><img src="{{villain_icon_url}}" alt="{{villains_label}}" class="avatar-group-icon">{{villains_label}}</h5>
                         {{/is_first_column}}
                         {{^is_first_column}}
-                        <div style="height:28px;"></div>
+                        <div class="avatar-group-spacer"></div>
                         {{/is_first_column}}
                         <div class="villain-card {{card_class}}" 
                              data-villain-id="{{id}}"
@@ -142,50 +165,50 @@
                              data-villain-pet="{{pet_id}}"
                              data-villain-icon="{{icon_name}}"
                              data-can-unlock="{{can_unlock_flag}}"
-                             style="position:relative;aspect-ratio:1;cursor:{{cursor}};transition:all 0.3s ease;">
-                            <div style="position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;border:3px solid #06b6d4;">
+                             data-cursor="{{cursor}}">
+                            <div class="avatar-card-frame avatar-card-frame-villain">
                                 <img src="{{image_url}}" 
                                      alt="{{name}}"
-                                     style="width:100%;height:100%;object-fit:cover;filter:{{filter}};">
+                                     class="avatar-card-image"
+                                     data-filter="{{filter}}">
                                 
                                 {{#show_lock_overlay}}
-                                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);">
-                                        <i class="fa-solid fa-lock" style="font-size:36px;color:#94a3b8;"></i>
+                                    <div class="avatar-lock-overlay">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-md"></i>
                                     </div>
                                 {{/show_lock_overlay}}
                                 {{#show_price_overlay}}
-                                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);flex-direction:column;gap:6px;">
-                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" style="width:{{coin_stack_size}};height:32px;object-fit:contain;">
-                                        <div style="font-size:11px;color:#ff4444;font-weight:700;">{{price}}</div>
+                                    <div class="avatar-price-overlay">
+                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" class="avatar-price-icon" data-coin-size="{{coin_stack_size}}">
+                                        <div class="avatar-price-text avatar-price-text-red">{{price}}</div>
                                     </div>
                                 {{/show_price_overlay}}
                             </div>
                             
                             {{#show_pet_badge}}
-                            <div style="position:absolute;top:-4px;right:-4px;width:26%;aspect-ratio:1;border-radius:50%;overflow:hidden;border:2px solid #ec4899;background:#1a1f2e;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:10;display:flex;align-items:center;justify-content:center;">
-                                <img src="{{pet_badge_url}}" alt="{{pet_label}}" style="width:90%;height:90%;object-fit:contain;">
+                            <div class="avatar-badge avatar-badge-pet">
+                                <img src="{{pet_badge_url}}" alt="{{pet_label}}" class="avatar-badge-image">
                             </div>
                             {{/show_pet_badge}}
                             
                             {{#show_avatar_badge}}
-                            <div style="position:absolute;top:-4px;left:-4px;width:26%;aspect-ratio:1;border-radius:50%;overflow:hidden;border:2px solid #FFD700;background:#1a1f2e;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:10;display:flex;align-items:center;justify-content:center;">
-                                <img src="{{avatar_badge_url}}" alt="{{hero_label}}" style="width:90%;height:90%;object-fit:contain;">
+                            <div class="avatar-badge avatar-badge-hero avatar-badge-left">
+                                <img src="{{avatar_badge_url}}" alt="{{hero_label}}" class="avatar-badge-image">
                             </div>
                             {{/show_avatar_badge}}
                         </div>
-                        <div style="margin-top:8px;color:#06b6d4;font-size:13px;font-family:{{font_family}};">
+                        <div class="avatar-card-name avatar-card-name-villain" data-font-family="{{font_family}}">
                             {{name}}
                         </div>
                         
                         {{#story}}
-                        <button class="watch-story-btn" 
+                        <button class="watch-story-btn avatar-story-btn" 
                                 data-set-name="{{set_name}}"
-                                data-youtube-id="{{youtube_id}}"
-                                style="margin-top:12px;background:none;border:none;cursor:pointer;transition:all 0.3s;padding:0;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;">
+                                data-youtube-id="{{youtube_id}}">
                             <img src="{{storybook_url}}" 
                                  alt="{{watch_story_label}}" 
-                                 style="width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(6,182,212,0.5));transition:filter 0.3s;">
-                            <span style="font-size:13px;color:#06b6d4;font-weight:700;font-family:{{font_family}};text-shadow:0 2px 4px rgba(6,182,212,0.3);">{{watch_story_label}}</span>
+                                 class="avatar-story-icon">
+                            <span class="avatar-story-label" data-font-family="{{font_family}}">{{watch_story_label}}</span>
                         </button>
                         {{/story}}
                     </div>
@@ -197,36 +220,38 @@
         {{/levels}}
         
         {{#epic_levels}}
-        <div style="margin-bottom:40px;padding-bottom:24px;border-bottom:2px solid rgba(168,85,247,0.2);">
-            <h4 class="avatar-level-header" data-level="{{level_number}}" style="color:{{header_color}};font-size:18px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;transition:all 0.3s;">
-                <i class="fa-solid fa-chevron-down level-chevron" style="font-size:14px;transition:transform 0.3s;"></i>
+        <div class="avatar-level-block avatar-level-block-epic">
+            <h4 class="avatar-level-header" data-level="{{level_number}}" data-header-color="{{header_color}}">
+                <i class="fa-solid fa-chevron-down level-chevron"></i>
                 {{epic_level_label}} {{level_number}} {{collection_label}}
                 {{^can_access}}
-                    <i class="fa-solid fa-lock" style="color:#64748b;"></i> {{locked_until_label}} {{level_number}}
+                    <i class="fa-solid fa-lock avatar-lock-icon"></i> {{locked_until_label}} {{level_number}}
                 {{/can_access}}
             </h4>
             
-            <div class="avatar-level-content" data-level="{{level_number}}" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;opacity:{{content_opacity}};pointer-events:{{content_pointer}};overflow:hidden;transition:max-height 0.3s ease, opacity 0.3s ease;max-height:5000px;">
+            <div class="avatar-level-content" data-level="{{level_number}}" data-content-opacity="{{content_opacity}}" data-content-pointer="{{content_pointer}}">
                 <!-- HERO COLUMN -->
                 <div>
-                    <h5 style="color:#FFD700;font-size:15px;font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;text-align:center;"><img src="{{hero_icon_url}}" alt="{{heroes_label}}" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;margin-right:6px;">{{heroes_label}}</h5>
+                    <h5 class="avatar-group-title avatar-group-title-hero avatar-group-title-epic"><img src="{{hero_icon_url}}" alt="{{heroes_label}}" class="avatar-group-icon avatar-group-icon-epic">{{heroes_label}}</h5>
                     {{#heroes}}
-                    <div style="text-align:center;margin-bottom:16px;">
-                        <div class="avatar-card {{card_class}}" 
+                    <div class="avatar-epic-item">
+                        <div class="avatar-card avatar-card-hero {{card_class}}" 
                              data-avatar="{{filename}}"
                              data-name="{{display_name}}"
-                             data-level="{{level_number}}"
-                             style="position:relative;aspect-ratio:1;border-radius:50%;overflow:hidden;cursor:pointer;border:3px solid #FFD700;transition:all 0.3s ease;">
-                            <img src="{{image_url}}" 
-                                 alt="{{display_name}}" 
-                                 style="width:100%;height:100%;object-fit:cover;filter:{{filter}};">
-                            {{^unlocked}}
-                                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);">
-                                    <i class="fa-solid fa-lock" style="font-size:48px;color:#94a3b8;"></i>
-                                </div>
-                            {{/unlocked}}
+                             data-level="{{level_number}}">
+                            <div class="avatar-card-frame avatar-card-frame-hero">
+                                <img src="{{image_url}}" 
+                                     alt="{{display_name}}" 
+                                     class="avatar-card-image"
+                                     data-filter="{{filter}}">
+                                {{^unlocked}}
+                                    <div class="avatar-lock-overlay avatar-lock-overlay-strong">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-lg"></i>
+                                    </div>
+                                {{/unlocked}}
+                            </div>
                         </div>
-                        <div style="margin-top:8px;color:#FFD700;font-size:13px;font-family:{{font_family}};">
+                        <div class="avatar-card-name avatar-card-name-hero" data-font-family="{{font_family}}">
                             {{display_name}}
                         </div>
                     </div>
@@ -235,43 +260,44 @@
                 
                 <!-- PET COLUMN -->
                 <div>
-                    <h5 style="color:#ec4899;font-size:15px;font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;text-align:center;"><img src="{{pet_icon_url}}" alt="{{pets_label}}" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;margin-right:6px;">{{pets_label}}</h5>
+                    <h5 class="avatar-group-title avatar-group-title-pet avatar-group-title-epic"><img src="{{pet_icon_url}}" alt="{{pets_label}}" class="avatar-group-icon avatar-group-icon-epic">{{pets_label}}</h5>
                     {{#pets}}
-                    <div style="text-align:center;margin-bottom:16px;">
+                    <div class="avatar-epic-item">
                         <div class="pet-card {{card_class}}" 
                              data-pet-id="{{id}}"
                              data-pet-name="{{name}}"
                              data-pet-price="{{price}}"
                              data-pet-avatar="{{avatar}}"
                              data-can-unlock="{{can_unlock_flag}}"
-                             style="position:relative;aspect-ratio:1;cursor:{{cursor}};transition:all 0.3s ease;">
-                            <div style="position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;border:3px solid #ec4899;">
+                             data-cursor="{{cursor}}">
+                            <div class="avatar-card-frame avatar-card-frame-pet">
                                 <img src="{{image_url}}" 
                                      alt="{{name}}"
-                                     style="width:100%;height:100%;object-fit:cover;filter:{{filter}};">
+                                     class="avatar-card-image"
+                                     data-filter="{{filter}}">
                                 
                                 {{#show_lock_overlay}}
-                                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);">
-                                        <i class="fa-solid fa-lock" style="font-size:36px;color:#94a3b8;"></i>
+                                    <div class="avatar-lock-overlay avatar-lock-overlay-strong">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-md"></i>
                                     </div>
                                 {{/show_lock_overlay}}
                                 {{#show_price_overlay}}
-                                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);flex-direction:column;gap:6px;">
-                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" style="width:{{coin_stack_size}};height:32px;object-fit:contain;">
-                                        <div style="font-size:11px;color:#FFD700;font-weight:700;">{{price}}</div>
+                                    <div class="avatar-price-overlay">
+                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" class="avatar-price-icon" data-coin-size="{{coin_stack_size}}">
+                                        <div class="avatar-price-text avatar-price-text-gold">{{price}}</div>
                                     </div>
                                 {{/show_price_overlay}}
                             </div>
                             
                             {{#show_avatar_badge}}
-                            <div style="position:absolute;top:-4px;right:-4px;width:28%;aspect-ratio:1;border-radius:50%;overflow:hidden;border:2px solid #FFD700;background:#1a1f2e;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:10;display:flex;align-items:center;justify-content:center;">
+                            <div class="avatar-badge avatar-badge-hero">
                                 <img src="{{avatar_badge_url}}" 
                                      alt="{{avatar}}"
-                                     style="width:90%;height:90%;object-fit:contain;">
+                                     class="avatar-badge-image">
                             </div>
                             {{/show_avatar_badge}}
                         </div>
-                        <div style="margin-top:8px;color:#ec4899;font-size:13px;font-family:{{font_family}};">
+                        <div class="avatar-card-name avatar-card-name-pet" data-font-family="{{font_family}}">
                             {{name}}
                         </div>
                     </div>
@@ -280,9 +306,9 @@
                 
                 <!-- VILLAIN COLUMN -->
                 <div>
-                    <h5 style="color:#06b6d4;font-size:15px;font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;text-align:center;"><img src="{{villain_icon_url}}" alt="{{villains_label}}" style="width:20px;height:20px;object-fit:contain;vertical-align:middle;margin-right:6px;">{{villains_label}}</h5>
+                    <h5 class="avatar-group-title avatar-group-title-villain avatar-group-title-epic"><img src="{{villain_icon_url}}" alt="{{villains_label}}" class="avatar-group-icon avatar-group-icon-epic">{{villains_label}}</h5>
                     {{#villains}}
-                    <div style="text-align:center;margin-bottom:16px;">
+                    <div class="avatar-epic-item">
                         <div class="villain-card {{card_class}}" 
                              data-villain-id="{{id}}"
                              data-villain-name="{{name}}"
@@ -290,38 +316,39 @@
                              data-villain-pet="{{pet_id}}"
                              data-villain-icon="{{icon_name}}"
                              data-can-unlock="{{can_unlock_flag}}"
-                             style="position:relative;aspect-ratio:1;cursor:{{cursor}};transition:all 0.3s ease;">
-                            <div style="position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;border:3px solid #06b6d4;">
+                             data-cursor="{{cursor}}">
+                            <div class="avatar-card-frame avatar-card-frame-villain">
                                 <img src="{{image_url}}" 
                                      alt="{{name}}"
-                                     style="width:100%;height:100%;object-fit:cover;filter:{{filter}};">
+                                     class="avatar-card-image"
+                                     data-filter="{{filter}}">
                                 
                                 {{#show_lock_overlay}}
-                                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);">
-                                        <i class="fa-solid fa-lock" style="font-size:36px;color:#94a3b8;"></i>
+                                    <div class="avatar-lock-overlay avatar-lock-overlay-strong">
+                                        <i class="fa-solid fa-lock avatar-lock-icon avatar-lock-icon-md"></i>
                                     </div>
                                 {{/show_lock_overlay}}
                                 {{#show_price_overlay}}
-                                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);flex-direction:column;gap:6px;">
-                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" style="width:{{coin_stack_size}};height:32px;object-fit:contain;">
-                                        <div style="font-size:11px;color:#ff4444;font-weight:700;">{{price}}</div>
+                                    <div class="avatar-price-overlay">
+                                        <img src="{{coin_stack_url}}" alt="{{coins_label}}" class="avatar-price-icon" data-coin-size="{{coin_stack_size}}">
+                                        <div class="avatar-price-text avatar-price-text-red">{{price}}</div>
                                     </div>
                                 {{/show_price_overlay}}
                             </div>
                             
                             {{#show_pet_badge}}
-                            <div style="position:absolute;bottom:-4px;left:-4px;width:26%;aspect-ratio:1;border-radius:50%;overflow:hidden;border:2px solid #ec4899;background:#1a1f2e;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:10;display:flex;align-items:center;justify-content:center;">
-                                <img src="{{pet_badge_url}}" alt="{{pet_label}}" style="width:90%;height:90%;object-fit:contain;">
+                            <div class="avatar-badge avatar-badge-pet avatar-badge-bottom-left">
+                                <img src="{{pet_badge_url}}" alt="{{pet_label}}" class="avatar-badge-image">
                             </div>
                             {{/show_pet_badge}}
                             
                             {{#show_avatar_badge}}
-                            <div style="position:absolute;top:-4px;right:-4px;width:26%;aspect-ratio:1;border-radius:50%;overflow:hidden;border:2px solid #FFD700;background:#1a1f2e;box-shadow:0 2px 8px rgba(0,0,0,0.5);z-index:10;display:flex;align-items:center;justify-content:center;">
-                                <img src="{{avatar_badge_url}}" alt="{{hero_label}}" style="width:90%;height:90%;object-fit:contain;">
+                            <div class="avatar-badge avatar-badge-hero">
+                                <img src="{{avatar_badge_url}}" alt="{{hero_label}}" class="avatar-badge-image">
                             </div>
                             {{/show_avatar_badge}}
                         </div>
-                        <div style="margin-top:8px;color:#06b6d4;font-size:13px;font-family:{{font_family}};">
+                        <div class="avatar-card-name avatar-card-name-villain" data-font-family="{{font_family}}">
                             {{name}}
                         </div>
                     </div>
@@ -334,223 +361,8 @@
     </div>
 </section>
 
-<!-- ============================================================================
-     STYLES
-     ============================================================================ -->
-<style>
-/* Constrain card sizes to prevent image cutoff */
-.avatar-card,
-.pet-card,
-.villain-card {
-    max-width: 220px !important;
-    margin: 0 auto !important;
-}
-
-.avatar-card.locked:hover,
-.pet-card.locked:hover,
-.villain-card.locked:hover {
-    transform: scale(1.05);
-}
-
-.avatar-card.locked:hover { border-color: #ec4899; }
-.pet-card.locked:hover { border-color: #FF9500; }
-.villain-card.locked:hover { border-color: #dc2626; }
-</style>
-
-<!-- ============================================================================
-     JAVASCRIPT: Click Handlers & Modal Triggers
-     ============================================================================ -->
-<script src="{{avatar_modals_js_url}}"></script>
-<script>
-(function() {
-    'use strict';
-    
-    // Video mapping
-    const videoMap = {
-        'amazon.png': 'amazon.mp4', 'elf.png': 'elf.mp4', 'ent.png': 'ent.mp4',
-        'guardian.png': 'guardian.mp4', 'imp.png': 'imp.mp4', 'jester.png': 'jester.mp4',
-        'magician.png': 'magician.mp4', 'mermaid.png': 'mermaid.mp4', 'nomad.png': 'nomad.mp4',
-        'philosopher.png': 'philosopher.mp4', 'pirate.png': 'pirate.mp4', 'queen.png': 'queen.mp4',
-        'sorceress.png': 'sorceress.mp4', 'viking.png': 'viking.mp4', 'warrior.png': 'warrior.mp4',
-        'wizard.png': 'wizard.mp4', 'maori.png': 'maori.mp4', 'zulu.png': 'zulu.mp4',
-        'sentinel.png': 'sentinel.mp4', 'kapu.png': 'kapu.mp4', 'beserker.png': 'beserker.mp4'
-    };
-    
-    const petVideoMap = {
-        100: 'lynx.mp4',
-        101: 'tortoise.mp4',
-        102: 'hamster.mp4',
-        103: 'falcon.mp4',
-        104: 'gryphon.mp4',
-        105: 'boar.mp4',
-        106: 'viper.mp4',
-        107: 'swan.mp4',
-        108: 'mischiefcap.mp4',
-        109: 'otter.mp4',
-        110: 'kinkajou.mp4',
-        111: 'seahorse.mp4',
-        112: 'dragon.mp4',
-        113: 'mastiff.mp4',
-        114: 'raven.mp4',
-        115: 'tiger.mp4',
-        116: 'wolf.mp4',
-        117: 'polar_bear.mp4',
-        200: 'cheetah_bros.mp4',
-        201: 'monkey.mp4',
-        202: 'heron.mp4'
-    };
-    
-    const villainVideoMap = {
-        'dryad_elf': 'elf_dryad.mp4',
-        'blightmind_ent': 'ent_blightmind.mp4',
-        'jester_mourner': 'jester_mourner.mp4',
-        'magician_spellbreaker': 'magician_spellbreaker.mp4',
-        'nomad_dune': 'nomad_dune.mp4',
-        'philosopher_mirror': 'philosopher_mirror.mp4',
-        'mermaid_duchess': 'mermaid_duchess.mp4',
-        'warrior_warlord': 'warrior_warlord.mp4',
-        'sorceress_stormveil': 'sorceress_stormveil.mp4',
-        'gatekeeper_wraith': 'gatekeeper_wraith.mp4',
-        'viking_betrayer': 'viking_betrayer.mp4',
-        'pirate_barron': 'pirate_barron.mp4',
-        'amazon_huntsmistress': 'amazon_huntsmistress.mp4',
-        'imp_mole': 'imp_mole.mp4',
-        'wizard_pale_scholar': 'wizard_pale_scholar.mp4',
-        'maori_shaman': 'maori_shaman.mp4',
-        'zulu_witchdoctor': 'zulu_witchdoctor.mp4',
-        'sentinel_void': 'sentinel_void.mp4',
-        'kapu_judge': 'kapu_judge.mp4'
-    };
-    
-    // Hero unlock handlers
-    document.querySelectorAll('.avatar-card').forEach(card => {
-        card.addEventListener('click', function() {
-            const avatar = this.getAttribute('data-avatar');
-            const name = this.getAttribute('data-name');
-            const level = this.getAttribute('data-level');
-            const isUnlocked = this.classList.contains('unlocked');
-            const videoFile = videoMap[avatar] || 'elf.mp4';
-            if (isUnlocked) {
-                if (typeof showAvatarReviewModal === 'function') {
-                    showAvatarReviewModal(avatar, name, videoFile);
-                } else {
-                    alert('{{modal_not_loaded_label}}');
-                }
-                return;
-            }
-            if (typeof showAvatarUnlockModal === 'function') {
-                showAvatarUnlockModal(name, avatar, videoFile, level, {{tokens_available}});
-            } else {
-                alert('{{modal_not_loaded_label}}');
-            }
-        });
-    });
-
-    // Pet unlock handlers
-    document.querySelectorAll('.pet-card').forEach(card => {
-        card.addEventListener('click', function() {
-            const petId = parseInt(this.getAttribute('data-pet-id'));
-            const petName = this.getAttribute('data-pet-name');
-            const petPrice = parseInt(this.getAttribute('data-pet-price'));
-            const canUnlock = this.getAttribute('data-can-unlock') === '1';
-            const isOwned = this.classList.contains('owned');
-            const petVideo = petVideoMap[petId] || 'lynx.mp4';
-            if (isOwned) {
-                if (typeof showPetReviewModal === 'function') {
-                    showPetReviewModal(petName, petId, petVideo);
-                } else {
-                    alert('{{modal_not_loaded_label}}');
-                }
-                return;
-            }
-            if (!canUnlock) return;
-            if (typeof showPetUnlockModal === 'function') {
-                showPetUnlockModal(petId, petName, petPrice, petVideo, {{tokens_available}}, {{coin_balance}});
-            } else {
-                alert('{{modal_not_loaded_label}}');
-            }
-        });
-    });
-
-    // Villain unlock handlers
-    document.querySelectorAll('.villain-card').forEach(card => {
-        card.addEventListener('click', function() {
-            const villainId = parseInt(this.getAttribute('data-villain-id'));
-            const villainName = this.getAttribute('data-villain-name');
-            const villainPrice = parseInt(this.getAttribute('data-villain-price'));
-            const villainImageName = this.getAttribute('data-villain-icon');
-            const canUnlock = this.getAttribute('data-can-unlock') === '1';
-            const isOwned = this.classList.contains('owned');
-            const villainVideo = villainVideoMap[villainImageName.replace('.png','')] || 'elf_dryad.mp4';
-            if (isOwned) {
-                if (typeof showVillainReviewModal === 'function') {
-                    showVillainReviewModal(villainName, villainId, villainImageName, villainVideo);
-                } else {
-                    alert('{{modal_not_loaded_label}}');
-                }
-                return;
-            }
-            if (!canUnlock) return;
-            if (typeof showVillainUnlockModal === 'function') {
-                showVillainUnlockModal(villainId, villainName, villainPrice, villainImageName, villainVideo, {{tokens_available}}, {{coin_balance}});
-            } else {
-                alert('{{modal_not_loaded_label}}');
-            }
-        });
-    });
-
-    // Storybook handlers
-    document.querySelectorAll('.watch-story-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const youtubeId = btn.getAttribute('data-youtube-id');
-            if (!youtubeId) {
-                return;
-            }
-            // Create modal with embedded YouTube player (no comments, no suggestions)
-            const modalHtml = `
-                <div id="youtubeModalBackdrop" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:10000;display:flex;align-items:center;justify-content:center;">
-                    <div style="position:relative;width:90%;max-width:1000px;background:#000;border-radius:8px;overflow:hidden;box-shadow:0 10px 50px rgba(0,0,0,0.8);">
-                        <button id="youtubeModalClose" style="position:absolute;top:10px;right:10px;background:#FF4444;color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:24px;font-weight:bold;z-index:10001;display:flex;align-items:center;justify-content:center;transition:background 0.2s;">×</button>
-                        <iframe 
-                            width="100%" 
-                            height="600" 
-                            src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(youtubeId)}?autoplay=1&rel=0&modestbranding=1&fs=1" 
-                            title="YouTube video player" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen
-                            style="display:block;">
-                        </iframe>
-                    </div>
-                </div>
-            `;
-            
-            const modalContainer = document.createElement('div');
-            modalContainer.innerHTML = modalHtml;
-            document.body.appendChild(modalContainer);
-            
-            const backdrop = document.getElementById('youtubeModalBackdrop');
-            const closeBtn = document.getElementById('youtubeModalClose');
-            
-            closeBtn.addEventListener('click', function() {
-                backdrop.remove();
-            });
-            
-            backdrop.addEventListener('click', function(e) {
-                if (e.target === backdrop) {
-                    backdrop.remove();
-                }
-            });
-            
-            // Close on Escape key
-            const escapeHandler = function(e) {
-                if (e.key === 'Escape') {
-                    backdrop.remove();
-                    document.removeEventListener('keydown', escapeHandler);
-                }
-            };
-            document.addEventListener('keydown', escapeHandler);
-        });
-    });
-})();
-</script>
+{{#js}}
+require(['local_ascend_rewards/avatar_section'], function(mod) {
+  mod.init({{{avatar_js_config}}});
+});
+{{/js}}

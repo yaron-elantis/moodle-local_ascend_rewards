@@ -1,0 +1,103 @@
+{{!
+This file is part of Moodle - http://moodle.org/
+
+Moodle is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Moodle is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+@template local_ascend_rewards/admin_dashboard_metrics
+@copyright 2026 Elantis (Pty) LTD
+@license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
+<h2 class="aa-admin-section-title">{{metrics_heading}}</h2>
+
+<div class="apex-metrics-row">
+  <div class="apex-metric-card">
+    <span class="apex-metric-icon"></span>
+    <div class="apex-metric-label">{{total_badges_label}}</div>
+    <div class="apex-metric-value">{{total_badges}}</div>
+  </div>
+  <div class="apex-metric-card">
+    <span class="apex-metric-icon"></span>
+    <div class="apex-metric-label">{{users_with_badges_label}}</div>
+    <div class="apex-metric-value">{{users_with_badges}}</div>
+  </div>
+  <div class="apex-metric-card">
+    <span class="apex-metric-icon">{{{top_badge_icon}}}</span>
+    <div class="apex-metric-label">{{most_awarded_badge_label}}</div>
+    <div class="apex-metric-value">{{top_badge_name}}</div>
+    <div class="apex-metric-badge">{{top_badge_count_label}}</div>
+  </div>
+</div>
+
+<h3 class="aa-admin-section-title-top">{{badges_awarded_by_type_heading}}</h3>
+<table class="aa-admin-table aa-admin-table-metrics">
+  <tr class="aa-admin-table-head">
+    <th class="aa-admin-table-cell">{{badge_label}}</th>
+    <th class="aa-admin-table-cell">{{awards_label}}</th>
+  </tr>
+  {{#badge_counts}}
+    <tr>
+      <td class="aa-admin-table-cell">{{{icon_html}}} {{name}}</td>
+      <td class="aa-admin-table-cell">{{count}}</td>
+    </tr>
+  {{/badge_counts}}
+</table>
+
+<h3>{{leaderboard_heading}}</h3>
+<table class="aa-admin-table aa-admin-table-metrics">
+  <tr class="aa-admin-table-head">
+    <th class="aa-admin-table-cell">{{rank_heading}}</th>
+    <th class="aa-admin-table-cell">{{user_label}}</th>
+    <th class="aa-admin-table-cell">{{total_xp_label}}</th>
+  </tr>
+  {{#leader_rows}}
+    <tr>
+      <td class="aa-admin-table-cell">{{rank}}</td>
+      <td class="aa-admin-table-cell">{{name}}</td>
+      <td class="aa-admin-table-cell">{{xp}}</td>
+    </tr>
+  {{/leader_rows}}
+</table>
+
+<h3>{{badge_distribution_heading}}</h3>
+<div class="aa-admin-chart-row">
+  {{#badge_chart}}
+    <div class="aa-admin-chart-col">
+      <div class="aa-admin-chart-bar" data-bar-height="{{height}}"></div>
+      <img src="{{img}}" alt="{{name}}" class="aa-admin-chart-img" onerror="this.onerror=null;this.src='{{blank_badge_img}}';">
+      <div class="aa-admin-chart-label">{{name}}</div>
+      <div class="aa-admin-chart-value">{{count}}</div>
+    </div>
+  {{/badge_chart}}
+</div>
+
+<div class="aa-admin-card aa-admin-card-top">
+  <h3>{{test_badge_popup_heading}}</h3>
+  <p>{{test_badge_popup_desc}}</p>
+  <form method="post" id="testModalForm">
+    <input type="hidden" name="sesskey" value="{{sesskey}}">
+    <div class="aa-admin-flex-row">
+      <div>
+        <label class="aa-admin-label">{{badge_label}}:</label>
+        <select name="test_badgeid" id="testBadgeSelect" class="aa-admin-select aa-admin-select-wide">
+          {{#badge_options}}
+            <option value="{{id}}">{{label}}</option>
+          {{/badge_options}}
+        </select>
+      </div>
+      <button type="button" data-test-badge-modal="1" class="btn btn-primary aa-admin-btn-tall">{{show_modal_button}}</button>
+    </div>
+  </form>
+</div>
+
+{{> local_ascend_rewards/admin_dashboard_badge_preview_modal}}

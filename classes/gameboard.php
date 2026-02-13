@@ -46,7 +46,19 @@ class local_ascend_rewards_gameboard {
      * @return string Week identifier in Y-W format
      */
     public static function get_current_week() {
-        return date('Y-W');
+        [$week_start, $week_end] = self::get_week_range();
+        unset($week_end);
+        return date('Ymd', $week_start);
+    }
+
+    /**
+     * Get current week keys for backward compatibility.
+     * New key is Friday-based Ymd; legacy key is ISO Y-W.
+     *
+     * @return array
+     */
+    private static function get_current_week_keys() {
+        return [self::get_current_week(), date('Y-W')];
     }
 
     /**
@@ -101,29 +113,32 @@ class local_ascend_rewards_gameboard {
 
         [$week_start, $week_end] = self::get_week_range();
         $meta_badges = [8, 12, 16, 20];
+        [$metainsql, $metaparams] = $DB->get_in_or_equal($meta_badges, SQL_PARAMS_NAMED);
+        $params = [
+            'uid' => $userid,
+            'start' => $week_start,
+            'end' => $week_end,
+        ] + $metaparams;
 
-        // Get badges earned this week
-        $badges = $DB->get_records_sql(
-            "SELECT badgeid FROM {local_ascend_rewards_coins}
+        $counts = $DB->get_record_sql(
+            "SELECT
+                SUM(CASE WHEN badgeid {$metainsql} THEN 1 ELSE 0 END) AS metacount,
+                COUNT(*) AS totalcount
+             FROM {local_ascend_rewards_coins}
              WHERE userid = :uid
                AND badgeid > 0
                AND timecreated >= :start
                AND timecreated <= :end",
-            ['uid' => $userid, 'start' => $week_start, 'end' => $week_end]
+            $params
         );
 
-        $normal = 0;
-        $meta = 0;
+        $metacount = (int)($counts->metacount ?? 0);
+        $totalcount = (int)($counts->totalcount ?? 0);
 
-        foreach ($badges as $badge) {
-            if (in_array($badge->badgeid, $meta_badges)) {
-                $meta++;
-            } else {
-                $normal++;
-            }
-        }
-
-        return ['normal' => $normal, 'meta' => $meta];
+        return [
+            'normal' => max(0, $totalcount - $metacount),
+            'meta' => $metacount,
+        ];
     }
 
     /**
@@ -131,13 +146,17 @@ class local_ascend_rewards_gameboard {
      */
     public static function get_picks_made($userid) {
         global $DB;
-
-        $week = self::get_current_week();
-
-        $picks = $DB->get_records('local_ascend_rewards_gameboard', [
-            'userid' => $userid,
-            'week' => $week,
-        ], 'position ASC');
+        [$weeknew, $weeklegacy] = self::get_current_week_keys();
+        [$weeksql, $weekparams] = $DB->get_in_or_equal([$weeknew, $weeklegacy], SQL_PARAMS_NAMED);
+        $params = ['userid' => $userid] + $weekparams;
+        $picks = $DB->get_records_sql(
+            "SELECT *
+             FROM {local_ascend_rewards_gameboard}
+             WHERE userid = :userid
+               AND week {$weeksql}
+             ORDER BY position ASC",
+            $params
+        );
 
         return array_column(array_values($picks), 'position');
     }
@@ -159,14 +178,18 @@ class local_ascend_rewards_gameboard {
      */
     public static function get_picks_for_badge($userid, $badgeid) {
         global $DB;
-
-        $week = self::get_current_week();
-
-        $picks = $DB->get_records('local_ascend_rewards_gameboard', [
-            'userid' => $userid,
-            'badgeid' => $badgeid,
-            'week' => $week,
-        ], 'position ASC');
+        [$weeknew, $weeklegacy] = self::get_current_week_keys();
+        [$weeksql, $weekparams] = $DB->get_in_or_equal([$weeknew, $weeklegacy], SQL_PARAMS_NAMED);
+        $params = ['userid' => $userid, 'badgeid' => $badgeid] + $weekparams;
+        $picks = $DB->get_records_sql(
+            "SELECT *
+             FROM {local_ascend_rewards_gameboard}
+             WHERE userid = :userid
+               AND badgeid = :badgeid
+               AND week {$weeksql}
+             ORDER BY position ASC",
+            $params
+        );
 
         return $picks;
     }
@@ -258,6 +281,7 @@ class local_ascend_rewards_gameboard {
 
         global $DB;
         $week = self::get_current_week();
+        [$weeknew, $weeklegacy] = self::get_current_week_keys();
 
         // Check picks remaining
         $remaining = self::get_remaining_picks($userid);
@@ -267,11 +291,16 @@ class local_ascend_rewards_gameboard {
         }
 
         // Check if position already picked
-        $already_picked = $DB->record_exists('local_ascend_rewards_gameboard', [
-            'userid' => $userid,
-            'week' => $week,
-            'position' => $position,
-        ]);
+        [$weeksql, $weekparams] = $DB->get_in_or_equal([$weeknew, $weeklegacy], SQL_PARAMS_NAMED);
+        $params = ['userid' => $userid, 'position' => $position] + $weekparams;
+        $already_picked = $DB->record_exists_sql(
+            "SELECT 1
+             FROM {local_ascend_rewards_gameboard}
+             WHERE userid = :userid
+               AND position = :position
+               AND week {$weeksql}",
+            $params
+        );
 
         if ($already_picked) {
             return ['success' => false, 'error' => 'Already picked this card'];

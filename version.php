@@ -25,9 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_ascend_rewards';
-$plugin->version   = 2026020200;
+$plugin->version   = 2026021300;
 $plugin->requires  = 2022041900;
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.2.3';
+$plugin->release   = '1.2.11';
 $plugin->copyright = '2026 Elantis (Pty) LTD';
 $plugin->license   = 'https://www.gnu.org/copyleft/gpl.html';

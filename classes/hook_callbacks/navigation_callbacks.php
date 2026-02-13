@@ -44,8 +44,7 @@ class navigation_callbacks {
 
         // Cache warming - pre-load badges user is close to earning (once per hour).
         try {
-            global $USER, $CFG;
-            require_once($CFG->dirroot . '/local/ascend_rewards/classes/cache_warmer.php');
+            global $USER;
             $lastwarm = get_user_preferences('ascend_last_cache_warm', 0, $USER->id);
             if (time() - $lastwarm > 3600) {
                 \local_ascend_rewards\cache_warmer::warm_user_cache($USER->id);
